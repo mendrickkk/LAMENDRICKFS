@@ -1,0 +1,343 @@
+/* Orders Dashboard CSS */
+
+/* Container */
+.orders-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Back Button */
+.back-button-container {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.back-to-dashboard-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.back-to-dashboard-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: white;
+    text-decoration: none;
+}
+
+.back-to-dashboard-btn i {
+    font-size: 16px;
+}
+
+/* Header */
+.orders-header {
+    margin-bottom: 30px;
+}
+
+.orders-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.orders-header h1 i {
+    color: #ec4899;
+}
+
+.orders-header p {
+    color: #6b7280;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Card */
+.orders-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f9fafb;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-title i {
+    color: #ec4899;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.card-action-btn {
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.card-action-btn:hover {
+    background: #f9fafb;
+    border-color: #ec4899;
+    color: #ec4899;
+}
+
+.card-body {
+    padding: 0;
+}
+
+/* Table */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.orders-table thead {
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.orders-table th {
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.orders-table tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.2s;
+}
+
+.orders-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.orders-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.orders-table td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: #374151;
+    vertical-align: middle;
+}
+
+/* Table Cell Styles */
+.order-number {
+    font-weight: 600;
+    color: #ec4899;
+    font-family: 'Courier New', monospace;
+}
+
+.customer-name {
+    font-weight: 500;
+    color: #111827;
+}
+
+.order-total {
+    font-weight: 600;
+    color: #059669;
+    font-family: 'Courier New', monospace;
+}
+
+.order-date {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+/* Status Colors */
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-pending .status-dot {
+    background: #f59e0b;
+}
+
+.status-processing {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-processing .status-dot {
+    background: #3b82f6;
+}
+
+.status-completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-completed .status-dot {
+    background: #10b981;
+}
+
+.status-delivered {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.status-delivered .status-dot {
+    background: #8b5cf6;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-cancelled .status-dot {
+    background: #ef4444;
+}
+
+.status-shipped {
+    background: #f3e8ff;
+    color: #7c2d12;
+}
+
+.status-shipped .status-dot {
+    background: #a855f7;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+    font-style: italic;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.empty-state i {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .orders-container {
+        padding: 16px;
+    }
+    
+    .orders-header h1 {
+        font-size: 24px;
+    }
+    
+    .card-header {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .card-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .orders-table th,
+    .orders-table td {
+        padding: 12px 16px;
+    }
+    
+    .orders-table th {
+        font-size: 11px;
+    }
+    
+    .orders-table td {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .orders-table th,
+    .orders-table td {
+        padding: 8px 12px;
+    }
+    
+    .card-action-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .status-badge {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}

@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login · KM+BP Flower Shop{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/loginn.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="auth-wrapper">
+    <section class="auth-panel">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h2 class="auth-title">Welcome Back</h2>
+                <p class="auth-desc">Sign in to your account</p>
+            </div>
+            <div class="auth-card-body">
+                {% if error %}
+                    <div class="alert alert-danger">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                <form method="post"> 
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    
+                    <div class="form-group">
+                        <input class="form-input" type="text" id="username" name="_username" value="{{ last_username }}" placeholder="Username" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <input class="form-input" type="password" id="password" name="_password" placeholder="Password" required autocomplete="current-password">
+                    </div>
+                    <div class="form-row">
+                        <label class="checkbox">
+                            <input type="checkbox" name="_remember_me"> Remember me
+                        </label>
+                        <a class="link" href="#">Forgot Password?</a>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">
+                            Sign In
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <p class="auth-footer">
+                            Don't have an account? <a class="link" href="{{ path('app_signup') }}">Sign Up</a>
+                        </p>
+                    </div>
+                    <div class="auth-divider">OR</div>
+                    <div class="input-row">
+                        <button class="btn btn-outline" type="button">
+                            <i class="fab fa-google" style="font-size: 20px;"></i>
+                        </button>
+                        <button class="btn btn-outline" type="button">
+                            <i class="fab fa-facebook-f" style="font-size: 20px;"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-hero">
+        <div class="auth-hero-inner">
+            <div class="brand-badge">FlowerShop</div>
+            <h1 class="brand-title">Welcome Back to Your Floral Paradise</h1>
+            <p class="brand-subtitle">Continue your journey with beautiful blooms, expert arrangements, and personalized floral experiences waiting for you.</p>
+            
+            <div class="feature-list">
+                <div class="feature-item">
+                    <i class="fa fa-check-circle feature-icon"></i>
+                    <span>Your saved arrangements</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fa fa-check-circle feature-icon"></i>
+                    <span>Order history & tracking</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fa fa-check-circle feature-icon"></i>
+                    <span>Personal recommendations</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

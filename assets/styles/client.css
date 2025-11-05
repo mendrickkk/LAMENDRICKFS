@@ -1,0 +1,707 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    color: #ffffff;
+    line-height: 1.6;
+    background-color: #000000;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Main Body */
+.main-body {
+    flex: 1;
+    background: #000000;
+}
+
+/* Header Styles */
+.header {
+    background: #000000;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-top {
+    padding: 1rem 5%;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1;
+}
+
+.logo-small {
+    font-size: 0.7rem;
+    font-weight: normal;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    margin-bottom: -3px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.logo-main {
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: #ffffff;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    margin-left: -3px;
+    letter-spacing: -0.5px;
+}
+
+.logo-co {
+    font-size: 0.9rem;
+    font-weight: normal;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    margin-left: 8px;
+    margin-top: -3px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.header-right {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.header-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 400;
+    transition: color 0.3s;
+}
+
+.header-link:hover {
+    color: #cccccc;
+}
+
+.icon-link {
+    text-decoration: none;
+    position: relative;
+}
+
+.header-icon {
+    width: 20px;
+    height: 20px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.header-icon:hover {
+    color: #cccccc;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e91e63;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* Main Navigation */
+.main-nav {
+    background: #000000;
+    padding: 0.8rem 5%;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.8rem;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.nav-link:hover {
+    color: #cccccc;
+}
+
+.dropdown-arrow {
+    font-size: 0.7rem;
+    color: #ffffff;
+}
+
+/* Hero Banner */
+.hero-banner {
+    background: #000000;
+    padding: 4rem 5%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    color: white;
+    min-height: 600px;
+}
+
+.hero-content {
+    max-width: 500px;
+    padding-left: 2rem;
+}
+
+.hero-badge {
+    font-size: 0.8rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.hero-title {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    font-weight: 900;
+    font-family: 'Arial', sans-serif;
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+    line-height: 1.6;
+    color: #ffffff;
+}
+
+.btn-hero {
+    background: #000000;
+    color: #ffffff;
+    padding: 1.2rem 3rem;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 0;
+    font-weight: 600;
+    border: 2px solid #ffffff;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.btn-hero:hover {
+    background: #ffffff;
+    color: #000000;
+}
+
+.hero-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-image-placeholder {
+    background: #1a1a1a;
+    border: 2px dashed #333333;
+    padding: 3rem;
+    text-align: center;
+    border-radius: 8px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666666;
+}
+
+.hero-image-placeholder p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Announcement Bar */
+.announcement-bar {
+    background: #d4a574;
+    padding: 1rem 5%;
+    text-align: center;
+    color: white;
+}
+
+.announcement-bar p {
+    font-size: 0.95rem;
+}
+
+.announcement-bar a {
+    color: white;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* Best Selling Section */
+.best-selling {
+    padding: 4rem 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #333;
+    font-weight: 400;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.product-card {
+    text-align: center;
+    background: white;
+}
+
+.product-image {
+    width: 100%;
+    height: 300px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-name {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.product-price {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+.product-shipping {
+    font-size: 0.85rem;
+    color: #2c5f4f;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+.product-sub-price {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.view-all-container {
+    text-align: center;
+}
+
+.btn-secondary {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: #2c5f4f;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+    background: #1a3d2f;
+}
+
+/* Subscription Section */
+.subscription-section {
+    background: #f8f4f0;
+    padding: 4rem 5%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.subscription-content {
+    padding: 2rem;
+}
+
+.subscription-reviews {
+    font-size: 0.8rem;
+    color: #2c5f4f;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.subscription-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: 400;
+    font-family: 'Georgia', serif;
+}
+
+.subscription-text {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.subscription-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Wedding Section */
+.wedding-section {
+    background: #e8f5e8;
+    padding: 4rem 5%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.wedding-content {
+    padding: 2rem;
+}
+
+.wedding-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: 400;
+    font-family: 'Georgia', serif;
+}
+
+.wedding-text {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.wedding-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Corporate Section */
+.corporate-section {
+    background: #f8f4f0;
+    padding: 4rem 5%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.corporate-content {
+    padding: 2rem;
+}
+
+.corporate-badge {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.corporate-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: 400;
+    font-family: 'Georgia', serif;
+}
+
+.corporate-text {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.corporate-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: #2c5f4f;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: background 0.3s;
+    font-family: 'Arial', sans-serif;
+}
+
+.btn:hover {
+    background: #1a3d2f;
+}
+
+.btn-dark-green {
+    background: #2c5f4f;
+    color: white;
+    padding: 1rem 2rem;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: background 0.3s;
+}
+
+.btn-dark-green:hover {
+    background: #1a3d2f;
+}
+
+/* FAQ Section */
+.faq-section {
+    padding: 3rem 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    background: white;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+}
+
+.faq-item:hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.faq-title {
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 400;
+}
+
+/* Footer */
+.footer {
+    background: white;
+    color: #333;
+    padding: 4rem 5% 2rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+.footer-column h4 {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.footer-column ul {
+    list-style: none;
+}
+
+.footer-column li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-column a {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.footer-column a:hover {
+    color: #2c5f4f;
+}
+
+.footer-bottom {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    color: white;
+    background: #666;
+    border-radius: 50%;
+    padding: 8px;
+    transition: background 0.3s;
+}
+
+.social-links a:hover .social-icon {
+    background: #2c5f4f;
+}
+
+.footer-bottom p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .footer-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .hero-banner,
+    .subscription-section,
+    .wedding-section,
+    .corporate-section {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .footer-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .nav-links {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .logo {
+        font-size: 1.3rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-banner {
+        padding: 2rem 5%;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .subscription-title,
+    .wedding-title,
+    .corporate-title {
+        font-size: 2rem;
+    }
+}

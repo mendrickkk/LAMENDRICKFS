@@ -1,0 +1,80 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ product.Name }} - Flower Details{% endblock %}
+
+{% block page_title %}Product Details{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_admin') }}">Home</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_product_index') }}">Products</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">{{ product.Name }}</span>
+</nav>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+<div class="product-container">
+    <div class="product-header">
+        <h2>Flower Details</h2>
+        <p>View complete information about this beautiful flower</p>
+    </div>
+
+    <div class="product-detail">
+        <div class="product-detail-grid">
+            <div class="product-detail-image">
+                {% if product.image %}
+                    <img src="{{ asset('uploads/products/' ~ product.image) }}" 
+                         alt="{{ product.Name }}">
+                {% else %}
+                    <div class="no-image">
+                        <span>🌺 No image available</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="product-detail-info">
+                <h2>{{ product.Name }}</h2>
+                
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Product ID</span>
+                    <span class="product-detail-value">#{{ product.id }}</span>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Description</span>
+                    <p class="product-detail-value">{{ product.description }}</p>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Price</span>
+                    <div class="product-price">₱{{ product.price|number_format(2) }}</div>
+                </div>
+
+                {% if product.image %}
+                    <div class="product-detail-item">
+                        <span class="product-detail-label">Image File</span>
+                        <span class="product-detail-value">{{ product.image }}</span>
+                    </div>
+                {% endif %}
+
+                <div class="btn-group" style="margin-top: 3rem;">
+                    <a href="{{ path('app_product_index') }}" class="btn btn-secondary">← Back to List</a>
+                    <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn">Edit Product</a>
+                    {{ include('product/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

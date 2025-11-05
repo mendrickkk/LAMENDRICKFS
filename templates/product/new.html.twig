@@ -1,0 +1,68 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Add New Flower{% endblock %}
+
+{% block page_title %}Add New Product{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_admin') }}">Home</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_product_index') }}">Products</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">Add New</span>
+</nav>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+<div class="product-container">
+    <div class="product-header">
+        <h2>🌸 Add New Flower</h2>
+        <p>Add a beautiful new flower to your collection</p>
+    </div>
+
+    <div class="product-form">
+        {{ include('product/_form.html.twig', {'button_label': '+ Add Flower'}) }}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Image preview functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.querySelector('input[type="file"]');
+            if (imageInput) {
+                imageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            let preview = document.getElementById('imagePreview');
+                            if (!preview) {
+                                preview = document.createElement('div');
+                                preview.id = 'imagePreview';
+                                preview.className = 'image-preview-container';
+                                imageInput.parentNode.appendChild(preview);
+                            }
+                            preview.innerHTML = '<img src="' + e.target.result + '" class="image-preview" alt="Preview">';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}
+

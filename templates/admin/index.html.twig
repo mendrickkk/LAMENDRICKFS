@@ -1,0 +1,140 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Hello AdminPanelController!{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block breadcrumb_current %}Dashboard{% endblock %}
+
+{% block admin_content %}
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card stat-card-pink">
+            <div class="stat-card-header">
+                <div class="stat-card-info">
+                    <div class="stat-card-label">Total Orders</div>
+                    <div class="stat-card-value">1,240</div>
+                </div>
+                <div class="stat-card-icon stat-card-icon-pink">
+                    <i class="fa fa-receipt"></i>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <div class="stat-trend stat-trend-up">
+                    <i class="fa fa-arrow-up"></i>
+                    12%
+                </div>
+                <div class="stat-period">vs last week</div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-card-green">
+            <div class="stat-card-header">
+                <div class="stat-card-info">
+                    <div class="stat-card-label">Revenue</div>
+                    <div class="stat-card-value">₱ 84,500</div>
+                </div>
+                <div class="stat-card-icon stat-card-icon-green">
+                    <i class="fa fa-peso-sign"></i>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <div class="stat-trend stat-trend-up">
+                    <i class="fa fa-arrow-up"></i>
+                    8%
+                </div>
+                <div class="stat-period">this month</div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-card-blue">
+            <div class="stat-card-header">
+                <div class="stat-card-info">
+                    <div class="stat-card-label">Customers</div>
+                    <div class="stat-card-value">732</div>
+                </div>
+                <div class="stat-card-icon stat-card-icon-blue">
+                    <i class="fa fa-users"></i>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <div class="stat-trend stat-trend-up">
+                    <i class="fa fa-arrow-up"></i>
+                    3%
+                </div>
+                <div class="stat-period">this week</div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-card-purple">
+            <div class="stat-card-header">
+                <div class="stat-card-info">
+                    <div class="stat-card-label">Low Stock</div>
+                    <div class="stat-card-value">18</div>
+                </div>
+                <div class="stat-card-icon stat-card-icon-purple">
+                    <i class="fa fa-box"></i>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <div class="stat-trend stat-trend-down">
+                    <i class="fa fa-arrow-down"></i>
+                    2%
+                </div>
+                <div class="stat-period">vs last week</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Example card with table -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fa fa-receipt"></i>
+                Recent Orders
+            </div>
+            <div class="card-actions">
+                <button class="card-action-btn">Export</button>
+                <button class="card-action-btn">Refresh</button>
+            </div>
+        </div>
+        <div class="card-body card-body-no-padding">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#10234</td>
+                            <td>Jane Smith</td>
+                            <td>
+                                <span class="status-badge status-processing">
+                                    <span class="status-badge-dot"></span>
+                                    Processing
+                                </span>
+                            </td>
+                            <td>₱ 1,250.00</td>
+                        </tr>
+                        <tr>
+                            <td>#10233</td>
+                            <td>John Doe</td>
+                            <td>
+                                <span class="status-badge status-completed">
+                                    <span class="status-badge-dot"></span>
+                                    Completed
+                                </span>
+                            </td>
+                            <td>₱ 980.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

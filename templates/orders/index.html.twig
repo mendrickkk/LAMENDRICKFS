@@ -1,0 +1,73 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Orders Dashboard{% endblock %}
+
+{% block page_title %}Orders{% endblock %}
+
+{% block breadcrumb_current %}Orders{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/orders.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fa fa-receipt"></i>
+                Recent Orders
+            </div>
+            <div class="card-actions">
+                <button class="card-action-btn">
+                    <i class="fa fa-download"></i>
+                    Export
+                </button>
+                <button class="card-action-btn">
+                    <i class="fa fa-refresh"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+        <div class="card-body card-body-no-padding">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if recentOrders is not empty %}
+                            {% for order in recentOrders %}
+                                <tr>
+                                    <td style="font-weight: 600; color: #ec4899; font-family: 'Courier New', monospace;">#{{ order.orderNumber }}</td>
+                                    <td style="font-weight: 500; color: #111827;">{{ order.customerName }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ order.status|lower }}">
+                                            <span class="status-badge-dot"></span>
+                                            {{ order.status }}
+                                        </span>
+                                    </td>
+                                    <td style="font-weight: 600; color: #059669; font-family: 'Courier New', monospace;">₱{{ order.total|number_format(2, '.', ',') }}</td>
+                                    <td style="color: #6b7280; font-size: 13px;">{{ order.createdAt|date('M d, Y') }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+                                    <i class="fa fa-inbox" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
+                                    <span>No orders found</span>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

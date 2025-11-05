@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign Up · KM+BP Flower Shop{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/loginn.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="auth-wrapper">
+    <section class="auth-panel">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h2 class="auth-title">Create Account</h2>
+                <p class="auth-desc">Join KM+BP Flower Shop today</p>
+            </div>
+
+            <div class="auth-card-body">
+                {% if error is defined and error %}
+                    <div class="alert alert-danger" style="margin-bottom: 15px;">
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                {% if success is defined and success %}
+                    <div class="alert alert-success" style="margin-bottom: 15px;">
+                        {{ success }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{{ path('app_signup') }}">
+                    <div class="form-group">
+                        <input class="form-input" type="email" id="email" name="email" placeholder="Email Address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input class="form-input" type="text" id="username" name="username" placeholder="Username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input class="form-input" type="password" id="password" name="password" placeholder="Password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input class="form-input" type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+                    </div>
+
+                    {# ✅ Added Role dropdown #}
+                    <div class="form-group">
+    <label for="role">Account Type</label>
+    <select id="role" name="role" class="form-input" required>
+        <option value="">Select account type</option>
+        <option value="admin">Admin</option>
+        <option value="client">Client</option>
+    </select>
+</div>
+
+
+                    <div class="form-row" style="margin-top: 16px; margin-bottom: 24px;">
+                        <label class="checkbox">
+                            <input type="checkbox" name="terms" required>
+                            I agree to the Terms & Privacy Policy
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Create Account</button>
+                    </div>
+
+                    <div class="form-group">
+                        <p class="auth-footer">
+                            Already have an account?
+                            <a class="link" href="{{ path('app_login') }}">Sign In</a>
+                        </p>
+                    </div>
+
+                    <div class="auth-divider">OR</div>
+
+                    <div class="input-row">
+                        <button class="btn btn-outline" type="button">
+                            <i class="fab fa-google" style="font-size: 20px;"></i>
+                        </button>
+                        <button class="btn btn-outline" type="button">
+                            <i class="fab fa-facebook-f" style="font-size: 20px;"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-hero">
+        <div class="auth-hero-inner">
+            <div class="brand-badge">FlowerShop</div>
+            <h1 class="brand-title">Start Your Floral Journey Today</h1>
+            <p class="brand-subtitle">
+                Join thousands of satisfied customers who trust KM+BP for their floral needs.
+                Create lasting memories with our beautiful arrangements.
+            </p>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <i class="fa fa-check-circle feature-icon"></i>
+                    <span>Exclusive member discounts</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fa fa-check-circle feature-icon"></i>
+                    <span>Fast & reliable delivery</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fa fa-check-circle feature-icon"></i>
+                    <span>Personalized recommendations</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fa fa-check-circle feature-icon"></i>
+                    <span>24/7 customer support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

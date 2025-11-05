@@ -1,0 +1,243 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{{ path('app_admin') }}" class="sidebar-brand">
+                <div class="sidebar-logo">
+                    <img src="{{ asset('img/weblogoz.png') }}" alt="Logo" class="logo-image">
+                </div>
+                <div class="sidebar-logo-text">FlowerShop</div>
+            </a>
+            <button class="sidebar-toggle" aria-label="Toggle sidebar">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-section-title">Overview</div>
+                <a class="menu-item {% if app.request.attributes.get('_route') == 'app_admin' %}menu-item-active{% endif %}" href="{{ path('app_admin') }}">
+                    <i class="fa fa-gauge menu-item-icon"></i>
+                    Dashboard
+                </a>
+                <a class="menu-item {% if 'app_product' in app.request.attributes.get('_route') %}menu-item-active{% endif %}" href="{{ path('app_product_index') }}">
+                    <i class="fa fa-box menu-item-icon"></i>
+                    Product
+                </a>
+                <a class="menu-item {% if app.request.attributes.get('_route') == 'app_orders' %}menu-item-active{% endif %}" href="{{ path('app_orders') }}">
+                    <i class="fa fa-receipt menu-item-icon"></i>
+                    Orders
+                </a>
+                <a class="menu-item" href="#">
+                    <i class="fa fa-receipt menu-item-icon"></i>
+                    Stocks
+                </a>
+                <a class="menu-item" href="#">
+                    <i class="fa fa-users menu-item-icon"></i>
+                    Category
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar">KM</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">Mendrick</div>
+                    <div class="sidebar-user-role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" aria-label="Open menu">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                </div>
+                <div class="header-search">
+                    <input class="search-input" placeholder="Search..." />
+                    <i class="fa fa-search search-icon"></i>
+                </div>
+                <div class="header-actions">
+                    <button class="header-action-btn" aria-label="Notifications">
+                        <i class="fa fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="header-action-btn" aria-label="Settings">
+                        <i class="fa fa-gear"></i>
+                    </button>
+                    
+                    <!-- Account Dropdown -->
+                    <div class="account-dropdown">
+                        <button class="account-dropdown-toggle" aria-label="Account Menu">
+                            <div class="account-avatar">M</div>
+                            <div class="account-info">
+                                <div class="account-name">Mendrick</div>
+                                <div class="account-role">Admin</div>
+                            </div>
+                            <i class="fa fa-chevron-down account-dropdown-arrow"></i>
+                        </button>
+                        
+                        <div class="account-menu">
+                            <div class="account-menu-header">
+                                <div class="account-menu-user">
+                                    <div class="account-menu-avatar">M</div>
+                                    <div class="account-menu-info">
+                                        <div class="account-menu-name">Mendrick</div>
+                                        <div class="account-menu-role">Admin</div>
+                                        <div class="account-menu-email">mendrick@flowershop.com</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="account-menu-body">
+                                <a href="#" class="account-menu-item">
+                                    <i class="fa fa-user"></i>
+                                    My Profile
+                                </a>
+                                <a href="#" class="account-menu-item">
+                                    <i class="fa fa-cog"></i>
+                                    Account Settings
+                                </a>
+                                <a href="#" class="account-menu-item">
+                                    <i class="fa fa-bell"></i>
+                                    Notifications
+                                </a>
+                                <a href="#" class="account-menu-item">
+                                    <i class="fa fa-shield"></i>
+                                    Security
+                                </a>
+                                
+                                <div class="account-menu-divider"></div>
+                                
+                                <a href="#" class="account-menu-item">
+                                    <i class="fa fa-question-circle"></i>
+                                    Help & Support
+                                </a>
+                                <a href="#" class="account-menu-item">
+                                    <i class="fa fa-info-circle"></i>
+                                    About
+                                </a>
+                            </div>
+                            
+                            <div class="account-menu-footer">
+                                <button class="account-logout-btn">
+                                    <i class="fa fa-sign-out"></i>
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-container">
+            {% block breadcrumb %}
+            <nav class="breadcrumb">
+                <span class="breadcrumb-item">
+                    <a class="breadcrumb-link" href="{{ path('app_admin') }}">Home</a>
+                </span>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">{% block breadcrumb_current %}Dashboard{% endblock %}</span>
+            </nav>
+            {% endblock %}
+
+            {% block admin_content %}{% endblock %}
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Account dropdown functionality
+    const accountDropdown = document.querySelector('.account-dropdown');
+    const accountToggle = document.querySelector('.account-dropdown-toggle');
+    const accountMenu = document.querySelector('.account-menu');
+    
+    if (accountToggle && accountMenu) {
+        // Toggle dropdown on click
+        accountToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            accountDropdown.classList.toggle('open');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!accountDropdown.contains(e.target)) {
+                accountDropdown.classList.remove('open');
+            }
+        });
+        
+        // Close dropdown on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                accountDropdown.classList.remove('open');
+            }
+        });
+        
+        // Handle menu item clicks
+        const menuItems = document.querySelectorAll('.account-menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Menu item clicked:', this.textContent.trim());
+                // Add your navigation logic here
+                accountDropdown.classList.remove('open');
+            });
+        });
+        
+        // Handle logout button
+        const logoutBtn = document.querySelector('.account-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Logout clicked');
+                // Add your logout logic here
+                if (confirm('Are you sure you want to sign out?')) {
+                    // Redirect to landing page
+                    window.location.href = "{{ path('app_landing') }}";
+                }
+            });
+        }
+    }
+    
+    // Mobile menu functionality
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (mobileMenuBtn && sidebar) {
+        mobileMenuBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-mobile-open');
+        });
+    }
+    
+    // Sidebar toggle functionality
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            document.body.classList.toggle('sidebar-collapsed');
+        });
+    }
+});
+</script>
+{% endblock %}

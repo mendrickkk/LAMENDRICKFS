@@ -1,0 +1,178 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Flower Shop - Products{% endblock %}
+
+{% block page_title %}Products{% endblock %}
+
+{% block breadcrumb_current %}Products{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    {% for message in app.flashes('success') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-success">
+                <span>✓</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-error">
+                <span>⚠</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fa fa-box"></i>
+                Products
+            </div>
+            <div class="card-actions">
+                <a href="{{ path('app_product_new') }}" class="card-action-btn product-new-btn">
+                    <i class="fa fa-plus"></i>
+                    New Product
+                </a>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="product-search-toolbar">
+            <div class="search-input-container">
+                <i class="fa fa-search"></i>
+                <input type="text" placeholder="Search" id="productSearch">
+            </div>
+            <button class="product-filter-btn">
+                <i class="fa fa-filter"></i>
+                More Filter
+            </button>
+            <div class="dropdown">
+                <button class="product-filter-btn dropdown-toggle">
+                    Category
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="dropdown">
+                <button class="product-filter-btn dropdown-toggle">
+                    Export
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="card-body card-body-no-padding">
+            {% if products|length > 0 %}
+                <div class="table-responsive product-table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Flower Name</th>
+                                <th>Description</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for product in products %}
+                            <tr class="product-row" data-name="{{ product.Name|lower }}" data-description="{{ product.description|lower }}">
+                                <td>
+                                    {% if product.image %}
+                                        <img src="{{ asset('uploads/products/' ~ product.image) }}" 
+                                             alt="{{ product.Name }}" 
+                                             class="table-product-image">
+                                    {% else %}
+                                        <div class="product-image-placeholder">
+                                            🌺
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td><strong>{{ product.Name }}</strong></td>
+                                <td>
+                                    <span class="product-description-text">
+                                        {{ product.description|length > 120 ? product.description|slice(0, 120) ~ '...' : product.description }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="product-price-text">₱{{ product.price|number_format(2) }}</span>
+                                </td>
+                                <td>
+                                    <div class="product-actions-cell">
+                                        <a href="{{ path('app_product_show', {'id': product.id}) }}" 
+                                           class="card-action-btn product-action-btn" 
+                                           title="View">
+                                            <i class="fa fa-eye"></i>
+                                            View
+                                        </a>
+                                        <a href="{{ path('app_product_edit', {'id': product.id}) }}" 
+                                           class="card-action-btn product-action-btn product-action-btn-edit" 
+                                           title="Edit">
+                                            <i class="fa fa-pencil"></i>
+                                            Edit
+                                        </a>
+                                        <form method="post" 
+                                              action="{{ path('app_product_delete', {'id': product.id}) }}" 
+                                              onsubmit="return confirm('Are you sure you want to delete this product?');" 
+                                              class="product-delete-form">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                                            <button type="submit" 
+                                                    class="card-action-btn product-action-btn product-action-btn-delete" 
+                                                    title="Delete">
+                                                <i class="fa fa-trash"></i>
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="product-empty-state">
+                    <i class="fa fa-inbox product-empty-state-icon"></i>
+                    <h3 class="product-empty-state-title">No flowers yet</h3>
+                    <p class="product-empty-state-text">Start by adding your first flower to the collection!</p>
+                    <a href="{{ path('app_product_new') }}" class="card-action-btn product-empty-state-btn">
+                        <i class="fa fa-plus"></i>
+                        Add Your First Flower
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search Functionality
+            const searchInput = document.getElementById('productSearch');
+            const productRows = document.querySelectorAll('.product-row');
+
+            if (searchInput && productRows.length > 0) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    
+                    productRows.forEach(row => {
+                        const productName = row.getAttribute('data-name') || '';
+                        const description = row.getAttribute('data-description') || '';
+                        
+                        if (productName.includes(searchTerm) || description.includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+{% endblock %}

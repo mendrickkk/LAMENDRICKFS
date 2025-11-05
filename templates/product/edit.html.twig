@@ -1,0 +1,91 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Edit {{ product.Name }}{% endblock %}
+
+{% block page_title %}Edit Product{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_admin') }}">Home</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_product_index') }}">Products</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">Edit {{ product.Name }}</span>
+</nav>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+<div class="product-container">
+    <div class="product-header">
+        <h2>✏️ Edit Flower</h2>
+        <p>Update information for {{ product.Name }}</p>
+    </div>
+
+    {% if product.image %}
+        <div class="product-card" style="text-align: center;">
+            <p class="product-detail-label">Current Image</p>
+            <img src="{{ asset('uploads/products/' ~ product.image) }}" 
+                 alt="{{ product.Name }}"
+                 style="max-width: 300px; border-radius: 12px; margin-top: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+    {% endif %}
+
+    <div class="product-form">
+        {{ include('product/_form.html.twig', {'button_label': '💾 Update Flower'}) }}
+    </div>
+
+    <div class="btn-group" style="margin-top: 2rem; justify-content: center;">
+        <a href="{{ path('app_product_index') }}" class="btn btn-secondary">← Back to List</a>
+        <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn btn-secondary">View Details</a>
+        {{ include('product/_delete_form.html.twig') }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Image preview functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.querySelector('input[type="file"]');
+            if (imageInput) {
+                imageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            let preview = document.getElementById('imagePreview');
+                            if (!preview) {
+                                preview = document.createElement('div');
+                                preview.id = 'imagePreview';
+                                preview.className = 'image-preview-container';
+                                preview.innerHTML = '<p class="product-detail-label">New Image Preview</p>';
+                                imageInput.parentNode.appendChild(preview);
+                            }
+                            const existingImg = preview.querySelector('img');
+                            if (existingImg) {
+                                existingImg.src = e.target.result;
+                            } else {
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+                                img.className = 'image-preview';
+                                img.alt = 'Preview';
+                                preview.appendChild(img);
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}
