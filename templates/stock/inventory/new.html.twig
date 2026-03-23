@@ -1,0 +1,82 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Add Inventory{% endblock %}
+
+{% block page_title %}INVENTORY MANAGEMENT{% endblock %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    {% for message in app.flashes('success') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-success">
+                <span>✓</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-error">
+                <span>⚠</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="stock-entry-page">
+        <div class="stock-entry-header">
+            <div class="stock-entry-header-left">
+                <div class="stock-entry-section-label">INVENTORY MANAGEMENT</div>
+                <h1 class="stock-entry-title">Add Inventory</h1>
+            </div>
+            <div class="stock-entry-header-right">
+                <a href="{{ path('app_inventory_index') }}" class="stock-entry-back-btn">
+                    <i class="fa fa-arrow-left"></i>
+                    Back to list
+                </a>
+            </div>
+        </div>
+
+        <div class="stock-entry-form-container">
+            {{ form_start(form, {'attr': {'class': 'stock-entry-form'}}) }}
+                <div class="form-section">
+                    <div class="form-section-title">Product Information</div>
+                    <div class="form-group">
+                        {{ form_label(form.product, 'Product', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.product, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.product) }}
+                        <small class="form-text">Select an existing product from your stock</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Quantity</div>
+                    <div class="form-group">
+                        {{ form_label(form.quantity, 'Quantity', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.quantity, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.quantity) }}
+                        <small class="form-text">Enter the quantity to add to inventory</small>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-plus"></i>
+                        Add Inventory
+                    </button>
+                    <a href="{{ path('app_inventory_index') }}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+

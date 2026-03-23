@@ -1,0 +1,440 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Account Settings - Flower Shop{% endblock %}
+
+{% block page_title %}ACCOUNT SETTINGS{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+    <style>
+        .settings-page-container {
+            margin-top: 24px;
+        }
+        .settings-tabs {
+            display: flex !important;
+            gap: 8px !important;
+            border-bottom: 2px solid #e5e7eb !important;
+            margin-bottom: 24px !important;
+            flex-wrap: wrap !important;
+            width: 100% !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            height: auto !important;
+            min-height: 50px !important;
+        }
+        .settings-tab {
+            padding: 12px 24px !important;
+            background: transparent !important;
+            border: none !important;
+            border-bottom: 3px solid transparent !important;
+            cursor: pointer !important;
+            font-weight: 600 !important;
+            color: #6b7280 !important;
+            transition: all 0.2s;
+            font-size: 0.9375rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            height: auto !important;
+            min-height: 40px !important;
+        }
+        .settings-tab:hover {
+            color: #111827 !important;
+            background: #f9fafb !important;
+        }
+        .settings-tab.active {
+            color: #92400e !important;
+            border-bottom-color: #f59e0b !important;
+            background: #fef3c7 !important;
+        }
+        .settings-tab-content {
+            display: none;
+        }
+        .settings-tab-content.active {
+            display: block;
+        }
+        .settings-form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+        .settings-section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 24px;
+        }
+        .form-section {
+            margin-bottom: 32px;
+        }
+        .form-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.9375rem;
+        }
+        .form-text {
+            display: block;
+            font-size: 0.8125rem;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .two-column-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .two-column-grid {
+                grid-template-columns: 1fr;
+            }
+            .settings-tabs {
+                overflow-x: auto;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+    {% for message in app.flashes('success') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-success">
+                <span>✓</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-error">
+                <span>⚠</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="settings-page-container">
+        <div class="settings-form-card">
+            <h2 class="settings-section-title">Account Settings</h2>
+
+            <!-- Tabs -->
+            <div class="settings-tabs" style="display: flex !important; visibility: visible !important; opacity: 1 !important;">
+                <button type="button" class="settings-tab active" data-tab="general">
+                    <i class="fa fa-cog"></i> General
+                </button>
+                <button type="button" class="settings-tab" data-tab="email">
+                    <i class="fa fa-envelope"></i> Email
+                </button>
+                <button type="button" class="settings-tab" data-tab="payment">
+                    <i class="fa fa-credit-card"></i> Payment
+                </button>
+                <button type="button" class="settings-tab" data-tab="security">
+                    <i class="fa fa-shield"></i> Security
+                </button>
+                <button type="button" class="settings-tab" data-tab="inventory">
+                    <i class="fa fa-boxes"></i> Inventory
+                </button>
+                <button type="button" class="settings-tab" data-tab="orders">
+                    <i class="fa fa-shopping-cart"></i> Orders
+                </button>
+            </div>
+
+            <form method="POST" action="{{ path('app_settings_save') }}" class="settings-form">
+                <input type="hidden" name="_token" value="{{ csrf_token('settings') }}">
+
+                <!-- General Tab -->
+                <div class="settings-tab-content active" id="tab-general">
+                    <div class="form-section">
+                        <div class="form-section-title">Store Information</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Store Name</label>
+                            <input type="text" name="store_name" class="form-control" value="{{ settings.store_name ?? '' }}" required>
+                            <small class="form-text">Your store or business name</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Store Address</label>
+                            <textarea name="store_address" class="form-control" rows="3">{{ settings.store_address ?? '' }}</textarea>
+                            <small class="form-text">Physical address of your store</small>
+                        </div>
+
+                        <div class="two-column-grid">
+                            <div class="form-group">
+                                <label class="form-label">Store Phone</label>
+                                <input type="text" name="store_phone" class="form-control" value="{{ settings.store_phone ?? '' }}">
+                                <small class="form-text">Contact phone number</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Store Email</label>
+                                <input type="email" name="store_email" class="form-control" value="{{ settings.store_email ?? '' }}">
+                                <small class="form-text">Contact email address</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Business Hours</label>
+                            <textarea name="business_hours" class="form-control" rows="2">{{ settings.business_hours ?? '' }}</textarea>
+                            <small class="form-text">Business operating hours (e.g., Mon-Fri: 9AM-5PM)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Tab -->
+                <div class="settings-tab-content" id="tab-email">
+                    <div class="form-section">
+                        <div class="form-section-title">SMTP Settings</div>
+                        
+                        <div class="two-column-grid">
+                            <div class="form-group">
+                                <label class="form-label">SMTP Host</label>
+                                <input type="text" name="smtp_host" class="form-control" value="{{ settings.smtp_host ?? 'smtp.example.com' }}">
+                                <small class="form-text">SMTP server hostname</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">SMTP Port</label>
+                                <input type="number" name="smtp_port" class="form-control" value="{{ settings.smtp_port ?? 587 }}">
+                                <small class="form-text">SMTP server port (usually 587 or 465)</small>
+                            </div>
+                        </div>
+
+                        <div class="two-column-grid">
+                            <div class="form-group">
+                                <label class="form-label">SMTP Username</label>
+                                <input type="text" name="smtp_username" class="form-control" value="{{ settings.smtp_username ?? '' }}">
+                                <small class="form-text">SMTP authentication username</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">SMTP Password</label>
+                                <input type="password" name="smtp_password" class="form-control" placeholder="Leave blank to keep current">
+                                <small class="form-text">SMTP authentication password</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">SMTP Encryption</label>
+                            <select name="smtp_encryption" class="form-control">
+                                <option value="none" {% if (settings.smtp_encryption ?? 'tls') == 'none' %}selected{% endif %}>None</option>
+                                <option value="tls" {% if (settings.smtp_encryption ?? 'tls') == 'tls' %}selected{% endif %}>TLS</option>
+                                <option value="ssl" {% if (settings.smtp_encryption ?? 'tls') == 'ssl' %}selected{% endif %}>SSL</option>
+                            </select>
+                            <small class="form-text">Encryption method for SMTP</small>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">Email Sender Settings</div>
+                        
+                        <div class="two-column-grid">
+                            <div class="form-group">
+                                <label class="form-label">From Email Address</label>
+                                <input type="email" name="from_email" class="form-control" value="{{ settings.from_email ?? 'noreply@example.com' }}">
+                                <small class="form-text">Default sender email address</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">From Name</label>
+                                <input type="text" name="from_name" class="form-control" value="{{ settings.from_name ?? 'Flower Shop' }}">
+                                <small class="form-text">Default sender name</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Tab -->
+                <div class="settings-tab-content" id="tab-payment">
+                    <div class="form-section">
+                        <div class="form-section-title">Payment Configuration</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Payment Methods</label>
+                            <select name="payment_methods[]" class="form-control" multiple style="min-height: 120px;">
+                                <option value="cash" {% if 'cash' in (settings.payment_methods|default([])) %}selected{% endif %}>Cash</option>
+                                <option value="credit_card" {% if 'credit_card' in (settings.payment_methods|default([])) %}selected{% endif %}>Credit Card</option>
+                                <option value="paypal" {% if 'paypal' in (settings.payment_methods|default([])) %}selected{% endif %}>PayPal</option>
+                                <option value="bank_transfer" {% if 'bank_transfer' in (settings.payment_methods|default([])) %}selected{% endif %}>Bank Transfer</option>
+                            </select>
+                            <small class="form-text">Select available payment methods (hold Ctrl/Cmd to select multiple)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Payment Gateway</label>
+                            <select name="payment_gateway" class="form-control">
+                                <option value="manual" {% if (settings.payment_gateway ?? 'manual') == 'manual' %}selected{% endif %}>Manual</option>
+                                <option value="stripe" {% if (settings.payment_gateway ?? 'manual') == 'stripe' %}selected{% endif %}>Stripe</option>
+                                <option value="paypal" {% if (settings.payment_gateway ?? 'manual') == 'paypal' %}selected{% endif %}>PayPal</option>
+                            </select>
+                            <small class="form-text">Primary payment gateway for processing payments</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Currency</label>
+                            <input type="text" name="currency" class="form-control" value="{{ settings.currency ?? 'PHP' }}">
+                            <small class="form-text">Default currency code (e.g., PHP, USD)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div class="settings-tab-content" id="tab-security">
+                    <div class="form-section">
+                        <div class="form-section-title">Admin Credentials</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Admin Username</label>
+                            <input type="text" class="form-control" value="{{ app.user.userIdentifier }}" readonly disabled>
+                            <small class="form-text">Your admin username</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Change Password</label>
+                            <input type="password" name="admin_password" class="form-control" placeholder="Leave blank to keep current password" autocomplete="new-password">
+                            <small class="form-text">Leave blank to keep current password. Enter new password to change it.</small>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">Password Policy</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Minimum Password Length</label>
+                            <input type="number" name="min_password_length" class="form-control" value="{{ settings.min_password_length ?? 8 }}" min="6" max="32">
+                            <small class="form-text">Minimum password length (6-32 characters)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Session Timeout (minutes)</label>
+                            <input type="number" name="session_timeout" class="form-control" value="{{ settings.session_timeout ?? 60 }}" min="5" max="1440">
+                            <small class="form-text">Session timeout in minutes (5-1440)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Tab -->
+                <div class="settings-tab-content" id="tab-inventory">
+                    <div class="form-section">
+                        <div class="form-section-title">Stock Management</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Low Stock Threshold</label>
+                            <input type="number" name="low_stock_threshold" class="form-control" value="{{ settings.low_stock_threshold ?? 10 }}" min="1">
+                            <small class="form-text">Alert when stock falls below this quantity</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" name="enable_low_stock_alerts" value="1" {% if (settings.enable_low_stock_alerts ?? true) %}checked{% endif %} class="form-check-input" style="margin-right: 8px;">
+                                Enable Low Stock Alerts
+                            </label>
+                            <small class="form-text" style="display: block; margin-top: 6px;">Receive alerts when stock is low</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Alert Email</label>
+                            <input type="email" name="alert_email" class="form-control" value="{{ settings.alert_email ?? '' }}">
+                            <small class="form-text">Email address to receive low stock alerts</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Tab -->
+                <div class="settings-tab-content" id="tab-orders">
+                    <div class="form-section">
+                        <div class="form-section-title">Order Configuration</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Order Prefix</label>
+                            <input type="text" name="order_prefix" class="form-control" value="{{ settings.order_prefix ?? 'ORD' }}">
+                            <small class="form-text">Prefix for order numbers (e.g., ORD-001, ORD-002)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" name="auto_confirm_orders" value="1" {% if (settings.auto_confirm_orders ?? false) %}checked{% endif %} class="form-check-input" style="margin-right: 8px;">
+                                Auto Confirm Orders
+                            </label>
+                            <small class="form-text" style="display: block; margin-top: 6px;">Automatically confirm orders when placed</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Default Delivery Days</label>
+                            <input type="number" name="default_delivery_days" class="form-control" value="{{ settings.default_delivery_days ?? 3 }}" min="1">
+                            <small class="form-text">Default number of days for order delivery</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ path('app_admin') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Settings page loaded');
+            const tabs = document.querySelectorAll('.settings-tab');
+            const tabContents = document.querySelectorAll('.settings-tab-content');
+            
+            console.log('Found tabs:', tabs.length);
+            console.log('Found tab contents:', tabContents.length);
+
+            if (tabs.length === 0) {
+                console.error('No tabs found!');
+                return;
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    console.log('Tab clicked:', targetTab);
+
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    const targetContent = document.getElementById('tab-' + targetTab);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    } else {
+                        console.error('Tab content not found:', 'tab-' + targetTab);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shop - La Kurt Flowershop{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/client.css') }}">
+    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/shop.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+{% endblock %}
+
+{% block body %}
+<div class="fv-page">
+    {% include 'client/index.html.twig' with {'header_only': true} %}
+
+    <main class="fv-main">
+        <section class="fv-collection-header">
+            <h2 class="fv-collection-header__title">OUR SHOP</h2>
+        </section>
+        
+        <div class="fv-products">
+            <p style="text-align: center; padding: 40px; color: #666;">Our full collection is coming soon.</p>
+        </div>
+    </main>
+
+    {% include 'client/footer.html.twig' %}
+</div>
+{% endblock %}

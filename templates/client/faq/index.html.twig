@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FAQ - La Kurt Flowershop{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/client.css') }}">
+    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+{% endblock %}
+
+{% block body %}
+<div class="fv-page">
+    {% include 'client/_header.html.twig' %}
+
+    <main class="fv-main">
+        <section class="fv-faq-page">
+            <h1 class="fv-faq-page__main-title">F A Q</h1>
+
+            <div class="fv-faq-page__content">
+                <div class="fv-faq-page__item">
+                    <h2 class="fv-faq-page__question">Do you deliver?</h2>
+                    <p class="fv-faq-page__answer">Yes, we offer an optional delivery service to our clients. Please see table below for our standard rates.</p>
+                    
+                    <h3 class="fv-faq-page__sub-heading">Standard Shipping Rates</h3>
+                    <table class="fv-faq-page__table">
+                        <tbody>
+                            <tr><td>ALABANG</td><td>₱350.00</td></tr>
+                            <tr><td>ANTIPOLO</td><td>₱350.00</td></tr>
+                            <tr><td>CAINTA</td><td>₱350.00</td></tr>
+                            <tr><td>CALOOCAN</td><td>₱350.00</td></tr>
+                            <tr><td>LAS PINAS</td><td>₱350.00</td></tr>
+                            <tr><td>MAKATI</td><td>₱180.00</td></tr>
+                            <tr><td>MALABON</td><td>₱350.00</td></tr>
+                            <tr><td>MANDALUYONG</td><td>₱350.00</td></tr>
+                            <tr><td>MANILA</td><td>₱350.00</td></tr>
+                            <tr><td>MARIKINA</td><td>₱350.00</td></tr>
+                            <tr><td>MUNTINLUPA</td><td>₱350.00</td></tr>
+                            <tr><td>NAVOTAS</td><td>₱350.00</td></tr>
+                            <tr><td>PARANAQUE</td><td>₱350.00</td></tr>
+                            <tr><td>PASAY</td><td>₱350.00</td></tr>
+                            <tr><td>PASIG</td><td>₱350.00</td></tr>
+                            <tr><td>PATEROS</td><td>₱350.00</td></tr>
+                            <tr><td>QUEZON CITY (NORTH)</td><td>₱350.00</td></tr>
+                            <tr><td>QUEZON CITY (SOUTH)</td><td>₱350.00</td></tr>
+                            <tr><td>RIZAL</td><td>₱350.00</td></tr>
+                            <tr><td>SAN JUAN</td><td>₱350.00</td></tr>
+                            <tr><td>TAGUIG</td><td>₱350.00</td></tr>
+                            <tr><td>BONIFACIO GLOBAL CITY</td><td>₱180.00</td></tr>
+                            <tr><td>VALENZUELA</td><td>₱350.00</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="fv-faq-page__sub-heading">Sympathy Shipping Rates</h3>
+                    <p class="fv-faq-page__answer">For standing sympathy arrangements, please note that we charge a flat rate of PHP 700.00 for delivery within Metro Manila only. For sympathy orders to be shipped outside Metro Manila, please contact our team to get a quotation. Thank you!</p>
+                </div>
+
+                <div class="fv-faq-page__item">
+                    <h2 class="fv-faq-page__question">Do you do same day delivery/pick up?</h2>
+                    <p class="fv-faq-page__answer">We are currently not allowing same day pick-ups. Please note that if you request that your order be made available for pick-up on the same day, it will be scheduled for the next available pick-up date. Rest assured, we will message you to confirm your order and when it will be ready for pick-up. Thank you for understanding!</p>
+                </div>
+
+                <div class="fv-faq-page__item">
+                    <h2 class="fv-faq-page__question">How do I place my order?</h2>
+                    <p class="fv-faq-page__answer">All orders will have to be made through our website.</p>
+                    <p class="fv-faq-page__answer">You can do it in four easy steps:</p>
+                    <ol class="fv-faq-page__list">
+                        <li>Browse from our available floral arrangements in the Shop page of this website, and pick which items you like best.</li>
+                        <li>Add them to your Cart, and choose a delivery or pick-up date. You may also add a dedication note to your recipient!</li>
+                        <li>Proceed to check out, fill up your contact details, and confirm your order.</li>
+                        <li>Pay via your preferred payment option (BDO, BPI, Metrobank, or GCash) and email us a screenshot/picture of your deposit slip at <a href="mailto:figvineph@gmail.com" class="fv-faq-page__link">figvineph@gmail.com</a>.</li>
+                    </ol>
+                    <p class="fv-faq-page__answer">If you need assistance with your orders, please message us on any of our social media accounts.</p>
+                </div>
+
+                <div class="fv-faq-page__item">
+                    <h2 class="fv-faq-page__question">How do I pay for my order?</h2>
+                    <p class="fv-faq-page__answer">Depending on the payment option you select, directions will be provided upon checkout. Currently, we're accepting bank deposits through BDO, BPI, Metrobank, and GCash. Please visit this page for the account numbers. Email us a screenshot/picture of your deposit slip at <a href="mailto:sales@figvinefloralstudio.com" class="fv-faq-page__link">sales@figvinefloralstudio.com</a>.</p>
+                </div>
+
+                <div class="fv-faq-page__item">
+                    <h2 class="fv-faq-page__question">How do I take care of my orchids?</h2>
+                    <p class="fv-faq-page__answer">Orchids should be watered every three days. Three to five sprays per leaf should suffice to keep the plant hydrated. As for the moss, you may estimate the amount of sprays so long as the soil gets wet (but not soaking wet!), and all areas are covered.</p>
+                    <p class="fv-faq-page__answer">Bacteria that could harm your plant love warm, moist conditions, so best to avoid that kind of environment for your orchids. Please also avoid placing the Phalaenopsis too close to other plants, and allow for proper ventilation and airflow to decrease humidity. A place between 18℃ and 26℃ is best to inhibit fungal growth.</p>
+                </div>
+
+                <div class="fv-faq-page__item">
+                    <h2 class="fv-faq-page__question">How do I take care of my preserved flowers?</h2>
+                    <p class="fv-faq-page__answer">Preserved flowers should be kept in a cool & dry area. Do not water them nor spray perfume on them, as this may cause damage.</p>
+                    <p class="fv-faq-page__answer">Keep your preserved flowers stored away from direct sunlight in order to prevent discoloration or fading. Once they accumulate dust, you may blow them with a hair dryer from a distance.</p>
+                </div>
+
+                <div class="fv-faq-page__item">
+                    <h2 class="fv-faq-page__question">How do I take care of my plants?</h2>
+                    <p class="fv-faq-page__answer">You may learn more about how to take care of the plants you're purchasing in the product page.</p>
+                    <p class="fv-faq-page__answer">Please note that some plants are harmful when ingested. Please check the information provided in each product page, and please keep away from pets and children, and wash your hands as needed.</p>
+                </div>
+
+                <div class="fv-faq-page__item">
+                    <h2 class="fv-faq-page__question">How long do preserved flowers last?</h2>
+                    <p class="fv-faq-page__answer">With proper care, our preserved flowers could last up to 3 to 5 years.</p>
+                </div>
+
+                <div class="fv-faq-page__item">
+                    <h2 class="fv-faq-page__question">Do you issue Official Receipts?</h2>
+                    <p class="fv-faq-page__answer">If you are purchasing an arrangement for yourself, La Kurt will issue an Official Receipt and place it in a separate envelope.</p>
+                    <p class="fv-faq-page__answer">If you are ordering for another, the Official Receipt can be picked up at the La Kurt production studio located at Ground Flr. G and A Building 2303 Chino Roces Ave, Makati, Metro Manila. If you choose to do so, please call in advance so we may prepare the OR for road-side pick up.</p>
+                    <p class="fv-faq-page__answer">We may also deliver the Official Receipt to you with an additional delivery fee. Please <a href="{{ path('app_contact') }}" class="fv-faq-page__link">contact us</a> for more details.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'client/footer.html.twig' %}
+</div>
+{% endblock %}

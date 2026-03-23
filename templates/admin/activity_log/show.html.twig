@@ -1,0 +1,111 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Log Details - Flower Shop{% endblock %}
+
+{% block page_title %}SYSTEM LOGS{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+    <style>
+        .badge-action {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-create { background-color: #dcfce7; color: #16a34a; }
+        .badge-update { background-color: #e0f2fe; color: #0284c7; }
+        .badge-delete { background-color: #fee2e2; color: #dc2626; }
+        .badge-login { background-color: #f3f4f6; color: #4b5563; }
+        .badge-logout { background-color: #f3f4f6; color: #4b5563; }
+        
+        .detail-row {
+            padding: 16px 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+        }
+        .detail-label {
+            width: 200px;
+            font-weight: 600;
+            color: #374151;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            color: #111827;
+            flex: 1;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+    <div class="stock-entry-page">
+        <div class="stock-entry-header">
+            <div class="stock-entry-header-left">
+                <div class="stock-entry-section-label">SYSTEM ADMINISTRATION</div>
+                <h1 class="stock-entry-title">Log Details #{{ log.id }}</h1>
+            </div>
+            <div class="stock-entry-header-right">
+                <a href="{{ path('app_activity_log_index') }}" class="stock-entry-back-btn">
+                    <i class="fa fa-arrow-left"></i>
+                    Back to Logs
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="detail-row">
+                    <div class="detail-label">Date & Time</div>
+                    <div class="detail-value">{{ log.createdAt|date('Y-m-d h:i:s A') }}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">User</div>
+                    <div class="detail-value">
+                        <div><strong>{{ log.username }}</strong> (ID: {{ log.userId }})</div>
+                        <div style="margin-top: 4px;">
+                            <span class="role-badge 
+                                {% if 'ADMIN' in log.role %}role-badge-admin
+                                {% elseif 'STAFF' in log.role %}role-badge-staff
+                                {% else %}role-badge-client{% endif %}">
+                                {{ log.role|replace({'ROLE_': ''})|title }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Action</div>
+                    <div class="detail-value">
+                        <span class="badge-action badge-{{ log.action|lower }}">
+                            {{ log.actionLabel }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Target Entity</div>
+                    <div class="detail-value">{{ log.targetEntity|default('N/A') }}</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Target ID</div>
+                    <div class="detail-value">{{ log.targetId|default('N/A') }}</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Full Description</div>
+                    <div class="detail-value" style="font-family: monospace; background: #f9fafb; padding: 10px; border-radius: 6px;">
+                        {{ log.targetData }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

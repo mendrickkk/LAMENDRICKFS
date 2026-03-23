@@ -313,6 +313,8 @@ body {
 }
 
 .form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
 .form-group input[type="number"],
 .form-group input[type="file"],
 .form-group textarea,
@@ -341,15 +343,29 @@ body {
 /* Image Preview */
 .image-preview-container {
     margin-top: 1rem;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.image-preview-container[style*="display: none"] {
+    display: none !important;
 }
 
 .image-preview {
     max-width: 300px;
-    width: 100%;
+    width: auto;
     height: auto;
+    max-height: 300px;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     margin-top: 0.5rem;
+    display: block !important;
+    visibility: visible !important;
+    object-fit: contain;
+}
+
+.image-preview[style*="display: none"] {
+    display: none !important;
 }
 
 /* Flash Messages */
@@ -447,7 +463,7 @@ body {
     }
 
     .product-table {
-        overflow-x: auto;
+        overflow-x: visible;
     }
 
     .product-table table {
@@ -599,7 +615,7 @@ body {
 /* Product Table Column Widths - Admin Layout */
 .card .table-responsive.product-table {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: visible;
     box-sizing: border-box;
 }
 
@@ -610,77 +626,158 @@ body {
 
 .card .product-table .table {
     width: 100% !important;
-    table-layout: fixed !important;
+    table-layout: auto !important;
     border-collapse: collapse !important;
     margin: 0 !important;
     box-sizing: border-box;
 }
 
-/* Image Column - Fixed width for images */
+/* ID Column - Compact, centered */
 .card .product-table .table th:nth-child(1),
 .card .product-table .table td:nth-child(1) {
-    width: 100px !important;
-    padding: 12px 16px !important;
+    width: auto !important;
+    min-width: 60px !important;
+    padding: 12px 8px !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    color: #6b7280 !important;
 }
 
-/* Flower Name Column - Auto width, flexible */
+/* Image Column - Centered, compact */
 .card .product-table .table th:nth-child(2),
 .card .product-table .table td:nth-child(2) {
-    width: 18% !important;
-    padding: 12px 16px !important;
+    width: auto !important;
+    min-width: 80px !important;
+    padding: 12px 8px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
 }
 
-/* Description Column - Wider for description text */
+/* Name Column - Left aligned, balanced width */
 .card .product-table .table th:nth-child(3),
 .card .product-table .table td:nth-child(3) {
-    width: 35% !important;
-    padding: 12px 16px !important;
+    width: auto !important;
+    min-width: 120px !important;
+    padding: 12px 10px !important;
+    text-align: left !important;
+    font-weight: 500 !important;
+    color: #111827 !important;
 }
 
-/* Price Column - Fixed width for price */
+.card .product-table .table td:nth-child(3) strong {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Text truncation for long content */
+.card .product-table .table td:nth-child(3) strong,
+.card .product-table .table td:nth-child(7) {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+/* Category Column - Left aligned, balanced width */
 .card .product-table .table th:nth-child(4),
 .card .product-table .table td:nth-child(4) {
-    width: 12% !important;
-    padding: 12px 16px !important;
+    width: auto !important;
+    min-width: 100px !important;
+    padding: 12px 10px !important;
+    text-align: left !important;
 }
 
-/* Actions Column - Fixed width for action buttons */
+/* Stock Quantity Column - Centered, balanced width */
 .card .product-table .table th:nth-child(5),
 .card .product-table .table td:nth-child(5) {
-    width: 25% !important;
-    padding: 12px 16px !important;
+    width: auto !important;
+    min-width: 80px !important;
+    padding: 12px 10px !important;
+    text-align: center !important;
+}
+
+.stock-quantity-header {
+    line-height: 1.3 !important;
+    white-space: normal !important;
+}
+
+/* Price Column - Right aligned, balanced width */
+.card .product-table .table th:nth-child(6),
+.card .product-table .table td:nth-child(6) {
+    width: auto !important;
+    min-width: 100px !important;
+    padding: 12px 10px !important;
+    text-align: right !important;
+}
+
+/* Description Column - Left aligned, wider for text */
+.card .product-table .table th:nth-child(7),
+.card .product-table .table td:nth-child(7) {
+    width: auto !important;
+    min-width: 150px !important;
+    padding: 12px 10px !important;
+    text-align: left !important;
+}
+
+/* Actions Column - Left aligned, compact */
+.card .product-table .table th:nth-child(8),
+.card .product-table .table td:nth-child(8) {
+    width: auto !important;
+    min-width: 70px !important;
+    padding: 12px 8px !important;
     white-space: nowrap !important;
+    text-align: left !important;
+}
+
+/* Inventory Table Actions Column (5th) - Centered */
+.card .inventory-table .table th:nth-child(5),
+.card .inventory-table .table td:nth-child(5) {
+    text-align: center !important;
+}
+
+/* Center actions cell for inventory table */
+.card .inventory-table .product-actions-cell {
+    justify-content: center !important;
 }
 
 /* Ensure table cells are properly aligned - override admin.css */
 .card .product-table .table th,
 .card .product-table .table td {
-    padding: 12px 16px !important;
     vertical-align: middle !important;
     box-sizing: border-box;
-    text-align: left !important;
+    line-height: 1.5 !important;
 }
 
 .card .product-table .table th {
     font-weight: 600 !important;
-    font-size: 12px !important;
-    color: #6b7280 !important;
+    font-size: 0.75rem !important;
+    color: #374151 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
     background: #f9fafb !important;
+    padding: 12px 14px !important;
 }
 
 .card .product-table .table thead {
-    background: #f9fafb !important;
+    background: #f3f4f6 !important;
     border-bottom: 1px solid #e5e7eb !important;
 }
 
 .card .product-table .table thead th {
     border-bottom: 1px solid #e5e7eb !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    color: #374151 !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.5px !important;
+    padding: 12px 14px !important;
+    vertical-align: middle !important;
 }
 
 .card .product-table .table tbody tr {
     border-bottom: 1px solid #f3f4f6 !important;
+    transition: background-color 0.15s ease;
 }
 
 .card .product-table .table tbody tr:hover {
@@ -688,33 +785,64 @@ body {
 }
 
 .card .product-table .table td {
-    font-size: 14px !important;
+    font-size: 0.875rem !important;
     color: #374151 !important;
+    padding: 12px 14px !important;
 }
 
-/* Product Image in Admin Table - Match Reference (40x40px) */
+.card .product-table .table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* Product Image in Admin Table - Properly sized and centered */
 .card .product-table .table .table-product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: inline-block;
+    margin: 0 auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Stock Table Image */
+.card .stock-table .table td:nth-child(3) .table-product-image {
     width: 40px;
     height: 40px;
     object-fit: cover;
     border-radius: 6px;
-    display: block;
-    margin: 0;
+    display: inline-block;
+    margin: 0 auto;
+    vertical-align: middle;
 }
 
-/* Product Image Placeholder - Match Reference Size */
-.product-image-placeholder {
+/* Stock Table Image Placeholder */
+.card .stock-table .table td:nth-child(3) .table-product-image-placeholder {
     width: 40px;
     height: 40px;
     background: linear-gradient(135deg, #fef5f8, #f8bbd0);
     border-radius: 6px;
-    display: flex;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #e91e63;
+    margin: 0 auto;
+    font-size: 16px;
+}
+
+/* Product Image Placeholder - Match Reference Size */
+.product-image-placeholder {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #fef5f8, #f8bbd0);
+    border-radius: 8px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     color: #e91e63;
     font-weight: bold;
     font-size: 20px;
-    margin: 0;
+    margin: 0 auto;
 }
 
 /* Product Name Cell - Bold and Left Aligned */
@@ -740,7 +868,17 @@ body {
 .product-price-text {
     font-weight: 600;
     color: #111827;
-    font-size: 14px;
+    font-size: 0.875rem;
+}
+
+.card .product-table .table td:nth-child(5) .product-price-text {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.card .product-table .table td:nth-child(6) .product-price-text {
+    color: #059669;
+    font-weight: 600;
 }
 
 /* Product Actions Cell - Match Reference Alignment */
@@ -814,10 +952,34 @@ body {
     color: #ef4444;
 }
 
+.product-action-btn-enable {
+    background: transparent;
+    border-color: #e5e7eb;
+    color: #6b7280;
+}
+
+.product-action-btn-enable:hover {
+    background: #dcfce7;
+    border-color: #059669;
+    color: #059669;
+}
+
+.product-action-btn-disable {
+    background: transparent;
+    border-color: #e5e7eb;
+    color: #6b7280;
+}
+
+.product-action-btn-disable:hover {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
 /* Empty State - Match Reference */
 .product-empty-state {
     text-align: center;
-    padding: 80px 24px;
+    padding: 100px 24px;
     color: #6b7280;
     width: 100%;
     box-sizing: border-box;
@@ -825,18 +987,19 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-height: 400px;
 }
 
 .product-empty-state-icon {
-    font-size: 64px;
-    margin-bottom: 24px;
-    color: #9ca3af;
+    font-size: 80px;
+    margin-bottom: 32px;
+    color: #d1d5db;
     display: block;
 }
 
 .product-empty-state-title {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 12px;
     color: #111827;
     display: block;
@@ -853,23 +1016,29 @@ body {
 .product-empty-state-btn {
     background: #10b981;
     color: white;
-    border: 1px solid #10b981;
-    border-radius: 8px;
-    padding: 10px 20px;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.2s;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
 }
 
 .product-empty-state-btn:hover {
     background: #059669;
-    border-color: #059669;
     color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.product-empty-state-btn i {
+    font-size: 16px;
 }
 
 /* New Product Button */
@@ -907,24 +1076,24 @@ body {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    overflow-x: auto;
+    overflow-x: visible;
 }
 
 .card-body-no-padding .table-responsive.product-table .table {
     width: 100% !important;
     margin: 0;
-    table-layout: fixed !important;
+    table-layout: auto !important;
 }
 
-/* Ensure table rows have proper spacing - Match Reference */
+/* Ensure table rows have proper spacing - Professional Admin Panel */
 .card .product-table .table tbody td {
-    padding-top: 12px !important;
-    padding-bottom: 12px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
 }
 
 .card .product-table .table thead th {
-    padding-top: 12px !important;
-    padding-bottom: 12px !important;
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
 }
 
 /* Ensure proper alignment for product filter buttons */
@@ -946,32 +1115,972 @@ body {
     }
     
     .card .product-table .table {
-        table-layout: fixed !important;
+        table-layout: auto !important;
     }
     
     /* Adjust column widths for mobile */
     .card .product-table .table th:nth-child(1),
     .card .product-table .table td:nth-child(1) {
-        width: 80px !important;
+        width: 5% !important;
     }
     
     .card .product-table .table th:nth-child(2),
     .card .product-table .table td:nth-child(2) {
-        width: 20% !important;
+        width: 80px !important;
     }
     
     .card .product-table .table th:nth-child(3),
     .card .product-table .table td:nth-child(3) {
-        width: 30% !important;
+        width: 18% !important;
     }
     
     .card .product-table .table th:nth-child(4),
     .card .product-table .table td:nth-child(4) {
-        width: 15% !important;
+        width: 12% !important;
     }
     
     .card .product-table .table th:nth-child(5),
     .card .product-table .table td:nth-child(5) {
+        width: 30% !important;
+    }
+    
+    /* Stock Quantity Column */
+    .card .product-table .table th:nth-child(5),
+    .card .product-table .table td:nth-child(5) {
+        width: 10% !important;
+    }
+    
+    /* Price Column */
+    .card .product-table .table th:nth-child(6),
+    .card .product-table .table td:nth-child(6) {
+        width: 10% !important;
+    }
+    
+    /* Description Column */
+    .card .product-table .table th:nth-child(7),
+    .card .product-table .table td:nth-child(7) {
         width: 25% !important;
+    }
+    
+    /* Actions Column */
+    .card .product-table .table th:nth-child(8),
+    .card .product-table .table td:nth-child(8) {
+        width: 15% !important;
+    }
+}
+
+/* Stock Table Specific Styling - 9 Columns */
+.card .table-responsive.stock-table {
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    width: 100% !important;
+}
+
+.card .stock-table .table {
+    table-layout: auto !important;
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.card .stock-table .table th:nth-child(1),
+.card .stock-table .table td:nth-child(1) {
+    width: auto !important;
+    min-width: 40px !important;
+    padding: 12px 6px !important;
+    text-align: center !important;
+}
+
+.card .stock-table .table th:nth-child(2),
+.card .stock-table .table td:nth-child(2) {
+    width: auto !important;
+    min-width: 60px !important;
+    padding: 12px 6px !important;
+    text-align: center !important;
+}
+
+.card .stock-table .table th:nth-child(3),
+.card .stock-table .table td:nth-child(3) {
+    width: auto !important;
+    min-width: 70px !important;
+    padding: 12px 6px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* Ensure image column header is centered */
+.card .stock-table .table th:nth-child(3) {
+    text-align: center !important;
+    padding: 12px 8px !important;
+}
+
+.card .stock-table .table th:nth-child(4),
+.card .stock-table .table td:nth-child(4) {
+    width: auto !important;
+    min-width: 120px !important;
+    padding: 12px 10px !important;
+    text-align: left !important;
+}
+
+.card .stock-table .table th:nth-child(5),
+.card .stock-table .table td:nth-child(5) {
+    width: auto !important;
+    min-width: 100px !important;
+    padding: 12px 10px !important;
+    text-align: left !important;
+}
+
+.card .stock-table .table th:nth-child(6),
+.card .stock-table .table td:nth-child(6) {
+    width: auto !important;
+    min-width: 90px !important;
+    padding: 12px 10px !important;
+    text-align: right !important;
+}
+
+.card .stock-table .table th:nth-child(7),
+.card .stock-table .table td:nth-child(7) {
+    width: auto !important;
+    min-width: 80px !important;
+    padding: 12px 8px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.card .stock-table .table th:nth-child(8),
+.card .stock-table .table td:nth-child(8) {
+    width: auto !important;
+    min-width: 80px !important;
+    padding: 12px 8px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.card .stock-table .table th:nth-child(9),
+.card .stock-table .table td:nth-child(9) {
+    width: auto !important;
+    min-width: 90px !important;
+    padding: 12px 8px !important;
+    white-space: nowrap !important;
+    text-align: left !important;
+}
+
+.card .stock-table .table th {
+    text-align: left !important;
+    vertical-align: middle !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #495057 !important;
+    border-bottom: 2px solid #dee2e6 !important;
+    padding: 12px 10px !important;
+}
+
+.card .stock-table .table th:nth-child(1) {
+    text-align: center !important;
+}
+
+.card .stock-table .table th:nth-child(2) {
+    text-align: center !important;
+}
+
+.card .stock-table .table th:nth-child(5) {
+    text-align: left !important;
+}
+
+.card .stock-table .table th:nth-child(6) {
+    text-align: right !important;
+}
+
+.card .stock-table .table th:nth-child(3) {
+    text-align: center !important;
+    padding: 12px 8px !important;
+    vertical-align: middle !important;
+}
+
+.card .stock-table .table th:nth-child(7),
+.card .stock-table .table th:nth-child(8) {
+    text-align: center !important;
+}
+
+.card .stock-table .table td {
+    vertical-align: middle !important;
+    padding: 12px 10px !important;
+    font-size: 0.9rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.card .stock-table .table td:nth-child(1) {
+    text-align: center !important;
+    font-weight: 600 !important;
+    color: #6c757d !important;
+}
+
+.card .stock-table .table td:nth-child(2) {
+    text-align: center !important;
+}
+
+.card .stock-table .table td:nth-child(3) {
+    text-align: center !important;
+    padding: 12px 6px !important;
+    vertical-align: middle !important;
+}
+
+.card .stock-table .table td:nth-child(4) {
+    text-align: left !important;
+    padding: 12px 10px !important;
+}
+
+.card .stock-table .table td:nth-child(5) {
+    text-align: left !important;
+    font-weight: 500 !important;
+    color: #495057 !important;
+    padding: 12px 10px !important;
+}
+
+.card .stock-table .table td:nth-child(6) {
+    text-align: center !important;
+    font-weight: 500 !important;
+}
+
+.card .stock-table .table td:nth-child(7),
+.card .stock-table .table td:nth-child(8) {
+    text-align: center !important;
+    color: #6c757d !important;
+    font-size: 0.85rem !important;
+}
+
+.card .stock-table .table td:nth-child(9) {
+    text-align: left !important;
+}
+
+.card .stock-table .product-actions-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+}
+
+/* ========================================
+   Stock Entry Form - Reference Design
+   ======================================== */
+
+.stock-entry-page {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+}
+
+.stock-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.stock-entry-header-left {
+    flex: 1;
+}
+
+.stock-entry-section-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.stock-entry-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    padding: 0;
+}
+
+.stock-entry-header-right {
+    display: flex;
+    align-items: center;
+}
+
+.stock-entry-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #111827;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #111827;
+    transition: all 0.2s;
+}
+
+.stock-entry-back-btn:hover {
+    background: #ec4899;
+    border-color: #ec4899;
+}
+
+.stock-entry-form-container {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+}
+
+/* Stock Form Sections */
+.stock-form-section {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.stock-form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 24px;
+}
+
+.stock-form-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 16px 0;
+}
+
+.stock-form-section-description {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 20px 0;
+    line-height: 1.6;
+}
+
+/* Form Control - General styling for all form inputs */
+.form-control,
+.stock-entry-form .form-control {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    color: #111827;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.form-control:focus,
+.stock-entry-form .form-control:focus {
+    outline: none;
+    border-color: #ec4899;
+    box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+/* Stock Form Fields */
+.stock-form-field {
+    margin-bottom: 20px;
+}
+
+.stock-form-field:last-child {
+    margin-bottom: 0;
+}
+
+.stock-form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.stock-form-field select,
+.stock-form-field input[type="text"],
+.stock-form-field input[type="email"],
+.stock-form-field input[type="password"],
+.stock-form-field input[type="number"],
+.stock-form-field textarea {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    color: #111827;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.stock-form-field select:focus,
+.stock-form-field input[type="text"]:focus,
+.stock-form-field input[type="email"]:focus,
+.stock-form-field input[type="password"]:focus,
+.stock-form-field input[type="number"]:focus,
+.stock-form-field textarea:focus {
+    outline: none;
+    border-color: #ec4899;
+    box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+.stock-form-field textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+.stock-form-field select {
+    cursor: pointer;
+}
+
+/* Checkbox Field Styling */
+.stock-form-field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-right: 8px;
+    accent-color: #111827;
+}
+
+.stock-form-field label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.stock-form-field label input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Price Input Wrapper */
+.stock-price-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.stock-price-symbol {
+    position: absolute;
+    left: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    z-index: 1;
+}
+
+.stock-price-input {
+    padding-left: 40px !important;
+}
+
+/* Form Actions */
+.stock-form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.stock-form-btn-primary {
+    padding: 12px 24px;
+    background: #111827;
+    color: white;
+    border: 1px solid #111827;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.stock-form-btn-primary:hover {
+    background: #ec4899;
+    border-color: #ec4899;
+}
+
+.stock-form-btn-cancel {
+    padding: 12px 24px;
+    background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stock-form-btn-cancel:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+/* Form Errors */
+.stock-form-field .invalid-feedback {
+    display: block;
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.stock-form-field select.is-invalid,
+.stock-form-field input.is-invalid,
+.stock-form-field textarea.is-invalid {
+    border-color: #ef4444;
+}
+
+/* ========================================
+   Stock Management Empty State Template
+   ======================================== */
+
+/* Stock Management Container */
+.stock-management-container {
+    width: 100%;
+}
+
+/* Stock Management Header */
+.stock-management-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.stock-management-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.stock-management-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Circular Back Button */
+.stock-back-circle-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 50%;
+    color: #111827;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.stock-back-circle-btn:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+
+.stock-back-circle-btn i {
+    font-size: 16px;
+}
+
+/* New Stock Entry Button */
+.stock-new-entry-btn {
+    padding: 10px 20px;
+    background: #111827;
+    color: white;
+    border: 1px solid #111827;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stock-new-entry-btn:hover {
+    background: #ec4899;
+    border-color: #ec4899;
+    color: white;
+}
+
+/* Empty State Cell in Table */
+.stock-empty-state-cell {
+    padding: 120px 24px !important;
+    text-align: center;
+    border: none !important;
+}
+
+.category-empty-state-cell {
+    padding: 100px 24px !important;
+    text-align: center;
+    border: none !important;
+}
+
+.category-empty-state-cell .product-empty-state {
+    padding: 0;
+    min-height: auto;
+}
+
+.stock-empty-state-message {
+    font-size: 16px;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.stock-empty-state-link {
+    color: #2563eb;
+    text-decoration: underline;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.stock-empty-state-link:hover {
+    color: #1d4ed8;
+}
+
+/* Category Table Specific Styling */
+/* Checkbox Styling */
+.card .product-table .table input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #ec4899;
+}
+
+/* Category Table - Column Widths and Alignment */
+.card .product-table .table {
+    table-layout: auto !important;
+    min-width: 1200px;
+}
+
+/* Checkbox Column (1st) */
+.card .product-table .table th:nth-child(1),
+.card .product-table .table td:nth-child(1) {
+    width: 40px !important;
+    min-width: 40px !important;
+    padding: 16px 8px !important;
+    text-align: center !important;
+}
+
+/* ID Column (2nd) */
+.card .product-table .table th:nth-child(2),
+.card .product-table .table td:nth-child(2) {
+    width: 60px !important;
+    min-width: 60px !important;
+    padding: 16px 12px !important;
+    text-align: center !important;
+}
+
+/* NAME Column (3rd) */
+.card .product-table .table th:nth-child(3),
+.card .product-table .table td:nth-child(3) {
+    width: 150px !important;
+    min-width: 120px !important;
+    padding: 16px 16px !important;
+    text-align: left !important;
+}
+
+/* DESCRIPTION Column (4th) - Wider for full text */
+.card .product-table .table th:nth-child(4),
+.card .product-table .table td:nth-child(4) {
+    width: 300px !important;
+    min-width: 250px !important;
+    padding: 16px 16px !important;
+    text-align: left !important;
+}
+
+/* STATUS Column (5th) */
+.card .product-table .table th:nth-child(5),
+.card .product-table .table td:nth-child(5) {
+    width: 120px !important;
+    min-width: 100px !important;
+    padding: 16px 16px !important;
+    text-align: center !important;
+}
+
+/* PRODUCTS COUNT Column (6th) */
+.card .product-table .table th:nth-child(6),
+.card .product-table .table td:nth-child(6) {
+    width: 120px !important;
+    min-width: 100px !important;
+    padding: 16px 16px !important;
+    text-align: center !important;
+}
+
+/* CREATED AT Column (7th) */
+.card .product-table .table th:nth-child(7),
+.card .product-table .table td:nth-child(7) {
+    width: 120px !important;
+    min-width: 100px !important;
+    padding: 16px 16px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+/* UPDATED AT Column (8th) */
+.card .product-table .table th:nth-child(8),
+.card .product-table .table td:nth-child(8) {
+    width: 120px !important;
+    min-width: 100px !important;
+    padding: 16px 16px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+/* ACTIONS Column (9th) */
+.card .product-table .table th:nth-child(9),
+.card .product-table .table td:nth-child(9) {
+    width: 180px !important;
+    min-width: 160px !important;
+    padding: 16px 16px !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+}
+
+/* Category Table - Description Text - Full Width, No Truncation */
+.card .product-table .table td:nth-child(4) .product-description-text {
+    white-space: normal !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+    max-width: none !important;
+    line-height: 1.6 !important;
+}
+
+/* Category Table - Header Alignment */
+.card .product-table .table th:nth-child(1),
+.card .product-table .table th:nth-child(2),
+.card .product-table .table th:nth-child(5),
+.card .product-table .table th:nth-child(6),
+.card .product-table .table th:nth-child(7),
+.card .product-table .table th:nth-child(8) {
+    text-align: center !important;
+}
+
+/* Category Table - Cell Alignment */
+.card .product-table .table td:nth-child(1),
+.card .product-table .table td:nth-child(2) {
+    text-align: center !important;
+    font-weight: 600 !important;
+    color: #6c757d !important;
+}
+
+.card .product-table .table td:nth-child(3) {
+    text-align: left !important;
+    font-weight: 500 !important;
+}
+
+.card .product-table .table td:nth-child(5),
+.card .product-table .table td:nth-child(6) {
+    text-align: center !important;
+}
+
+.card .product-table .table td:nth-child(7),
+.card .product-table .table td:nth-child(8) {
+    text-align: center !important;
+    color: #6c757d !important;
+    font-size: 0.85rem !important;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #ec4899;
+    margin: 0;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #ec4899;
+    border-color: #ec4899;
+}
+
+/* User table checkbox specific styling */
+.card .user-table .user-checkbox,
+.card .user-table #selectAllCheckbox {
+    width: 18px;
+    height: 18px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Bulk Actions Bar */
+.category-bulk-actions,
+.stock-bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    background: #f3f4f6;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.category-bulk-actions #selectedCount,
+.stock-bulk-actions #selectedCount {
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+}
+
+.category-bulk-actions form,
+.stock-bulk-actions form {
+    margin: 0;
+    display: inline-block;
+}
+
+/* Description Text - Full Width, No Truncation */
+.card .product-table .table td:nth-child(4) .product-description-text {
+    white-space: normal !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+    max-width: none !important;
+    line-height: 1.6 !important;
+}
+
+/* ========================================
+   User Table Specific Styling
+   ======================================== */
+.card .user-table .table {
+    table-layout: auto !important;
+    width: 100% !important;
+}
+
+.card .user-table .table th,
+.card .user-table .table td {
+    padding: 10px 8px !important;
+    vertical-align: middle !important;
+}
+
+/* Checkbox Column (1st) - Very narrow */
+.card .user-table .table th:nth-child(1),
+.card .user-table .table td:nth-child(1) {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    padding: 10px 4px !important;
+    text-align: center !important;
+}
+
+/* ID Column (2nd) - Compact */
+.card .user-table .table th:nth-child(2),
+.card .user-table .table td:nth-child(2) {
+    width: auto !important;
+    min-width: 50px !important;
+    padding: 10px 6px !important;
+    text-align: center !important;
+}
+
+/* Name Column (3rd) */
+.card .user-table .table th:nth-child(3),
+.card .user-table .table td:nth-child(3) {
+    width: auto !important;
+    min-width: 120px !important;
+    padding: 10px 8px !important;
+    text-align: left !important;
+}
+
+/* Username Column (4th) */
+.card .user-table .table th:nth-child(4),
+.card .user-table .table td:nth-child(4) {
+    width: auto !important;
+    min-width: 100px !important;
+    padding: 10px 8px !important;
+    text-align: left !important;
+}
+
+/* Email Column (5th) */
+.card .user-table .table th:nth-child(5),
+.card .user-table .table td:nth-child(5) {
+    width: auto !important;
+    min-width: 150px !important;
+    padding: 10px 8px !important;
+    text-align: left !important;
+}
+
+/* Role Column (6th) - Centered */
+.card .user-table .table th:nth-child(6),
+.card .user-table .table td:nth-child(6) {
+    width: auto !important;
+    min-width: 90px !important;
+    padding: 10px 6px !important;
+    text-align: center !important;
+}
+
+/* Status Column (7th) - Centered */
+.card .user-table .table th:nth-child(7),
+.card .user-table .table td:nth-child(7) {
+    width: auto !important;
+    min-width: 90px !important;
+    padding: 10px 6px !important;
+    text-align: center !important;
+}
+
+/* Created At Column (8th) */
+.card .user-table .table th:nth-child(8),
+.card .user-table .table td:nth-child(8) {
+    width: auto !important;
+    min-width: 130px !important;
+    padding: 10px 8px !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+}
+
+/* Created By Column (9th) */
+.card .user-table .table th:nth-child(9),
+.card .user-table .table td:nth-child(9) {
+    width: auto !important;
+    min-width: 100px !important;
+    padding: 10px 8px !important;
+    text-align: left !important;
+}
+
+/* Actions Column (10th) */
+.card .user-table .table th:nth-child(10),
+.card .user-table .table td:nth-child(10) {
+    width: auto !important;
+    min-width: 120px !important;
+    padding: 10px 6px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+.card .user-table .product-actions-cell {
+    justify-content: center !important;
+    gap: 4px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stock-management-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .stock-management-header-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .stock-empty-state-cell {
+        padding: 80px 16px !important;
     }
 }

@@ -18,10 +18,16 @@ class RedirectController extends AbstractController
         }
         
         // Check user role and redirect accordingly
-        if (in_array('ROLE_ADMIN', $user->getRoles())) {
+        $roles = $user->getRoles();
+        if (in_array('ROLE_ADMIN', $roles)) {
             return $this->redirectToRoute('app_admin');
-        } else {
-            return $this->redirectToRoute('app_landing');
         }
+
+        if (in_array('ROLE_STAFF', $roles)) {
+            // Staff should land on the dashboard
+            return $this->redirectToRoute('app_admin');
+        }
+
+        return $this->redirectToRoute('app_client');
     }
 }

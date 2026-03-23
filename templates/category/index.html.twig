@@ -1,0 +1,295 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Flower Shop - Categories{% endblock %}
+
+{% block page_title %}Categories{% endblock %}
+
+{% block breadcrumb_current %}Categories{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    {% for message in app.flashes('success') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-success">
+                <span>✓</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-error">
+                <span>⚠</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fa fa-tags"></i>
+                Categories
+            </div>
+            <div class="card-actions">
+                <a href="{{ path('app_category_new') }}" class="card-action-btn product-new-btn">
+                    <i class="fa fa-plus"></i>
+                    New Category
+                </a>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="product-search-toolbar">
+            <div class="search-input-container">
+                <i class="fa fa-search"></i>
+                <input type="text" placeholder="Search" id="categorySearch">
+            </div>
+        </div>
+
+        <div class="card-body card-body-no-padding">
+            <div class="category-bulk-actions" id="categoryBulkActions" style="display: none; padding: 12px 16px; background: #f3f4f6; border-bottom: 1px solid #e5e7eb;">
+                <span id="selectedCount" style="font-weight: 600; color: #374151; margin-right: 16px;">0 selected</span>
+                <form method="post" action="{{ path('app_category_bulk_delete') }}" id="bulkDeleteForm" onsubmit="return confirm('Are you sure you want to delete the selected categories?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('bulk_delete') }}">
+                    <input type="hidden" name="ids" id="bulkDeleteIds">
+                    <button type="submit" class="card-action-btn product-action-btn product-action-btn-delete" style="margin: 0;">
+                        <i class="fa fa-trash"></i>
+                        Delete Selected
+                    </button>
+                </form>
+            </div>
+            <div class="table-responsive product-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">
+                                <input type="checkbox" id="selectAllCategories" style="cursor: pointer;">
+                            </th>
+                            <th>ID</th>
+                            <th>NAME</th>
+                            <th>DESCRIPTION</th>
+                            <th>STATUS</th>
+                            <th>
+                                <div style="display: flex; flex-direction: column; align-items: center; line-height: 1.2;">
+                                    <span>PRODUCTS</span>
+                                    <span>COUNT</span>
+                                </div>
+                            </th>
+                            <th>CREATED BY</th>
+                            <th>CREATED AT</th>
+                            <th>UPDATED AT</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if categories|length > 0 %}
+                        {% for category in categories %}
+                            <tr class="category-row" 
+                                data-name="{{ category.name|lower }}" 
+                                data-description="{{ category.description|lower }}"
+                                data-id="{{ category.id }}"
+                                data-products="{{ category.products|length }}">
+                                <td>
+                                    <input type="checkbox" class="category-checkbox" value="{{ category.id }}" style="cursor: pointer;">
+                                </td>
+                                <td>#{{ category.id }}</td>
+                                <td><strong>{{ category.name }}</strong></td>
+                                <td>
+                                    <span class="product-description-text" style="white-space: normal; text-overflow: clip; overflow: visible;">
+                                        {{ category.description ? category.description : '-' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if category.isActive %}
+                                        <span class="badge badge-success">Active</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="product-price-text">{{ category.products|length }}</span>
+                                </td>
+                                <td>
+                                    {% if category.createdBy %}
+                                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                                            <strong style="font-size: 13px; color: #374151;">{{ category.createdBy.getFullName() }}</strong>
+                                            <span style="font-size: 11px; color: #6b7280;">{{ category.createdBy.getRoleLabel() }}</span>
+                                        </div>
+                                    {% else %}
+                                        <span style="color: #9ca3af; font-style: italic;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ category.createdAt|date('Y-m-d') }}</td>
+                                <td>{{ category.updatedAt|date('Y-m-d') }}</td>
+                                <td>
+                                    <div class="product-actions-cell">
+                                        <a href="{{ path('app_category_show', {'id': category.id}) }}" 
+                                           class="card-action-btn product-action-btn" 
+                                           title="View">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_category_edit', {'id': category.id}) }}" 
+                                           class="card-action-btn product-action-btn product-action-btn-edit" 
+                                           title="Edit">
+                                            <i class="fa fa-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <!-- Search Empty State (hidden by default) -->
+                        <tr id="categorySearchEmptyState" class="category-search-empty-state" style="display: none;">
+                            <td colspan="10" class="category-empty-state-cell">
+                                <div class="stock-empty-state-message">
+                                    <i class="fa fa-search" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                                    <p style="font-size: 16px; color: #6b7280; margin: 0 0 8px 0;">No categories found matching your search.</p>
+                                    <p style="font-size: 14px; color: #9ca3af; margin: 0;">Try searching with a different term or <a href="{{ path('app_category_new') }}" class="stock-empty-state-link">create a new category</a></p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bulk Selection Functionality - Define variables and functions first
+            const selectAllCheckbox = document.getElementById('selectAllCategories');
+            const bulkActionsBar = document.getElementById('categoryBulkActions');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const bulkDeleteForm = document.getElementById('bulkDeleteForm');
+            const bulkDeleteIdsInput = document.getElementById('bulkDeleteIds');
+
+            // Get visible checkboxes (not hidden by search filter)
+            function getVisibleCheckboxes() {
+                return Array.from(document.querySelectorAll('.category-checkbox')).filter(checkbox => {
+                    const row = checkbox.closest('.category-row');
+                    return row && row.style.display !== 'none';
+                });
+            }
+
+            // Get all checkboxes
+            function getAllCheckboxes() {
+                return document.querySelectorAll('.category-checkbox');
+            }
+
+            function updateBulkActions() {
+                const checkedBoxes = document.querySelectorAll('.category-checkbox:checked');
+                const count = checkedBoxes.length;
+                
+                if (count > 0) {
+                    bulkActionsBar.style.display = 'flex';
+                    bulkActionsBar.style.alignItems = 'center';
+                    selectedCountSpan.textContent = count + ' selected';
+                    
+                    // Update hidden input with selected IDs
+                    const ids = Array.from(checkedBoxes).map(cb => cb.value);
+                    bulkDeleteIdsInput.value = ids.join(',');
+                } else {
+                    bulkActionsBar.style.display = 'none';
+                }
+
+                // Update select all checkbox state based on visible checkboxes
+                if (selectAllCheckbox) {
+                    const visibleCheckboxes = getVisibleCheckboxes();
+                    const visibleChecked = visibleCheckboxes.filter(cb => cb.checked);
+                    
+                    if (visibleCheckboxes.length === 0) {
+                        selectAllCheckbox.checked = false;
+                        selectAllCheckbox.indeterminate = false;
+                    } else if (visibleChecked.length === visibleCheckboxes.length) {
+                        selectAllCheckbox.checked = true;
+                        selectAllCheckbox.indeterminate = false;
+                    } else if (visibleChecked.length > 0) {
+                        selectAllCheckbox.checked = false;
+                        selectAllCheckbox.indeterminate = true;
+                    } else {
+                        selectAllCheckbox.checked = false;
+                        selectAllCheckbox.indeterminate = false;
+                    }
+                }
+            }
+
+            // Select all checkbox - selects only visible checkboxes
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    const visibleCheckboxes = getVisibleCheckboxes();
+                    visibleCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateBulkActions();
+                });
+            }
+
+            // Individual checkboxes
+            getAllCheckboxes().forEach(checkbox => {
+                checkbox.addEventListener('change', updateBulkActions);
+            });
+
+            // Search Functionality
+            const searchInput = document.getElementById('categorySearch');
+            const categoryRows = document.querySelectorAll('.category-row');
+            const searchEmptyState = document.getElementById('categorySearchEmptyState');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
+                    
+                    if (categoryRows.length > 0) {
+                        categoryRows.forEach(row => {
+                            // Skip the empty state row
+                            if (row.classList.contains('category-search-empty-state')) {
+                                return;
+                            }
+                            
+                            const categoryName = row.getAttribute('data-name') || '';
+                            const description = row.getAttribute('data-description') || '';
+                            const id = row.getAttribute('data-id') || '';
+                            const products = row.getAttribute('data-products') || '';
+                            
+                            // Search in multiple fields
+                            const matchesSearch = searchTerm === '' || 
+                                categoryName.includes(searchTerm) || 
+                                description.includes(searchTerm) ||
+                                id.toString().includes(searchTerm) ||
+                                products.toString().includes(searchTerm);
+                            
+                            if (matchesSearch) {
+                                row.style.display = '';
+                                visibleCount++;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    }
+                    
+                    // Show/hide empty state based on search results
+                    if (searchEmptyState) {
+                        if (searchTerm !== '' && visibleCount === 0 && categoryRows.length > 0) {
+                            searchEmptyState.style.display = '';
+                        } else {
+                            searchEmptyState.style.display = 'none';
+                        }
+                    }
+                    
+                    // Update select all state after filtering
+                    updateBulkActions();
+                });
+            }
+
+            // Initialize
+            updateBulkActions();
+        });
+    </script>
+{% endblock %}
+

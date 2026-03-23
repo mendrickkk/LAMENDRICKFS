@@ -37,9 +37,9 @@
                 Products
             </div>
             <div class="card-actions">
-                <a href="{{ path('app_product_new') }}" class="card-action-btn product-new-btn">
+                <a href="{{ path('app_stock_new') }}" class="card-action-btn product-new-btn">
                     <i class="fa fa-plus"></i>
-                    New Product
+                    Add via Stocks
                 </a>
             </div>
         </div>
@@ -69,21 +69,35 @@
         </div>
 
         <div class="card-body card-body-no-padding">
-            {% if products|length > 0 %}
-                <div class="table-responsive product-table">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Image</th>
-                                <th>Flower Name</th>
-                                <th>Description</th>
-                                <th>Price</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div class="table-responsive product-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>IMAGE</th>
+                            <th>NAME</th>
+                            <th>CATEGORY</th>
+                            <th class="stock-quantity-header">STOCK<br>QUANTITY</th>
+                            <th>PRICE</th>
+                            <th>DESCRIPTION</th>
+                            <th>CREATED BY</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if products|length > 0 %}
                         {% for product in products %}
-                            <tr class="product-row" data-name="{{ product.Name|lower }}" data-description="{{ product.description|lower }}">
+                            {% set totalStockQuantity = 0 %}
+                            {% for stock in product.stocks %}
+                                {% set totalStockQuantity = totalStockQuantity + stock.quantity %}
+                            {% endfor %}
+                            <tr class="product-row" 
+                                data-name="{{ product.Name|lower }}" 
+                                data-description="{{ product.description|lower }}"
+                                data-category="{{ product.category ? product.category.name|lower : '' }}"
+                                data-id="{{ product.id }}"
+                                data-price="{{ product.price }}">
+                                <td>#{{ product.id }}</td>
                                 <td>
                                     {% if product.image %}
                                         <img src="{{ asset('uploads/products/' ~ product.image) }}" 
@@ -97,12 +111,32 @@
                                 </td>
                                 <td><strong>{{ product.Name }}</strong></td>
                                 <td>
+                                    {% if product.category %}
+                                        <span class="badge badge-info">{{ product.category.name }}</span>
+                                    {% else %}
+                                        <span>-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="product-price-text">{{ totalStockQuantity }}</span>
+                                </td>
+                                <td>
+                                    <span class="product-price-text">₱{{ product.price|number_format(2) }}</span>
+                                </td>
+                                <td>
                                     <span class="product-description-text">
                                         {{ product.description|length > 120 ? product.description|slice(0, 120) ~ '...' : product.description }}
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="product-price-text">₱{{ product.price|number_format(2) }}</span>
+                                    {% if product.createdBy %}
+                                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                                            <strong style="font-size: 13px; color: #374151;">{{ product.createdBy.getFullName() }}</strong>
+                                            <span style="font-size: 11px; color: #6b7280;">{{ product.createdBy.getRoleLabel() }}</span>
+                                        </div>
+                                    {% else %}
+                                        <span style="color: #9ca3af; font-style: italic;">-</span>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     <div class="product-actions-cell">
@@ -110,44 +144,25 @@
                                            class="card-action-btn product-action-btn" 
                                            title="View">
                                             <i class="fa fa-eye"></i>
-                                            View
                                         </a>
-                                        <a href="{{ path('app_product_edit', {'id': product.id}) }}" 
-                                           class="card-action-btn product-action-btn product-action-btn-edit" 
-                                           title="Edit">
-                                            <i class="fa fa-pencil"></i>
-                                            Edit
-                                        </a>
-                                        <form method="post" 
-                                              action="{{ path('app_product_delete', {'id': product.id}) }}" 
-                                              onsubmit="return confirm('Are you sure you want to delete this product?');" 
-                                              class="product-delete-form">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
-                                            <button type="submit" 
-                                                    class="card-action-btn product-action-btn product-action-btn-delete" 
-                                                    title="Delete">
-                                                <i class="fa fa-trash"></i>
-                                                Delete
-                                            </button>
-                                        </form>
                                     </div>
                                 </td>
                             </tr>
                         {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="product-empty-state">
-                    <i class="fa fa-inbox product-empty-state-icon"></i>
-                    <h3 class="product-empty-state-title">No flowers yet</h3>
-                    <p class="product-empty-state-text">Start by adding your first flower to the collection!</p>
-                    <a href="{{ path('app_product_new') }}" class="card-action-btn product-empty-state-btn">
-                        <i class="fa fa-plus"></i>
-                        Add Your First Flower
-                    </a>
-                </div>
-            {% endif %}
+                        <!-- Search Empty State (hidden by default) -->
+                        <tr id="productSearchEmptyState" class="product-search-empty-state" style="display: none;">
+                            <td colspan="9" class="stock-empty-state-cell">
+                                <div class="stock-empty-state-message">
+                                    <i class="fa fa-search" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                                    <p style="font-size: 16px; color: #6b7280; margin: 0 0 8px 0;">No products found matching your search.</p>
+                                    <p style="font-size: 14px; color: #9ca3af; margin: 0;">Try searching with a different term or <a href="{{ path('app_stock_new') }}" class="stock-empty-state-link">create a new product</a></p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -156,21 +171,51 @@
             // Search Functionality
             const searchInput = document.getElementById('productSearch');
             const productRows = document.querySelectorAll('.product-row');
+            const searchEmptyState = document.getElementById('productSearchEmptyState');
 
-            if (searchInput && productRows.length > 0) {
+            if (searchInput) {
                 searchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
+                    const searchTerm = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
                     
-                    productRows.forEach(row => {
-                        const productName = row.getAttribute('data-name') || '';
-                        const description = row.getAttribute('data-description') || '';
-                        
-                        if (productName.includes(searchTerm) || description.includes(searchTerm)) {
-                            row.style.display = '';
+                    if (productRows.length > 0) {
+                        productRows.forEach(row => {
+                            // Skip the empty state row
+                            if (row.classList.contains('product-search-empty-state')) {
+                                return;
+                            }
+                            
+                            const productName = row.getAttribute('data-name') || '';
+                            const description = row.getAttribute('data-description') || '';
+                            const category = row.getAttribute('data-category') || '';
+                            const id = row.getAttribute('data-id') || '';
+                            const price = row.getAttribute('data-price') || '';
+                            
+                            // Search in multiple fields
+                            const matchesSearch = searchTerm === '' || 
+                                productName.includes(searchTerm) || 
+                                description.includes(searchTerm) ||
+                                category.includes(searchTerm) ||
+                                id.toString().includes(searchTerm) ||
+                                price.toString().includes(searchTerm);
+                            
+                            if (matchesSearch) {
+                                row.style.display = '';
+                                visibleCount++;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    }
+                    
+                    // Show/hide empty state based on search results
+                    if (searchEmptyState) {
+                        if (searchTerm !== '' && visibleCount === 0 && productRows.length > 0) {
+                            searchEmptyState.style.display = '';
                         } else {
-                            row.style.display = 'none';
+                            searchEmptyState.style.display = 'none';
                         }
-                    });
+                    }
                 });
             }
         });

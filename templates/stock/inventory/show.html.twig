@@ -1,0 +1,72 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Inventory Details{% endblock %}
+
+{% block page_title %}INVENTORY MANAGEMENT{% endblock %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    <div class="stock-entry-page">
+        <div class="stock-entry-header">
+            <div class="stock-entry-header-left">
+                <div class="stock-entry-section-label">INVENTORY MANAGEMENT</div>
+                <h1 class="stock-entry-title">Inventory Details</h1>
+            </div>
+            <div class="stock-entry-header-right">
+                <a href="{{ path('app_inventory_index') }}" class="stock-entry-back-btn">
+                    <i class="fa fa-arrow-left"></i>
+                    Back to list
+                </a>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 style="margin-bottom: 1.5rem; color: #111827;">Product Information</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Product Name:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ inventory.product.Name }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Price:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">₱{{ inventory.product.price|number_format(2) }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 style="margin-bottom: 1.5rem; color: #111827;">Inventory Information</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Quantity Added:</strong>
+                            <p style="margin-top: 0.5rem; color: #059669; font-weight: 600; font-size: 1.25rem;">+{{ inventory.quantity }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Created At:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ inventory.createdAt|date('Y-m-d H:i:s') }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Updated At:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ inventory.updatedAt|date('Y-m-d H:i:s') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                    <a href="{{ path('app_inventory_edit', {'id': inventory.id}) }}" class="btn btn-primary">
+                        <i class="fa fa-pencil"></i>
+                        Edit
+                    </a>
+                    <a href="{{ path('app_inventory_index') }}" class="btn btn-secondary">
+                        Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

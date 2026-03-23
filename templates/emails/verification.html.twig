@@ -1,0 +1,28 @@
+{% set appName = 'La Kurt Flowershop' %}
+
+<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+  <h2 style="margin: 0 0 12px; font-weight: 700;">Verify your email</h2>
+
+  <p style="margin: 0 0 16px;">
+    Hi {{ user.fullName }},
+  </p>
+
+  <p style="margin: 0 0 16px;">
+    Thanks for signing up to {{ appName }}. Please confirm your email address to activate your account.
+  </p>
+
+  <p style="margin: 0 0 18px;">
+    <a href="{{ verifyUrl }}" style="display: inline-block; background: #6e0f0f; color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 6px;">
+      Verify Email
+    </a>
+  </p>
+
+  <p style="margin: 0 0 8px; color: #444; font-size: 14px;">
+    This link will expire in about {{ expiresInHours }} hours.
+  </p>
+
+  <p style="margin: 0; color: #666; font-size: 12px;">
+    If you didn’t create an account, you can ignore this email.
+  </p>
+</div>
+

@@ -1,0 +1,70 @@
+<footer class="fv-footer" role="contentinfo">
+    <div class="fv-footer__inner">
+        <div class="fv-footer__col">
+            <h3 class="fv-footer__heading">MAIN MENU</h3>
+            <ul class="fv-footer__links">
+                <li><a href="{{ path('app_client') }}">Home</a></li>
+                <li><a href="{{ path('app_shop') }}">Shop</a></li>
+                <li><a href="{{ path('app_about') }}">About</a></li>
+                <li><a href="{{ path('app_faq') }}">FAQ</a></li>
+                <li><a href="{{ path('app_contact') }}">Contact Us</a></li>
+            </ul>
+        </div>
+
+        <div class="fv-footer__col">
+            <h3 class="fv-footer__heading">SHOP</h3>
+            <ul class="fv-footer__links">
+                <li><a href="#">Bestsellers</a></li>
+                <li><a href="#">Bouquets</a></li>
+                <li><a href="#">Box &amp; Vase Blooms</a></li>
+                <li><a href="#">Floral Glass Domes</a></li>
+                <li><a href="#">Sympathy Flowers</a></li>
+            </ul>
+        </div>
+
+        <div class="fv-footer__col">
+            <h3 class="fv-footer__heading">NEWSLETTER</h3>
+            <p class="fv-footer__text">
+                Subscribe to receive updates, access to exclusive deals, and more.
+            </p>
+            <form class="fv-footer__newsletter" action="#" method="post">
+                <input
+                    type="email"
+                    name="email"
+                    class="fv-footer__input"
+                    placeholder="Enter your email address"
+                    autocomplete="email"
+                    required
+                >
+                <button type="submit" class="fv-footer__button">
+                    SUBSCRIBE
+                </button>
+            </form>
+        </div>
+
+        <div class="fv-footer__col">
+            <h3 class="fv-footer__heading">HELP</h3>
+            <ul class="fv-footer__links">
+                <li><a href="#">Terms and Conditions</a></li>
+                <li><a href="#">Payment Options</a></li>
+                <li><a href="#">FAQs</a></li>
+            </ul>
+
+            <h3 class="fv-footer__heading fv-footer__heading--mt">FOLLOW US</h3>
+            <div class="fv-footer__social">
+                <a href="#" aria-label="Facebook" class="fv-footer__social-link">Fb</a>
+                <a href="#" aria-label="Instagram" class="fv-footer__social-link">Ig</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="fv-footer__bottom">
+        <p class="fv-footer__copy">
+            Copyright © {{ "now"|date("Y") }}, La Kurt Floral Studio.
+        </p>
+        <p class="fv-footer__legal">
+            <a href="#">Privacy Policy</a> · <a href="#">Cookie Policy</a>
+        </p>
+    </div>
+</footer>
+

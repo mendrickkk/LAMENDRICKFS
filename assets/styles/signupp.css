@@ -1,549 +1,93 @@
-/* ============================================
-   KM+BP Flower Shop - Sign Up Styles
-   Unique Floral Design - Pink & White Theme
-   ============================================ */
+/* ==========================================================================
+   REGISTER / SIGNUP — La Kurt Flowershop (Fig & Vine style)
+   Load AFTER loginn.css (reuses .fv-login__, :root variables from loginn.css)
+   ========================================================================== */
 
-:root {
-  --color-primary: #ec4899;
-  --color-primary-dark: #db2777;
-  --color-primary-light: #f472b6;
-  --color-accent: #fbb6ce;
-  --color-secondary: #10b981;
-  --text-main: #111827;
-  --text-muted: #6b7280;
-  --border: #e5e7eb;
+.fv-register-page .fv-main {
+  min-height: min(65vh, 720px);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+.fv-register__form {
+  text-align: left;
+}
 
-html, body { height: 100%; }
+.fv-login__submit--register {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  padding: 18px 12px;
+  line-height: 1.35;
+}
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #fdf2f8 0%, #fae8ff 50%, #f3e8ff 100%);
-  color: var(--text-main);
-  line-height: 1.6;
+.fv-register__error {
+  display: block;
+  font-family: var(--fv-sans);
+  font-size: 12px;
+  color: #c62828;
+  margin-top: 6px;
+  min-height: 0;
+}
+
+.fv-register__input--error {
+  border-color: #c62828 !important;
+}
+
+.fv-register__requirements {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  font-family: var(--fv-sans);
+  font-size: 11px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.fv-register__req-title,
+.fv-register__req-sub {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.fv-register__req-sub {
+  margin-top: 10px;
+}
+
+.fv-register__req-item {
+  margin: 4px 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 40px 20px;
-  position: relative;
-  overflow-x: hidden;
+  gap: 8px;
 }
 
-/* Floating flower background decorations */
-body::before {
-  content: '🌸';
-  position: fixed;
-  top: 10%;
-  left: 5%;
-  font-size: 60px;
-  opacity: 0.15;
-  animation: float 8s ease-in-out infinite;
-  pointer-events: none;
+.fv-register__req-item.is-valid {
+  color: #2e7d32;
 }
 
-body::after {
-  content: '🌺';
-  position: fixed;
-  bottom: 15%;
-  right: 8%;
-  font-size: 80px;
-  opacity: 0.12;
-  animation: float 10s ease-in-out infinite 2s;
-  pointer-events: none;
+.fv-register__req-icon {
+  font-weight: 700;
+  width: 1em;
+  display: inline-block;
 }
 
-@keyframes float {
-  0%, 100% { 
-    transform: translateY(0px) rotate(0deg); 
-  }
-  50% { 
-    transform: translateY(-20px) rotate(5deg); 
-  }
-}
-
-.auth-wrapper {
-  display: flex;
-  max-width: 1100px;
-  width: 100%;
-  background: white;
-  border-radius: 32px;
-  overflow: hidden;
-  box-shadow: 0 30px 60px rgba(236, 72, 153, 0.15), 
-              0 0 0 1px rgba(236, 72, 153, 0.1);
-  position: relative;
-}
-
-.auth-wrapper::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  border-radius: 32px;
-  z-index: -1;
-  opacity: 0.1;
-}
-
-@media (max-width: 968px) {
-  .auth-wrapper { 
-    flex-direction: column-reverse;
-    max-width: 550px;
-  }
-}
-
-/* Left Form Panel */
-.auth-panel {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 70px 55px;
-  background: white;
-  position: relative;
-}
-
-/* Subtle floral pattern overlay */
-.auth-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(251, 182, 206, 0.04) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-.auth-card {
-  width: 100%;
-  max-width: 420px;
-  position: relative;
-  z-index: 1;
-}
-
-.auth-card-header {
-  margin-bottom: 36px;
-  text-align: center;
-}
-
-.auth-title {
-  font-size: 38px;
-  font-weight: 800;
-  color: var(--text-main);
-  margin-bottom: 10px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.auth-desc {
-  color: var(--text-muted);
-  font-size: 16px;
-  font-weight: 400;
-}
-
-
-
-.form-group {
-  margin-bottom: 22px;
-  position: relative;
-}
-
-.input-container {
-  position: relative;
-}
-
-.form-input {
-  width: 100%;
-  padding: 16px 20px 16px 50px;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  font-size: 15px;
-  transition: all 0.3s ease;
-  background: white;
-  color: var(--text-main);
-  font-family: inherit;
-}
-
-.form-input::placeholder {
-  color: #9ca3af;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.12);
-  transform: translateY(-1px);
-}
-
-.input-icon {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  font-size: 18px;
-  pointer-events: none;
-  transition: all 0.3s ease;
-  z-index: 10;
-}
-
-.form-input:focus ~ .input-icon {
-  color: var(--color-primary);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.checkbox-group {
+.fv-register__terms {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin: 20px 0 28px;
+  margin: 8px 0 20px;
+  font-family: var(--fv-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: #666;
+  cursor: pointer;
 }
 
-.checkbox-group input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--color-primary);
-  cursor: pointer;
-  margin-top: 2px;
+.fv-register__terms input {
+  margin-top: 3px;
   flex-shrink: 0;
 }
 
-.checkbox-group label {
-  font-size: 14px;
-  color: var(--text-main);
-  cursor: pointer;
-  user-select: none;
-}
-
-.checkbox-group .link {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.checkbox-group .link:hover {
+.fv-register__terms a {
+  color: var(--fv-maroon);
   text-decoration: underline;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 17px 20px;
-  border: 0;
-  border-radius: 16px;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.btn:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-  color: white;
-  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.35);
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(236, 72, 153, 0.45);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-outline {
-  background: white;
-  color: #6b7280;
-  border: 2px solid #e5e7eb;
-  padding: 15px 20px;
-  transition: all 0.3s ease;
-}
-
-.btn-outline:hover {
-  border-color: var(--color-primary);
-  background: #fdf2f8;
-  color: var(--color-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(236, 72, 153, 0.15);
-}
-
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  color: var(--text-muted);
-  font-size: 13px;
-  margin: 26px 0;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: '';
-  height: 2px;
-  flex: 1;
-  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
-}
-
-.input-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.auth-footer {
-  margin-top: 32px;
-  text-align: center;
-  font-size: 15px;
-  color: var(--text-muted);
-}
-
-.link {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-/* Right Hero Panel */
-.auth-hero {
-  flex: 1;
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 70px 55px;
-  background: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #fbb6ce 100%);
-  color: white;
-  overflow: hidden;
-}
-
-/* Decorative flowers and circles */
-.auth-hero::before {
-  content: '🌷';
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  font-size: 100px;
-  bottom: -20px;
-  left: -20px;
-  opacity: 0.25;
-  animation: float 6s ease-in-out infinite;
-}
-
-.auth-hero::after {
-  content: '';
-  position: absolute;
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  bottom: -80px;
-  right: -60px;
-  animation: float 8s ease-in-out infinite 1s;
-}
-
-/* Additional decorative elements */
-.auth-hero-inner::before {
-  content: '🌹';
-  position: absolute;
-  top: 30px;
-  right: 40px;
-  font-size: 50px;
-  opacity: 0.2;
-  animation: float 7s ease-in-out infinite 3s;
-}
-
-.auth-hero-inner {
-  position: relative;
-  z-index: 1;
-  max-width: 440px;
-}
-
-.brand-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 28px;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50px;
-  backdrop-filter: blur(10px);
-}
-
-.brand-badge::before {
-  content: '🌸';
-  font-size: 24px;
-}
-
-.brand-title {
-  font-size: 46px;
-  font-weight: 900;
-  line-height: 1.15;
-  margin-bottom: 22px;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-}
-
-.brand-subtitle {
-  font-size: 18px;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.95);
-  margin-bottom: 50px;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
-}
-
-/* Feature list styling */
-.feature-list {
-  margin-top: 50px;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-  font-size: 17px;
-  font-weight: 500;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-}
-
-.feature-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateX(5px);
-}
-
-.feature-icon {
-  color: #10b981;
-  font-size: 26px;
-  flex-shrink: 0;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-/* Loading State */
-.loading {
-  opacity: 0.6;
-  pointer-events: none;
-  position: relative;
-}
-
-.loading .btn-primary {
-  background: #d1d5db;
-  cursor: not-allowed;
-}
-
-/* Responsive */
-@media (max-width: 968px) {
-  .auth-hero {
-    padding: 60px 45px;
-  }
-  
-  .auth-panel {
-    padding: 60px 45px;
-  }
-  
-  .brand-title {
-    font-size: 38px;
-  }
-}
-
-@media (max-width: 640px) {
-  body {
-    padding: 0;
-  }
-  
-  body::before,
-  body::after {
-    display: none;
-  }
-  
-  .auth-wrapper {
-    border-radius: 0;
-    min-height: 100vh;
-  }
-  
-  .auth-hero {
-    padding: 45px 30px;
-  }
-  
-  .auth-panel {
-    padding: 45px 30px;
-  }
-  
-  .auth-title {
-    font-size: 32px;
-  }
-  
-  .brand-title {
-    font-size: 32px;
-  }
-  
-  .form-input {
-    font-size: 16px;
-  }
-}
-
-/* Accessibility */
-.form-input:focus,
-.btn:focus,
-.checkbox-group input:focus {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+  text-underline-offset: 3px;
 }

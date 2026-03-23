@@ -1,0 +1,306 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Edit Stock Entry{% endblock %}
+
+{% block page_title %}STOCK MANAGEMENT{% endblock %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    <div class="stock-entry-page">
+        <div class="stock-entry-header">
+            <div class="stock-entry-header-left">
+                <div class="stock-entry-section-label">STOCK MANAGEMENT</div>
+                <h1 class="stock-entry-title">Edit Stock Entry</h1>
+            </div>
+            <div class="stock-entry-header-right">
+                <a href="{{ path('app_stock_index') }}" class="stock-entry-back-btn">
+                    <i class="fa fa-arrow-left"></i>
+                    Back to list
+                </a>
+            </div>
+        </div>
+
+        <div class="stock-entry-form-container">
+            {{ include('stock/_form.html.twig', {'button_label': 'Update Stock Entry'}) }}
+        </div>
+    </div>
+    
+    <style>
+        .image-upload-container {
+            margin-top: 0.5rem;
+        }
+        
+        .image-upload-dropzone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .image-upload-dropzone:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+        
+        .image-upload-dropzone.dragover {
+            border-color: #007bff;
+            background: #e7f3ff;
+            transform: scale(1.02);
+        }
+        
+        .dropzone-content {
+            pointer-events: none;
+        }
+        
+        .dropzone-text {
+            margin: 0.5rem 0;
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .dropzone-link {
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        
+        .dropzone-hint {
+            margin: 0.5rem 0 0 0;
+            color: #999;
+            font-size: 0.875rem;
+        }
+        
+        .image-preview-container {
+            margin-top: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .image-preview {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .image-remove-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .image-remove-btn:hover {
+            background: #c82333;
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Image drag and drop functionality
+            const dropzone = document.getElementById('imageDropzone');
+            // Try multiple ways to find the file input
+            let fileInput = document.getElementById('imageFileInput');
+            if (!fileInput) {
+                // Fallback: find by name attribute
+                fileInput = document.querySelector('input[type="file"][name*="productImage"]');
+            }
+            if (!fileInput) {
+                // Another fallback: find any file input in the form
+                fileInput = dropzone ? dropzone.querySelector('input[type="file"]') : null;
+            }
+            
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('imagePreview');
+            const removeBtn = document.getElementById('imageRemoveBtn');
+            
+            if (dropzone && fileInput) {
+                console.log('File input found:', fileInput);
+                
+                // Click to browse
+                dropzone.addEventListener('click', function(e) {
+                    if (e.target.closest('.image-remove-btn')) return;
+                    fileInput.click();
+                });
+                
+                // Prevent default drag behaviors on the document
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, preventDefaults, false);
+                    document.body.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                // Drag and drop events
+                dropzone.addEventListener('dragover', function(e) {
+                    dropzone.classList.add('dragover');
+                });
+                
+                dropzone.addEventListener('dragleave', function(e) {
+                    dropzone.classList.remove('dragover');
+                });
+                
+                dropzone.addEventListener('drop', function(e) {
+                    dropzone.classList.remove('dragover');
+                    
+                    const files = e.dataTransfer.files;
+                    console.log('Files dropped:', files);
+                    
+                    if (files.length > 0) {
+                        const file = files[0];
+                        console.log('File dropped:', file.name, 'Type:', file.type, 'Size:', file.size);
+                        
+                        // Check if it's an image by extension or MIME type
+                        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
+                        const fileName = file.name.toLowerCase();
+                        const isImageByExtension = imageExtensions.some(ext => fileName.endsWith(ext));
+                        const isImageByType = file.type.startsWith('image/') || file.type === '';
+                        
+                        if (isImageByType || isImageByExtension) {
+                            // Assign file to input using DataTransfer (most reliable method)
+                            try {
+                                const dataTransfer = new DataTransfer();
+                                dataTransfer.items.add(file);
+                                fileInput.files = dataTransfer.files;
+                                console.log('File assigned via DataTransfer. File count:', fileInput.files.length);
+                                
+                                // Verify the file was assigned
+                                if (fileInput.files.length === 0) {
+                                    console.error('File was not assigned to input!');
+                                    alert('Error: Could not assign file to form. Please try clicking to browse instead.');
+                                    return;
+                                }
+                            } catch (err) {
+                                console.error('DataTransfer failed:', err);
+                                alert('Error assigning file. Please try clicking to browse instead.');
+                                return;
+                            }
+                            
+                            // Trigger change event to ensure form recognizes the file
+                            const changeEvent = new Event('change', { bubbles: true, cancelable: true });
+                            fileInput.dispatchEvent(changeEvent);
+                            
+                            console.log('File input files after assignment:', fileInput.files);
+                            handleFile(file);
+                        } else {
+                            alert('Please select an image file (JPG, PNG, GIF, etc.). File: ' + file.name);
+                        }
+                    }
+                });
+                
+                // File input change
+                fileInput.addEventListener('change', function(e) {
+                    console.log('File input changed:', this.files);
+                    if (this.files && this.files[0]) {
+                        handleFile(this.files[0]);
+                    }
+                });
+                
+                // Remove image
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Clear file input using DataTransfer (most reliable method)
+                        try {
+                            const dataTransfer = new DataTransfer();
+                            fileInput.files = dataTransfer.files;
+                        } catch (err) {
+                            // Fallback to traditional method
+                            fileInput.value = '';
+                        }
+                        
+                        // Clear preview image
+                        if (preview) {
+                            preview.src = '';
+                        }
+                        
+                        // Hide preview container and show dropzone
+                        if (previewContainer) {
+                            previewContainer.style.display = 'none';
+                        }
+                        if (dropzone) {
+                            dropzone.style.display = 'block';
+                        }
+                        
+                        console.log('Image removed, file input cleared');
+                    });
+                }
+                
+                function handleFile(file) {
+                    // Validate it's an image (by type or extension)
+                    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
+                    const fileName = file.name.toLowerCase();
+                    const isImageByExtension = imageExtensions.some(ext => fileName.endsWith(ext));
+                    const isImageByType = file.type.startsWith('image/') || file.type === '';
+                    
+                    if (!isImageByType && !isImageByExtension) {
+                        alert('Please select an image file.');
+                        return;
+                    }
+                    
+                    console.log('Handling file:', file.name);
+                    console.log('Preview elements:', { preview, previewContainer, dropzone });
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        console.log('FileReader loaded, setting preview');
+                        console.log('Data URL length:', e.target.result.length);
+                        
+                        if (preview) {
+                            preview.src = e.target.result;
+                            preview.style.display = 'block';
+                            console.log('Preview src set, display: block');
+                        } else {
+                            console.error('Preview image element not found!');
+                        }
+                        
+                        if (previewContainer) {
+                            previewContainer.style.display = 'block';
+                            previewContainer.style.visibility = 'visible';
+                            console.log('Preview container shown');
+                        } else {
+                            console.error('Preview container element not found!');
+                        }
+                        
+                        if (dropzone) {
+                            dropzone.style.display = 'none';
+                            console.log('Dropzone hidden');
+                        }
+                    };
+                    reader.onerror = function() {
+                        console.error('FileReader error');
+                        alert('Error reading file');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            } else {
+                console.error('Dropzone or file input not found!', { dropzone, fileInput });
+            }
+        });
+    </script>
+{% endblock %}

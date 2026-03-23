@@ -1,0 +1,390 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}User Management - Flower Shop{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block breadcrumb_current %}Users{% endblock %}
+
+{% block breadcrumb %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    {% for message in app.flashes('success') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-success">
+                <span>✓</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-error">
+                <span>⚠</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="stock-management-container">
+        <!-- Header Section -->
+        <div class="stock-management-header">
+            <h1 class="stock-management-title">User Management</h1>
+            <div class="stock-management-header-actions">
+                <button type="button" id="bulkDeleteBtn" class="stock-new-entry-btn" style="background: #dc2626; display: none;" onclick="handleBulkDelete()">
+                    <i class="fa fa-trash"></i> Delete Selected
+                </button>
+                <a href="{{ path('app_user_new') }}" class="stock-new-entry-btn">
+                    <i class="fa fa-plus"></i> New User
+                </a>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="card">
+            <!-- Search and Filter Bar -->
+            <div class="product-search-toolbar">
+                <div class="search-input-container">
+                    <i class="fa fa-search"></i>
+                    <input type="text" placeholder="Search by username or email" id="userSearch">
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <select id="roleFilter" class="form-control" style="width: auto; min-width: 140px;">
+                        <option value="">All Roles</option>
+                        <option value="ROLE_ADMIN">Admin</option>
+                        <option value="ROLE_STAFF">Staff</option>
+                        <option value="ROLE_CLIENT">Client</option>
+                    </select>
+                    <select id="statusFilter" class="form-control" style="width: auto; min-width: 140px;">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card-body card-body-no-padding">
+                <div class="table-responsive product-table user-table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">
+                                    <input type="checkbox" id="selectAllCheckbox" title="Select All">
+                                </th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                                <th>Created By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% if users|length > 0 %}
+                            {% for user in users %}
+                                <tr class="user-row" 
+                                    data-username="{{ user.username|lower }}" 
+                                    data-email="{{ user.email|lower }}"
+                                    data-role="{{ user.role }}"
+                                    data-status="{{ user.isActive ? 'active' : 'inactive' }}"
+                                    data-id="{{ user.id }}"
+                                    data-name="{{ user.fullName|lower }}"
+                                    data-firstname="{{ user.firstName|lower }}"
+                                    data-lastname="{{ user.lastName|lower }}">
+                                    <td>
+                                        <input type="checkbox" class="user-checkbox" name="user_ids[]" value="{{ user.id }}" data-user-id="{{ user.id }}">
+                                    </td>
+                                    <td>#{{ user.id }}</td>
+                                    <td>
+                                        <strong>{{ user.fullName }}</strong>
+                                        {% if user.firstName or user.lastName %}
+                                            <br><small style="color: #6b7280;">{{ user.username }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.role == 'ROLE_ADMIN' %}
+                                            <span class="badge" style="background: #dc2626; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Admin</span>
+                                        {% elseif user.role == 'ROLE_STAFF' %}
+                                            <span class="badge" style="background: #2563eb; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Staff</span>
+                                        {% else %}
+                                            <span class="badge" style="background: #059669; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Client</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.isActive %}
+                                            <span class="badge" style="background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                                                <i class="fa fa-check-circle"></i> Active
+                                            </span>
+                                        {% else %}
+                                            <span class="badge" style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                                                <i class="fa fa-times-circle"></i> Inactive
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.createdAt ? user.createdAt|date('Y-m-d H:i') : '-' }}</td>
+                                    <td>{{ user.createdBy ? user.createdBy.username : '-' }}</td>
+                                    <td>
+                                        <div class="product-actions-cell">
+                                            <a href="{{ path('app_user_show', {'id': user.id}) }}" 
+                                               class="card-action-btn product-action-btn" 
+                                               title="View">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('app_user_edit', {'id': user.id}) }}" 
+                                               class="card-action-btn product-action-btn product-action-btn-edit" 
+                                               title="Edit">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_user_toggle_status', {'id': user.id}) }}" 
+                                                  style="display: inline-block; margin: 0;"
+                                                  onsubmit="return confirm('Are you sure you want to {{ user.isActive ? 'disable' : 'enable' }} user {{ user.username }}?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('toggle_status' ~ user.id) }}">
+                                                <button type="submit" 
+                                                        class="card-action-btn product-action-btn {{ user.isActive ? 'product-action-btn-disable' : 'product-action-btn-enable' }}" 
+                                                        title="{{ user.isActive ? 'Disable' : 'Enable' }}">
+                                                    <i class="fa {{ user.isActive ? 'fa-ban' : 'fa-check-circle' }}"></i>
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" 
+                                                  style="display: inline-block; margin: 0;"
+                                                  onsubmit="return confirm('Are you sure you want to delete user {{ user.username }}?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                                <button type="submit" class="card-action-btn product-action-btn product-action-btn-delete" title="Delete">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            <!-- Search Empty State (hidden by default) -->
+                            <tr id="userSearchEmptyState" class="user-search-empty-state" style="display: none;">
+                                <td colspan="10" class="stock-empty-state-cell">
+                                    <div class="stock-empty-state-message">
+                                        <i class="fa fa-search" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                                        <p style="font-size: 16px; color: #6b7280; margin: 0 0 8px 0;">No users found matching your search.</p>
+                                        <p style="font-size: 14px; color: #9ca3af; margin: 0;">Try searching with a different term or <a href="{{ path('app_user_new') }}" class="stock-empty-state-link">create a new user</a></p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="10" class="stock-empty-state-cell">
+                                    <div class="stock-empty-state-message">
+                                        No users found. <a href="{{ path('app_user_new') }}" class="stock-empty-state-link">Create your first user</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Delete Form (hidden) -->
+    <form id="bulkDeleteForm" method="post" action="{{ path('app_user_bulk_delete') }}" style="display: none;">
+        <input type="hidden" name="_token" value="{{ csrf_token('bulk_delete') }}">
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('userSearch');
+            const roleFilter = document.getElementById('roleFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const userRows = document.querySelectorAll('.user-row');
+            const searchEmptyState = document.getElementById('userSearchEmptyState');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const userCheckboxes = document.querySelectorAll('.user-checkbox');
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+            // Select All functionality
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    userCheckboxes.forEach(checkbox => {
+                        const row = checkbox.closest('.user-row');
+                        if (row && row.style.display !== 'none') {
+                            checkbox.checked = this.checked;
+                        }
+                    });
+                    updateBulkDeleteButton();
+                });
+            }
+
+            // Individual checkbox change
+            userCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateSelectAllCheckbox();
+                    updateBulkDeleteButton();
+                });
+            });
+
+            // Update Select All checkbox state
+            function updateSelectAllCheckbox() {
+                if (!selectAllCheckbox) return;
+                
+                const visibleCheckboxes = Array.from(userCheckboxes).filter(cb => {
+                    const row = cb.closest('.user-row');
+                    return row && row.style.display !== 'none';
+                });
+                
+                const checkedVisible = visibleCheckboxes.filter(cb => cb.checked);
+                
+                if (visibleCheckboxes.length === 0) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                } else if (checkedVisible.length === visibleCheckboxes.length) {
+                    selectAllCheckbox.checked = true;
+                    selectAllCheckbox.indeterminate = false;
+                } else if (checkedVisible.length > 0) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = true;
+                } else {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                }
+            }
+
+            // Update bulk delete button visibility
+            function updateBulkDeleteButton() {
+                if (!bulkDeleteBtn) return;
+                
+                const checkedBoxes = Array.from(userCheckboxes).filter(cb => {
+                    const row = cb.closest('.user-row');
+                    return cb.checked && row && row.style.display !== 'none';
+                });
+                
+                if (checkedBoxes.length > 0) {
+                    bulkDeleteBtn.style.display = 'inline-flex';
+                } else {
+                    bulkDeleteBtn.style.display = 'none';
+                }
+            }
+
+            // Bulk delete handler
+            window.handleBulkDelete = function() {
+                const checkedBoxes = Array.from(userCheckboxes).filter(cb => cb.checked);
+                
+                if (checkedBoxes.length === 0) {
+                    alert('Please select at least one user to delete.');
+                    return;
+                }
+
+                const userCount = checkedBoxes.length;
+                if (!confirm(`Are you sure you want to delete ${userCount} user(s)? This action cannot be undone.`)) {
+                    return;
+                }
+
+                // Get form and clear any existing user_ids inputs
+                const form = document.getElementById('bulkDeleteForm');
+                form.querySelectorAll('input[name="user_ids[]"]').forEach(input => input.remove());
+                
+                // Add selected user IDs as hidden inputs
+                checkedBoxes.forEach(checkbox => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'user_ids[]';
+                    input.value = checkbox.value;
+                    form.appendChild(input);
+                });
+
+                // Submit form
+                form.submit();
+            };
+
+            function filterUsers() {
+                const searchTerm = (searchInput ? searchInput.value.toLowerCase().trim() : '');
+                const roleValue = (roleFilter ? roleFilter.value : '');
+                const statusValue = (statusFilter ? statusFilter.value : '');
+                let visibleCount = 0;
+
+                userRows.forEach(row => {
+                    if (row.classList.contains('user-search-empty-state')) {
+                        return;
+                    }
+
+                    const username = row.getAttribute('data-username') || '';
+                    const email = row.getAttribute('data-email') || '';
+                    const name = row.getAttribute('data-name') || '';
+                    const firstname = row.getAttribute('data-firstname') || '';
+                    const lastname = row.getAttribute('data-lastname') || '';
+                    const id = row.getAttribute('data-id') || '';
+                    const role = row.getAttribute('data-role') || '';
+                    const status = row.getAttribute('data-status') || '';
+
+                    // Search matching
+                    const matchesSearch = searchTerm === '' || 
+                        username.includes(searchTerm) || 
+                        email.includes(searchTerm) ||
+                        name.includes(searchTerm) ||
+                        firstname.includes(searchTerm) ||
+                        lastname.includes(searchTerm) ||
+                        id.includes(searchTerm);
+                    
+                    // Role matching - if filter is empty, show all; otherwise match exactly
+                    const matchesRole = roleValue === '' || role === roleValue;
+                    
+                    // Status matching - if filter is empty, show all; otherwise match exactly
+                    const matchesStatus = statusValue === '' || status === statusValue;
+
+                    // Show row only if it matches all active filters
+                    if (matchesSearch && matchesRole && matchesStatus) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Update select all checkbox and bulk delete button after filtering
+                updateSelectAllCheckbox();
+                updateBulkDeleteButton();
+
+                // Show/hide empty state based on results
+                if (searchEmptyState) {
+                    if (visibleCount === 0 && (searchTerm !== '' || roleValue !== '' || statusValue !== '')) {
+                        searchEmptyState.style.display = '';
+                    } else {
+                        searchEmptyState.style.display = 'none';
+                    }
+                }
+            }
+
+            // Attach event listeners - filters work independently
+            if (searchInput) {
+                searchInput.addEventListener('input', filterUsers);
+            }
+            
+            if (roleFilter) {
+                roleFilter.addEventListener('change', function() {
+                    filterUsers();
+                });
+            }
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', function() {
+                    filterUsers();
+                });
+            }
+            
+            // Always run filter on page load to ensure proper initial state
+            if (userRows.length > 0) {
+                filterUsers();
+            }
+        });
+    </script>
+{% endblock %}
+

@@ -1,0 +1,83 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'stock-entry-form', 'enctype': 'multipart/form-data'}}) }}
+    
+    <!-- EXISTING PRODUCT Section -->
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">EXISTING PRODUCT</h3>
+        <div class="stock-form-field">
+            <label class="stock-form-label">Existing Product</label>
+            {{ form_widget(form.existingProduct, {'attr': {'placeholder': 'Select existing product (or fill form below to create new)'}}) }}
+            {{ form_errors(form.existingProduct) }}
+        </div>
+    </div>
+
+    <!-- NEW PRODUCT DETAILS (OPTIONAL) Section -->
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">NEW PRODUCT DETAILS (OPTIONAL)</h3>
+        <p class="stock-form-section-description">
+            Leave blank if you selected an existing product above. Fill these fields to create or update product information while managing stock.
+        </p>
+        
+        <div class="stock-form-field">
+            <label class="stock-form-label">Product Name</label>
+            {{ form_widget(form.productName, {'attr': {'placeholder': 'Enter product name'}}) }}
+            {{ form_errors(form.productName) }}
+        </div>
+
+        <div class="stock-form-field">
+            <label class="stock-form-label">Price</label>
+            <div class="stock-price-input-wrapper">
+                <span class="stock-price-symbol">₱</span>
+                {{ form_widget(form.productPrice, {'attr': {'placeholder': '0.00', 'step': '0.01', 'min': '0', 'class': 'stock-price-input'}}) }}
+            </div>
+            {{ form_errors(form.productPrice) }}
+        </div>
+
+        <div class="stock-form-field">
+            <label class="stock-form-label">Quantity <span style="color: #ef4444;">*</span></label>
+            {{ form_widget(form.quantity, {'attr': {'placeholder': 'Enter quantity'}}) }}
+            {{ form_errors(form.quantity) }}
+        </div>
+
+        <div class="stock-form-field">
+            <label class="stock-form-label">Description</label>
+            {{ form_widget(form.productDescription, {'attr': {'placeholder': 'Enter product description', 'rows': 4}}) }}
+            {{ form_errors(form.productDescription) }}
+        </div>
+
+        <div class="stock-form-field">
+            <label class="stock-form-label">Category</label>
+            {{ form_widget(form.productCategory, {'attr': {'placeholder': 'Select a category'}}) }}
+            {{ form_errors(form.productCategory) }}
+        </div>
+
+        <div class="stock-form-field">
+            <label class="stock-form-label">Product Image</label>
+            <div class="image-upload-container">
+                <div class="image-upload-dropzone" id="imageDropzone" style="position: relative;">
+                    <div class="dropzone-content">
+                        <i class="fa fa-cloud-upload-alt" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                        <p class="dropzone-text">Drag & drop an image here, or <span class="dropzone-link">click to browse</span></p>
+                        <p class="dropzone-hint">Supports: JPG, PNG, GIF</p>
+                    </div>
+                    {{ form_widget(form.productImage, {'attr': {'id': 'imageFileInput', 'accept': 'image/*', 'style': 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;'}}) }}
+                </div>
+                <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
+                    <img id="imagePreview" src="" alt="Preview" class="image-preview" style="display: none;">
+                    <button type="button" class="image-remove-btn" id="imageRemoveBtn" title="Remove image">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            {{ form_errors(form.productImage) }}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="stock-form-actions">
+        <button type="submit" class="stock-form-btn-primary">
+            {{ button_label|default('Create Stock Entry') }}
+        </button>
+        <a href="{{ path('app_stock_index') }}" class="stock-form-btn-cancel">Cancel</a>
+    </div>
+
+{{ form_end(form) }}

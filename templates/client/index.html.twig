@@ -1,274 +1,269 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}KM+BP - Premium Flower Shop{% endblock %}
+{% block title %}La Kurt Flowershop{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('styles/client.css') }}">
+    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
-<!-- Header -->
-<header class="header">
-    <!-- Top Bar -->
-    <div class="header-top">
-        <div class="header-container">
-            <a href="{{ path('app_landing') }}" class="logo">
-                <span class="logo-small">KM+BP</span>
-                
+{% if header_only is defined and header_only %}
+    <header class="fv-topbar" role="banner">
+        <div class="fv-topbar__inner">
+            <div class="fv-topbar__left" aria-hidden="true"></div>
+
+            <a class="fv-brand" href="{{ path('app_client') }}">
+                <img class="fv-brand__mark" src="{{ asset('img/logo1.png') }}" alt="La Kurt Flowershop">
+                <span class="fv-brand__text">
+                    <span class="fv-brand__name">LA KURT</span>
+                    <span class="fv-brand__tag">FLOWERSHOP</span>
+                </span>
             </a>
-            <div class="header-right">
-                <a href="#" class="header-link">Store Locations</a>
-                <a href="#" class="header-link">Track Order</a>
-                <a href="#" class="header-link">Help</a>
-                <a href="#" class="icon-link">
-                    <svg class="header-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                    </svg>
-                </a>
-                <a href="#" class="icon-link">
-                    <svg class="header-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path>
-                    </svg>
-                    <span class="cart-badge">0</span>
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Main Navigation -->
-    <nav class="main-nav">
-        <div class="header-container">
-            <div class="nav-links">
-                <a href="#" class="nav-link">All Flowers <span class="dropdown-arrow">▼</span></a>
-                <a href="#" class="nav-link">Occasions <span class="dropdown-arrow">▼</span></a>
-                <a href="#" class="nav-link">Fall</a>
-                <a href="#" class="nav-link">Halloween</a>
-                <a href="#" class="nav-link">Birthday</a>
-                <a href="#" class="nav-link">Next Day</a>
-                <a href="#" class="nav-link">Same Day</a>
-                <a href="#" class="nav-link">Weddings <span class="dropdown-arrow">▼</span></a>
-                <a href="#" class="nav-link">Subscriptions <span class="dropdown-arrow">▼</span></a>
-            </div>
-        </div>
-    </nav>
-</header>
 
-<!-- Hero Banner -->
-<section class="hero-banner">
-    <div class="hero-content">
-        <p class="hero-badge">BOUQSDAY SAVINGS</p>
-        <h1 class="hero-title">Get 25% Off</h1>
-        <p class="hero-subtitle">Save big on fall favorites, spooky stems, and more with code BOUQSDAY.</p>
-        <a href="{{ path('app_product_index') }}" class="btn btn-hero">Shop Now</a>
-    </div>
-    <div class="hero-image">
-        <!-- You can insert your hero image here -->
-        <div class="hero-image-placeholder">
-            <p>Hero Image Placeholder</p>
-            <p>Insert your floral arrangement image here</p>
+            <nav class="fv-topbar__right" aria-label="Utility">
+                <a class="fv-link" href="{{ path('app_login') }}">ACCOUNT</a>
+                <a class="fv-link" href="#">SEARCH</a>
+                <a class="fv-link" href="#">CART (0)</a>
+            </nav>
         </div>
-    </div>
-</section>
 
-<!-- Announcement Bar -->
-<div class="announcement-bar">
-    <p>Marigolds, strawflower, calla lilies, and more—the best of autumn is now in bloom. <a href="{{ path('app_product_index') }}">Shop Unique Stems</a></p>
+        <nav class="fv-nav" aria-label="Primary">
+            <ul class="fv-nav__list">
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_client' ? 'is-active' : '' }}"><a href="{{ path('app_client') }}">HOME</a></li>
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_shop' ? 'is-active' : '' }}"><a href="{{ path('app_shop') }}">SHOP</a></li>
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_about' ? 'is-active' : '' }}"><a href="{{ path('app_about') }}">ABOUT</a></li>
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_faq' ? 'is-active' : '' }}"><a href="{{ path('app_faq') }}">FAQ</a></li>
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_contact' ? 'is-active' : '' }}"><a href="{{ path('app_contact') }}">CONTACT US</a></li>
+            </ul>
+        </nav>
+    </header>
+{% else %}
+<div class="fv-page">
+    <header class="fv-topbar" role="banner">
+        <div class="fv-topbar__inner">
+            <div class="fv-topbar__left" aria-hidden="true"></div>
+
+            <a class="fv-brand" href="{{ path('app_client') }}">
+                <img class="fv-brand__mark" src="{{ asset('img/logo1.png') }}" alt="La Kurt Flowershop">
+                <span class="fv-brand__text">
+                    <span class="fv-brand__name">LA KURT</span>
+                    <span class="fv-brand__tag">FLOWERSHOP</span>
+                </span>
+            </a>
+
+            <nav class="fv-topbar__right" aria-label="Utility">
+                <a class="fv-link" href="{{ path('app_login') }}">ACCOUNT</a>
+                <a class="fv-link" href="#">SEARCH</a>
+                <a class="fv-link" href="#">CART (0)</a>
+            </nav>
+        </div>
+
+        <nav class="fv-nav" aria-label="Primary">
+            <ul class="fv-nav__list">
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_client' ? 'is-active' : '' }}"><a href="{{ path('app_client') }}">HOME</a></li>
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_shop' ? 'is-active' : '' }}"><a href="{{ path('app_shop') }}">SHOP</a></li>
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_about' ? 'is-active' : '' }}"><a href="{{ path('app_about') }}">ABOUT</a></li>
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_faq' ? 'is-active' : '' }}"><a href="{{ path('app_faq') }}">FAQ</a></li>
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_contact' ? 'is-active' : '' }}"><a href="{{ path('app_contact') }}">CONTACT US</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="fv-main" role="main">
+        <section class="fv-hero">
+            <div class="fv-hero__content">
+                <h1 class="fv-hero__title">WE MAKE EVERY MOMENT BLOOM</h1>
+                <p class="fv-hero__text">Surprise your loved ones with La Kurt's latest collection of fresh flowers!</p>
+                <a href="#" class="fv-hero__link">Bouquets</a>
+            </div>
+            <div class="fv-hero__image-wrapper">
+                <img src="{{ asset('images/hero.png') }}" alt="Elegant Floral Arrangement" class="fv-hero__image">
+            </div>
+        </section>
+
+        <section class="fv-products">
+            <div class="fv-products__header">
+                <h2 class="fv-products__title">BOUQUETS</h2>
+            </div>
+            
+            <div class="fv-products__grid">
+                {# Row 1: PNGs #}
+                <div class="fv-product-card">
+                    <div class="fv-product-card__image-box">
+                        <img src="{{ asset('images/11flowers.png') }}" alt="Kiera Fresh Bouquet" class="fv-product-card__img">
+                    </div>
+                    <div class="fv-product-card__info">
+                        <h3 class="fv-product-card__name">KIERA FRESH BOUQUET</h3>
+                        <p class="fv-product-card__price">P3,960</p>
+                    </div>
+                </div>
+                <div class="fv-product-card">
+                    <div class="fv-product-card__image-box">
+                        <img src="{{ asset('images/22flowers.png') }}" alt="Lilianne Bouquet" class="fv-product-card__img">
+                    </div>
+                    <div class="fv-product-card__info">
+                        <h3 class="fv-product-card__name">LILIANNE BOUQUET</h3>
+                        <p class="fv-product-card__price">P4,550</p>
+                    </div>
+                </div>
+                <div class="fv-product-card">
+                    <div class="fv-product-card__image-box">
+                        <img src="{{ asset('images/33flowers.png') }}" alt="Linnea Bouquet" class="fv-product-card__img">
+                    </div>
+                    <div class="fv-product-card__info">
+                        <h3 class="fv-product-card__name">LINNEA BOUQUET</h3>
+                        <p class="fv-product-card__price">P4,800</p>
+                    </div>
+                </div>
+                <div class="fv-product-card">
+                    <div class="fv-product-card__image-box">
+                        <img src="{{ asset('images/44flowers.png') }}" alt="Candice Bouquet" class="fv-product-card__img">
+                    </div>
+                    <div class="fv-product-card__info">
+                        <h3 class="fv-product-card__name">CANDICE BOUQUET</h3>
+                        <p class="fv-product-card__price">P4,800</p>
+                    </div>
+                </div>
+
+                {# Row 2: AVIFs #}
+                <div class="fv-product-card">
+                    <div class="fv-product-card__image-box">
+                        <img src="{{ asset('images/2.avif') }}" alt="Classic Rose" class="fv-product-card__img">
+                    </div>
+                    <div class="fv-product-card__info">
+                        <h3 class="fv-product-card__name">CLASSIC ROSE</h3>
+                        <p class="fv-product-card__price">P2,500</p>
+                    </div>
+                </div>
+                <div class="fv-product-card">
+                    <div class="fv-product-card__image-box">
+                        <img src="{{ asset('images/3.avif') }}" alt="Spring Bloom" class="fv-product-card__img">
+                    </div>
+                    <div class="fv-product-card__info">
+                        <h3 class="fv-product-card__name">SPRING BLOOM</h3>
+                        <p class="fv-product-card__price">P3,200</p>
+                    </div>
+                </div>
+                <div class="fv-product-card">
+                    <div class="fv-product-card__image-box">
+                        <img src="{{ asset('images/4.avif') }}" alt="Sunset Glow" class="fv-product-card__img">
+                    </div>
+                    <div class="fv-product-card__info">
+                        <h3 class="fv-product-card__name">SUNSET GLOW</h3>
+                        <p class="fv-product-card__price">P2,800</p>
+                    </div>
+                </div>
+                <div class="fv-product-card">
+                    <div class="fv-product-card__image-box">
+                        <img src="{{ asset('images/5.avif') }}" alt="Midnight Petal" class="fv-product-card__img">
+                    </div>
+                    <div class="fv-product-card__info">
+                        <h3 class="fv-product-card__name">MIDNIGHT PETAL</h3>
+                        <p class="fv-product-card__price">P4,100</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fv-products__footer">
+                <a href="{{ path('app_shop') }}" class="fv-btn fv-btn--primary">VIEW ALL PRODUCTS</a>
+            </div>
+        </section>
+
+        <section class="fv-collection-header">
+            <h2 class="fv-collection-header__title">OUR COMPLETE<br>COLLECTION</h2>
+        </section>
+
+        <section class="fv-contact-cta">
+            <div class="fv-contact-cta__bg">
+                <img src="{{ asset('images/bgz.png') }}" alt="Floral Background" class="fv-contact-cta__img">
+            </div>
+            <div class="fv-contact-cta__card">
+                <h3 class="fv-contact-cta__title">HAVE ANY QUESTIONS?</h3>
+                <p class="fv-contact-cta__text">Drop us a line, and we'll get back to you as soon as we can.</p>
+                <a href="{{ path('app_contact') }}" class="fv-contact-cta__link">CONTACT US</a>
+            </div>
+        </section>
+
+        <section class="fv-quote">
+            <div class="fv-quote__content">
+                <h2 class="fv-quote__title">FLORALS FOR EVERY MOMENT</h2>
+                <p class="fv-quote__text">From the simplest gesture to the grandest celebration, we create arrangements that speak when words aren't enough.</p>
+            </div>
+        </section>
+
+        <section class="fv-features">
+            <div class="fv-features__grid">
+                <div class="fv-feature-item">
+                    <div class="fv-feature-item__icon">
+                        <svg viewBox="0 0 100 100" fill="none" stroke="white" stroke-width="1">
+                            <path d="M50 85c0 0-25-15-25-35 0-15 10-25 25-25s25 10 25 25c0 20-25 35-25 35z" />
+                            <path d="M50 25c-5 0-10 5-10 10s5 10 10 10 10-5 10-10-5-10-10-10z" />
+                            <path d="M40 35c-5 0-10 5-10 10s5 10 10 10" />
+                            <path d="M60 35c5 0 10 5 10 10s-5 10-10 10" />
+                        </svg>
+                    </div>
+                    <h3 class="fv-feature-item__title">FRESH<br>&<br>PRIME</h3>
+                    <p class="fv-feature-item__text">We use only the freshest blooms of the highest quality for your loved ones.</p>
+                </div>
+                <div class="fv-feature-item">
+                    <div class="fv-feature-item__icon">
+                        <svg viewBox="0 0 100 100" fill="none" stroke="white" stroke-width="1">
+                            <path d="M50 20c-10 0-15 10-15 15s5 15 15 15 15-10 15-15-5-15-15-15z" />
+                            <path d="M35 35c-10 0-15 10-15 15s5 15 15 15" />
+                            <path d="M65 35c10 0 15 10 15 15s-5 15-15 15" />
+                            <path d="M50 50c0 10-5 15-15 15s-15-5-15-15" />
+                            <path d="M50 50c0 10 5 15 15 15s15-5 15-15" />
+                        </svg>
+                    </div>
+                    <h3 class="fv-feature-item__title">TRUSTED<br>&<br>RENOWNED</h3>
+                    <p class="fv-feature-item__text">Our florists are veterans in the industry with years of experience that fuel their creativity for every floral arrangement made just for you.</p>
+                </div>
+                <div class="fv-feature-item">
+                    <div class="fv-feature-item__icon">
+                        <svg viewBox="0 0 100 100" fill="none" stroke="white" stroke-width="1">
+                            <circle cx="50" cy="50" r="30" />
+                            <path d="M50 20c-5 5-10 15-10 30s5 25 10 30" />
+                            <path d="M50 20c5 5 10 15 10 30s-5 25-10 30" />
+                            <path d="M20 50c5-5 15-10 30-10s25 5 30 10" />
+                            <path d="M20 50c5 5 15 10 30 10s25-5 30-10" />
+                        </svg>
+                    </div>
+                    <h3 class="fv-feature-item__title">DEDICATED<br>&<br>METICULOUS</h3>
+                    <p class="fv-feature-item__text">Our lines are open 24/7 - ask what you need anytime, anywhere, and our devoted sales executives will assist you with any of your floral needs.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="fv-who-we-are">
+            <div class="fv-who-we-are__bg">
+                <img src="{{ asset('images/fresh flower.png') }}" alt="Fresh Flowers Background" class="fv-who-we-are__img">
+            </div>
+            <div class="fv-who-we-are__card">
+                <span class="fv-who-we-are__subtitle">WHO WE ARE</span>
+                <p class="fv-who-we-are__text">
+                    <strong>La Kurt's</strong> is the premier floral studio in the Philippines, creating fresh cut blooms, upscale floral arrangements, and novelty pieces for every moment and occasion.
+                </p>
+                <a href="{{ path('app_about') }}" class="fv-who-we-are__link">Tell Me More</a>
+            </div>
+        </section>
+
+        <section class="fv-social-cta">
+            <div class="fv-social-cta__content">
+                <h2 class="fv-social-cta__title">AT LA KURT, WE MAKE EVERY MOMENT BLOOM.</h2>
+                <p class="fv-social-cta__text">
+                    Tag us on social media <strong>@lakurtph</strong>, and use our hashtag <strong>#LaKurtMoments</strong>. We'd love to hear your story!
+                </p>
+            </div>
+        </section>
+    </main>
+
+    {% include 'client/footer.html.twig' %}
 </div>
-
-<!-- Main Body Content -->
-<main class="main-body">
-    <!-- Best Selling Bouquets Section -->
-    <section class="best-selling">
-        <h2 class="section-title">Best-Selling Bouqs</h2>
-        <div class="product-grid">
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="{{ asset('images/2.avif') }}" alt="Sweater Weather">
-                </div>
-                <h3 class="product-name">Sweater Weather</h3>
-                <p class="product-price">from $64</p>
-                <p class="product-shipping">Subscribe for 30% off + free shipping</p>
-                <p class="product-sub-price">from $45</p>
-            </div>
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="{{ asset('images/3.avif') }}" alt="Buttercream">
-                </div>
-                <h3 class="product-name">Buttercream</h3>
-                <p class="product-price">from $69</p>
-                <p class="product-shipping">Subscribe for 30% off + free shipping</p>
-                <p class="product-sub-price">from $49</p>
-            </div>
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="{{ asset('images/4.avif') }}" alt="Black Magic">
-                </div>
-                <h3 class="product-name">Black Magic</h3>
-                <p class="product-price">from $64</p>
-                <p class="product-shipping">Subscribe for 30% off + free shipping</p>
-                <p class="product-sub-price">from $45</p>
-            </div>
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="{{ asset('images/5.avif') }}" alt="Glowing">
-                </div>
-                <h3 class="product-name">Glowing</h3>
-                <p class="product-price">from $64</p>
-                <p class="product-shipping">Subscribe for 30% off + free shipping</p>
-                <p class="product-sub-price">from $45</p>
-            </div>
-        </div>
-        <div class="view-all-container">
-            <a href="{{ path('app_product_index') }}" class="btn btn-secondary">SHOP ALL BEST SELLERS</a>
-        </div>
-    </section>
-
-    <!-- Monthly Flower Subscriptions Section -->
-    <section class="subscription-section">
-        <div class="subscription-content">
-            <p class="subscription-reviews">50,000 5-STAR REVIEWS</p>
-            <h2 class="subscription-title">Monthly Flower Subscriptions</h2>
-            <p class="subscription-text">Knock, knock—fresh flowers delivered straight to your door with <strong>FREE shipping</strong> every month.</p>
-            <a href="#" class="btn btn-dark-green">Start A Subscription</a>
-        </div>
-        <div class="subscription-image">
-            <img src="{{ asset('images/6.avif') }}" alt="Monthly flower subscription">
-        </div>
-    </section>
-
-    <!-- Wedding Flowers Section -->
-    <section class="wedding-section">
-        <div class="wedding-image">
-            <img src="{{ asset('images/7.avif') }}" alt="Wedding flowers">
-        </div>
-        <div class="wedding-content">
-            <h2 class="wedding-title">Wedding Flowers, Your Way</h2>
-            <p class="wedding-text">From full-service floral designs to ready-to-go arrangements, we'll help bring your dream wedding to life.</p>
-            <a href="#" class="btn btn-dark-green">Learn More About Weddings</a>
-        </div>
-    </section>
-
-    <!-- Corporate Gifts Section -->
-    <section class="corporate-section">
-        <div class="corporate-content">
-            <p class="corporate-badge">CORPORATE GIFTS</p>
-            <h2 class="corporate-title">Flowers That Mean Business</h2>
-            <p class="corporate-text">Universally appreciated bouquets, plants, and gifts for your clients and employees.</p>
-            <a href="#" class="btn btn-dark-green">Get In Touch</a>
-        </div>
-        <div class="corporate-image">
-            <img src="{{ asset('images/8.avif') }}" alt="Corporate gifts">
-        </div>
-    </section>
-</main>
-
-<!-- Final Call-to-Action Section -->
-<section class="final-cta-section">
-    <div class="cta-content">
-        <img src="{{ asset('images/11.avif') }}" alt="Final call to action" class="cta-image">
-        <div class="cta-text">
-            <h2>Ready to Get Started?</h2>
-            <p>Contact us today for all your floral needs</p>
-            <a href="#" class="btn">Get In Touch</a>
-        </div>
-    </div>
-</section>
-
-<!-- FAQ Accordions -->
-<section class="faq-section">
-    <div class="faq-item">
-        <h3 class="faq-title">Flower Delivery for Every Occasion by KM+BP Co. ⭐</h3>
-    </div>
-    <div class="faq-item">
-        <h3 class="faq-title">Send Flowers Gifts You Need ➜</h3>
-    </div>
-    <div class="faq-item">
-        <h3 class="faq-title">How-to-about Flower Bouquets by Expert Florists ⭐</h3>
-    </div>
-    <div class="faq-item">
-        <h3 class="faq-title">Insightful Flowers Whenever You Need Them 💐</h3>
-    </div>
-    <div class="faq-item">
-        <h3 class="faq-title">Choose Bougie for Your Next Flower Delivery 🌸</h3>
-    </div>
-</section>
-
-<!-- Footer -->
-<footer class="footer">
-    <div class="footer-container">
-        <div class="footer-column">
-            <h4>THE KM+BP CO.</h4>
-            <ul>
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Press</a></li>
-                <li><a href="#">KM+BP Video</a></li>
-                <li><a href="#">Blog</a></li>
-                <li><a href="#">Site Map</a></li>
-                <li><a href="{{ path('app_product_index') }}">Shop All Flowers</a></li>
-                <li><a href="#">Shop All Plants</a></li>
-                <li><a href="#">Shop Best Sellers</a></li>
-            </ul>
-        </div>
-        <div class="footer-column">
-            <h4>SERVICES</h4>
-            <ul>
-                <li><a href="#">Events</a></li>
-                <li><a href="#">Weddings</a></li>
-                <li><a href="#">Corporate Gifts</a></li>
-                <li><a href="#">Coupons</a></li>
-                <li><a href="#">eGift Card</a></li>
-                <li><a href="#">Students & Grads</a></li>
-                <li><a href="#">Exclusive Discounts</a></li>
-            </ul>
-        </div>
-        <div class="footer-column">
-            <h4>WORK WITH US</h4>
-            <ul>
-                <li><a href="#">Jobs</a></li>
-                <li><a href="#">Affiliates</a></li>
-            </ul>
-            <h4>STORE LOCATIONS</h4>
-            <ul>
-                <li>Beverly Hills, CA</li>
-                <li>Orange County, CA</li>
-                <li>San Francisco, CA</li>
-                <li>San Diego, CA</li>
-            </ul>
-        </div>
-        <div class="footer-column">
-            <h4>HELP</h4>
-            <ul>
-                <li><a href="#">Flower Care</a></li>
-                <li><a href="#">Help Center</a></li>
-                <li><a href="#">Shipping</a></li>
-                <li><a href="#">Terms of Use</a></li>
-                <li><a href="#">Accessibility</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Do Not Sell My Information</a></li>
-            </ul>
-        </div>
-        <div class="footer-column">
-            <h4>LOCAL</h4>
-            <ul>
-                <li>Local Delivery</li>
-                <li>Los Angeles</li>
-                <li>San Francisco</li>
-                <li>New York City</li>
-                <li>Dallas</li>
-                <li>Chicago</li>
-                <li>Washington DC</li>
-            </ul>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        <div class="social-links">
-            <a href="#"><svg class="social-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg></a>
-            <a href="#"><svg class="social-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
-            <a href="#"><svg class="social-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/></svg></a>
-            <a href="#"><svg class="social-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg></a>
-        </div>
-        <p>COPYRIGHT 2025, THE KM+BP COMPANY</p>
-    </div>
-</footer>
+{% endif %}
 {% endblock %}

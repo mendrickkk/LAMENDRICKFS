@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact Us - La Kurt Flowershop{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/client.css') }}">
+    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+{% endblock %}
+
+{% block body %}
+<div class="fv-page">
+    {% include 'client/_header.html.twig' %}
+
+    <main class="fv-main">
+        <section class="fv-contact-page">
+            <div class="fv-contact-page__inner">
+                <h1 class="fv-contact-page__title">TALK TO US</h1>
+
+                <p class="fv-contact-page__lead">
+                    Below are our contact details. Please feel free to message us anytime for any queries
+                    <br>or concerns.
+                </p>
+
+                <div class="fv-contact-page__details">
+                    <p><span class="fv-contact-page__label">Facebook:</span> <a class="fv-contact-page__link" href="#">Fig & Vine Floral Studio</a></p>
+                    <p><span class="fv-contact-page__label">Instagram:</span> <a class="fv-contact-page__link" href="#">@figvineph</a></p>
+                    <p><span class="fv-contact-page__label">Mobile Number:</span> <a class="fv-contact-page__link" href="tel:+639176274718">+63917-627-4718</a></p>
+                    <p><span class="fv-contact-page__label">Email Address:</span> <a class="fv-contact-page__link" href="mailto:figvineph@gmail.com">figvineph@gmail.com</a></p>
+                </div>
+
+                <p class="fv-contact-page__note">
+                    You may also visit us at Ground Flr. G and A Building 2303 Chino Roces Ave, Makati,
+                    <br>Metro Manila. Our showroom is open from 9 am to 5 pm Mondays to Sundays.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    {% include 'client/footer.html.twig' %}
+</div>
+{% endblock %}

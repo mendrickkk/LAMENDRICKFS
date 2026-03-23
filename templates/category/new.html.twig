@@ -1,0 +1,34 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Add Category{% endblock %}
+
+{% block page_title %}CATEGORY MANAGEMENT{% endblock %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    <div class="stock-entry-page">
+        <div class="stock-entry-header">
+            <div class="stock-entry-header-left">
+                <div class="stock-entry-section-label">CATEGORY MANAGEMENT</div>
+                <h1 class="stock-entry-title">Add Category</h1>
+            </div>
+            <div class="stock-entry-header-right">
+                <a href="{{ path('app_category_index') }}" class="stock-entry-back-btn">
+                    <i class="fa fa-arrow-left"></i>
+                    Back to list
+                </a>
+            </div>
+        </div>
+
+        <div class="stock-entry-form-container">
+            {{ include('category/_form.html.twig', {'button_label': 'Create Category'}) }}
+        </div>
+    </div>
+{% endblock %}
+

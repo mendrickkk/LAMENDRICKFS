@@ -1,0 +1,114 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}User Details - Flower Shop{% endblock %}
+
+{% block page_title %}USER MANAGEMENT{% endblock %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    <div class="stock-entry-page">
+        <div class="stock-entry-header">
+            <div class="stock-entry-header-left">
+                <div class="stock-entry-section-label">USER MANAGEMENT</div>
+                <h1 class="stock-entry-title">User Details</h1>
+            </div>
+            <div class="stock-entry-header-right">
+                <a href="{{ path('app_user_index') }}" class="stock-entry-back-btn">
+                    <i class="fa fa-arrow-left"></i>
+                    Back to list
+                </a>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 style="margin-bottom: 1.5rem; color: #111827;">Account Information</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>ID:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">#{{ user.id }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>First Name:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ user.firstName ?: '-' }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Last Name:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ user.lastName ?: '-' }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Full Name:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ user.fullName }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Username:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ user.username }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Email:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ user.email }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Role:</strong>
+                            <p style="margin-top: 0.5rem;">
+                                {% if user.role == 'ROLE_ADMIN' %}
+                                    <span class="badge" style="background: #dc2626; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Admin</span>
+                                {% elseif user.role == 'ROLE_STAFF' %}
+                                    <span class="badge" style="background: #2563eb; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Staff</span>
+                                {% else %}
+                                    <span class="badge" style="background: #059669; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Client</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Status:</strong>
+                            <p style="margin-top: 0.5rem;">
+                                {% if user.isActive %}
+                                    <span class="badge" style="background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                                        <i class="fa fa-check-circle"></i> Active
+                                    </span>
+                                {% else %}
+                                    <span class="badge" style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                                        <i class="fa fa-times-circle"></i> Inactive
+                                    </span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 style="margin-bottom: 1.5rem; color: #111827;">Audit Information</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Created At:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ user.createdAt ? user.createdAt|date('Y-m-d H:i:s') : '-' }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Updated At:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ user.updatedAt ? user.updatedAt|date('Y-m-d H:i:s') : '-' }}</p>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Created By:</strong>
+                            <p style="margin-top: 0.5rem; color: #374151;">{{ user.createdBy ? user.createdBy.username : 'Self-registered' }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-primary">
+                        <i class="fa fa-pencil"></i>
+                        Edit
+                    </a>
+                    <a href="{{ path('app_user_index') }}" class="btn btn-secondary">
+                        Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

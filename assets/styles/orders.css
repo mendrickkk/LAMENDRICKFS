@@ -130,50 +130,92 @@
     padding: 0;
 }
 
-/* Table */
-.table-responsive {
-    overflow-x: auto;
-}
-
-.orders-table {
+/* Table - Match Product Table Styling */
+.card .table-responsive {
     width: 100%;
-    border-collapse: collapse;
+    overflow-x: auto;
+    box-sizing: border-box;
 }
 
-.orders-table thead {
-    background: #f9fafb;
-    border-bottom: 2px solid #e5e7eb;
+.card .table-responsive .table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
+    box-sizing: border-box;
 }
 
-.orders-table th {
-    padding: 16px 20px;
-    text-align: left;
-    font-size: 12px;
-    font-weight: 600;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid #e5e7eb;
+.card .table-responsive .table thead {
+    background: #f9fafb !important;
+    border-bottom: 1px solid #e5e7eb !important;
 }
 
-.orders-table tbody tr {
-    border-bottom: 1px solid #f3f4f6;
+.card .table-responsive .table thead th {
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.card .table-responsive .table th {
+    padding: 12px 16px !important;
+    text-align: left !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #6b7280 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    vertical-align: middle !important;
+    box-sizing: border-box;
+}
+
+.card .table-responsive .table tbody tr {
+    border-bottom: 1px solid #f3f4f6 !important;
     transition: background 0.2s;
 }
 
-.orders-table tbody tr:hover {
-    background: #f9fafb;
+.card .table-responsive .table tbody tr:hover {
+    background: #f9fafb !important;
 }
 
-.orders-table tbody tr:last-child {
+.card .table-responsive .table tbody tr:last-child {
     border-bottom: none;
 }
 
-.orders-table td {
-    padding: 16px 20px;
-    font-size: 14px;
-    color: #374151;
-    vertical-align: middle;
+.card .table-responsive .table td {
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+    vertical-align: middle !important;
+    text-align: left !important;
+    box-sizing: border-box;
+}
+
+/* Order # Column - Fixed width */
+.card .table-responsive .table th:nth-child(1),
+.card .table-responsive .table td:nth-child(1) {
+    width: 15% !important;
+}
+
+/* Customer Column - Flexible width */
+.card .table-responsive .table th:nth-child(2),
+.card .table-responsive .table td:nth-child(2) {
+    width: 25% !important;
+}
+
+/* Status Column - Fixed width for status badges */
+.card .table-responsive .table th:nth-child(3),
+.card .table-responsive .table td:nth-child(3) {
+    width: 18% !important;
+}
+
+/* Total Column - Fixed width for price */
+.card .table-responsive .table th:nth-child(4),
+.card .table-responsive .table td:nth-child(4) {
+    width: 15% !important;
+}
+
+/* Date Column - Fixed width */
+.card .table-responsive .table th:nth-child(5),
+.card .table-responsive .table td:nth-child(5) {
+    width: 27% !important;
 }
 
 /* Table Cell Styles */
@@ -199,7 +241,7 @@
     font-size: 13px;
 }
 
-/* Status Badges */
+/* Status Badges - Match Product Table Alignment */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -211,10 +253,11 @@
     text-transform: capitalize;
 }
 
-.status-dot {
+.status-badge-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
+    display: inline-block;
 }
 
 /* Status Colors */
@@ -223,7 +266,7 @@
     color: #92400e;
 }
 
-.status-pending .status-dot {
+.status-pending .status-badge-dot {
     background: #f59e0b;
 }
 
@@ -232,7 +275,7 @@
     color: #1e40af;
 }
 
-.status-processing .status-dot {
+.status-processing .status-badge-dot {
     background: #3b82f6;
 }
 
@@ -241,7 +284,7 @@
     color: #065f46;
 }
 
-.status-completed .status-dot {
+.status-completed .status-badge-dot {
     background: #10b981;
 }
 
@@ -250,7 +293,7 @@
     color: #3730a3;
 }
 
-.status-delivered .status-dot {
+.status-delivered .status-badge-dot {
     background: #8b5cf6;
 }
 
@@ -259,7 +302,7 @@
     color: #991b1b;
 }
 
-.status-cancelled .status-dot {
+.status-cancelled .status-badge-dot {
     background: #ef4444;
 }
 
@@ -268,28 +311,42 @@
     color: #7c2d12;
 }
 
-.status-shipped .status-dot {
+.status-shipped .status-badge-dot {
     background: #a855f7;
 }
 
-/* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
+/* Empty State - Match Product Table */
+.card .table-responsive .table tbody td[colspan="5"] {
+    text-align: center !important;
+    padding: 80px 24px !important;
+    color: #6b7280 !important;
+}
+
+.card .table-responsive .table tbody td[colspan="5"] i {
+    font-size: 64px;
+    margin-bottom: 24px;
     color: #9ca3af;
-    font-style: italic;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    display: block;
 }
 
-.empty-state i {
-    font-size: 24px;
-    margin-bottom: 8px;
+.card .table-responsive .table tbody td[colspan="5"] span {
+    display: block;
+    font-size: 14px;
+    color: #6b7280;
 }
 
-/* Responsive Design */
+/* Ensure proper table row spacing - Match Product Table */
+.card .table-responsive .table tbody td {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+}
+
+.card .table-responsive .table thead th {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+}
+
+/* Responsive Design - Match Product Table */
 @media (max-width: 768px) {
     .orders-container {
         padding: 16px;
@@ -311,24 +368,51 @@
         justify-content: flex-end;
     }
     
-    .orders-table th,
-    .orders-table td {
-        padding: 12px 16px;
+    .card .table-responsive .table {
+        table-layout: fixed !important;
     }
     
-    .orders-table th {
-        font-size: 11px;
+    /* Adjust column widths for mobile */
+    .card .table-responsive .table th:nth-child(1),
+    .card .table-responsive .table td:nth-child(1) {
+        width: 12% !important;
     }
     
-    .orders-table td {
-        font-size: 13px;
+    .card .table-responsive .table th:nth-child(2),
+    .card .table-responsive .table td:nth-child(2) {
+        width: 22% !important;
+    }
+    
+    .card .table-responsive .table th:nth-child(3),
+    .card .table-responsive .table td:nth-child(3) {
+        width: 18% !important;
+    }
+    
+    .card .table-responsive .table th:nth-child(4),
+    .card .table-responsive .table td:nth-child(4) {
+        width: 15% !important;
+    }
+    
+    .card .table-responsive .table th:nth-child(5),
+    .card .table-responsive .table td:nth-child(5) {
+        width: 33% !important;
+    }
+    
+    .card .table-responsive .table th {
+        font-size: 11px !important;
+        padding: 10px 12px !important;
+    }
+    
+    .card .table-responsive .table td {
+        font-size: 13px !important;
+        padding: 10px 12px !important;
     }
 }
 
 @media (max-width: 480px) {
-    .orders-table th,
-    .orders-table td {
-        padding: 8px 12px;
+    .card .table-responsive .table th,
+    .card .table-responsive .table td {
+        padding: 8px 12px !important;
     }
     
     .card-action-btn {

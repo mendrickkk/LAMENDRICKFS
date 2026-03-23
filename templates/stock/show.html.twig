@@ -1,0 +1,96 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Stock Details{% endblock %}
+
+{% block page_title %}Stock Details{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_admin') }}">Home</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_stock_index') }}">Stocks</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">Stock Details</span>
+</nav>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+<div class="product-container">
+    <div class="product-header">
+        <h2>Stock Details</h2>
+        <p>View complete information about this stock entry</p>
+    </div>
+
+    <div class="product-detail">
+        <div class="product-detail-grid">
+            <div class="product-detail-info">
+                <h2>{{ stock.product.Name }}</h2>
+                
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Stock ID</span>
+                    <span class="product-detail-value">#{{ stock.id }}</span>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Product Name</span>
+                    <span class="product-detail-value">{{ stock.product.Name }}</span>
+                </div>
+
+                {% if stock.product.description %}
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Product Description</span>
+                    <p class="product-detail-value">{{ stock.product.description }}</p>
+                </div>
+                {% endif %}
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Price</span>
+                    <div class="product-price">₱{{ stock.product.price|number_format(2) }}</div>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Category</span>
+                    <span class="product-detail-value">
+                        {% if stock.product.category %}
+                            {{ stock.product.category.name }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Stock Quantity</span>
+                    <div class="product-price">{{ stock.quantity }}</div>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Created At</span>
+                    <span class="product-detail-value">{{ stock.createdAt|date('Y-m-d H:i:s') }}</span>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Updated At</span>
+                    <span class="product-detail-value">{{ stock.updatedAt|date('Y-m-d H:i:s') }}</span>
+                </div>
+
+                <div class="btn-group" style="margin-top: 3rem;">
+                    <a href="{{ path('app_stock_index') }}" class="btn btn-secondary">← Back to List</a>
+                    <a href="{{ path('app_stock_edit', {'id': stock.id}) }}" class="btn">Edit Stock</a>
+                    {{ include('stock/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

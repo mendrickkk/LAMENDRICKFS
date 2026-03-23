@@ -1,0 +1,310 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Flower Shop - Stocks{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block breadcrumb_current %}Stocks{% endblock %}
+
+{% block breadcrumb %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    {% for message in app.flashes('success') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-success">
+                <span>✓</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-error">
+                <span>⚠</span>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="stock-management-container">
+        <!-- Header Section -->
+        <div class="stock-management-header">
+            <h1 class="stock-management-title">Stock Management</h1>
+            <div class="stock-management-header-actions">
+                <a href="{{ path('app_stock_new') }}" class="stock-new-entry-btn">
+                    New Stock Entry
+                </a>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="card">
+            <!-- Search and Filter Bar -->
+            <div class="product-search-toolbar">
+                <div class="search-input-container">
+                    <i class="fa fa-search"></i>
+                    <input type="text" placeholder="Search" id="stockSearch">
+                </div>
+            </div>
+
+            <div class="card-body card-body-no-padding">
+                <div class="stock-bulk-actions" id="stockBulkActions" style="display: none; padding: 12px 16px; background: #f3f4f6; border-bottom: 1px solid #e5e7eb;">
+                    <span id="selectedCount" style="font-weight: 600; color: #374151; margin-right: 16px;">0 selected</span>
+                    <form method="post" action="{{ path('app_stock_bulk_delete') }}" id="bulkDeleteForm" onsubmit="return confirm('Are you sure you want to delete the selected stock entries?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('bulk_delete') }}">
+                        <input type="hidden" name="ids" id="bulkDeleteIds">
+                        <button type="submit" class="card-action-btn product-action-btn product-action-btn-delete" style="margin: 0;">
+                            <i class="fa fa-trash"></i>
+                            Delete Selected
+                        </button>
+                    </form>
+                </div>
+                <div class="table-responsive product-table stock-table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" id="selectAllStocks" style="cursor: pointer;">
+                                </th>
+                                <th>ID</th>
+                                <th>IMAGE</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price (₱)</th>
+                                <th>Quantity</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% if stocks|length > 0 %}
+                            {% for stock in stocks %}
+                                <tr class="stock-row" 
+                                    data-product="{{ stock.product.Name|lower }}"
+                                    data-category="{{ stock.product.category ? stock.product.category.name|lower : '' }}"
+                                    data-id="{{ stock.id }}"
+                                    data-price="{{ stock.product.price }}"
+                                    data-quantity="{{ stock.quantity }}">
+                                    <td>
+                                        <input type="checkbox" class="stock-checkbox" value="{{ stock.id }}" style="cursor: pointer;">
+                                    </td>
+                                    <td>#{{ stock.id }}</td>
+                                    <td>
+                                        {% if stock.product.image %}
+                                            <img src="{{ asset('uploads/products/' ~ stock.product.image) }}" 
+                                                 alt="{{ stock.product.Name }}" 
+                                                 class="table-product-image"
+                                                 onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="table-product-image-placeholder" style="display: none;">
+                                                <i class="fa fa-image"></i>
+                                            </div>
+                                        {% else %}
+                                            <div class="table-product-image-placeholder">
+                                                <i class="fa fa-image"></i>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>{{ stock.product.Name }}</strong></td>
+                                    <td>
+                                        {% if stock.product.category %}
+                                            <span class="badge badge-info">{{ stock.product.category.name }}</span>
+                                        {% else %}
+                                            <span>-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="product-price-text">₱{{ stock.product.price|number_format(2) }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="product-price-text">{{ stock.quantity }}</span>
+                                    </td>
+                                    <td>
+                                        {% if stock.createdBy %}
+                                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                                <strong style="font-size: 13px; color: #374151;">{{ stock.createdBy.getFullName() }}</strong>
+                                                <span style="font-size: 11px; color: #6b7280;">{{ stock.createdBy.getRoleLabel() }}</span>
+                                            </div>
+                                        {% else %}
+                                            <span style="color: #9ca3af; font-style: italic;">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ stock.createdAt|date('Y-m-d') }}</td>
+                                    <td>{{ stock.updatedAt|date('Y-m-d') }}</td>
+                                    <td>
+                                        <div class="product-actions-cell">
+                                            <a href="{{ path('app_stock_show', {'id': stock.id}) }}" 
+                                               class="card-action-btn product-action-btn" 
+                                               title="View">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('app_stock_edit', {'id': stock.id}) }}" 
+                                               class="card-action-btn product-action-btn product-action-btn-edit" 
+                                               title="Edit">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            <!-- Search Empty State (hidden by default) -->
+                            <tr id="stockSearchEmptyState" class="stock-search-empty-state" style="display: none;">
+                                <td colspan="11" class="stock-empty-state-cell">
+                                    <div class="stock-empty-state-message">
+                                        <i class="fa fa-search" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                                        <p style="font-size: 16px; color: #6b7280; margin: 0 0 8px 0;">No stock items found matching your search.</p>
+                                        <p style="font-size: 14px; color: #9ca3af; margin: 0;">Try searching with a different term or <a href="{{ path('app_stock_new') }}" class="stock-empty-state-link">create a new stock entry</a></p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bulk Selection Functionality
+            const selectAllCheckbox = document.getElementById('selectAllStocks');
+            const bulkActionsBar = document.getElementById('stockBulkActions');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const bulkDeleteForm = document.getElementById('bulkDeleteForm');
+            const bulkDeleteIdsInput = document.getElementById('bulkDeleteIds');
+
+            // Get visible checkboxes (not hidden by search filter)
+            function getVisibleCheckboxes() {
+                return Array.from(document.querySelectorAll('.stock-checkbox')).filter(checkbox => {
+                    const row = checkbox.closest('.stock-row');
+                    return row && row.style.display !== 'none';
+                });
+            }
+
+            // Get all checkboxes
+            function getAllCheckboxes() {
+                return document.querySelectorAll('.stock-checkbox');
+            }
+
+            function updateBulkActions() {
+                const checkedBoxes = document.querySelectorAll('.stock-checkbox:checked');
+                const count = checkedBoxes.length;
+                
+                if (count > 0) {
+                    bulkActionsBar.style.display = 'flex';
+                    bulkActionsBar.style.alignItems = 'center';
+                    selectedCountSpan.textContent = count + ' selected';
+                    
+                    // Update hidden input with selected IDs
+                    const ids = Array.from(checkedBoxes).map(cb => cb.value);
+                    bulkDeleteIdsInput.value = ids.join(',');
+                } else {
+                    bulkActionsBar.style.display = 'none';
+                }
+
+                // Update select all checkbox state based on visible checkboxes
+                if (selectAllCheckbox) {
+                    const visibleCheckboxes = getVisibleCheckboxes();
+                    const visibleChecked = visibleCheckboxes.filter(cb => cb.checked);
+                    
+                    if (visibleCheckboxes.length === 0) {
+                        selectAllCheckbox.checked = false;
+                        selectAllCheckbox.indeterminate = false;
+                    } else if (visibleChecked.length === visibleCheckboxes.length) {
+                        selectAllCheckbox.checked = true;
+                        selectAllCheckbox.indeterminate = false;
+                    } else if (visibleChecked.length > 0) {
+                        selectAllCheckbox.checked = false;
+                        selectAllCheckbox.indeterminate = true;
+                    } else {
+                        selectAllCheckbox.checked = false;
+                        selectAllCheckbox.indeterminate = false;
+                    }
+                }
+            }
+
+            // Select all checkbox - selects only visible checkboxes
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    const visibleCheckboxes = getVisibleCheckboxes();
+                    visibleCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateBulkActions();
+                });
+            }
+
+            // Individual checkboxes
+            getAllCheckboxes().forEach(checkbox => {
+                checkbox.addEventListener('change', updateBulkActions);
+            });
+
+            // Search Functionality
+            const searchInput = document.getElementById('stockSearch');
+            const stockRows = document.querySelectorAll('.stock-row');
+            const searchEmptyState = document.getElementById('stockSearchEmptyState');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
+                    
+                    if (stockRows.length > 0) {
+                        stockRows.forEach(row => {
+                            // Skip the empty state row
+                            if (row.classList.contains('stock-search-empty-state')) {
+                                return;
+                            }
+                            
+                            const productName = row.getAttribute('data-product') || '';
+                            const category = row.getAttribute('data-category') || '';
+                            const id = row.getAttribute('data-id') || '';
+                            const price = row.getAttribute('data-price') || '';
+                            const quantity = row.getAttribute('data-quantity') || '';
+                            
+                            // Search in multiple fields
+                            const matchesSearch = searchTerm === '' || 
+                                productName.includes(searchTerm) || 
+                                category.includes(searchTerm) ||
+                                id.toString().includes(searchTerm) ||
+                                price.toString().includes(searchTerm) ||
+                                quantity.toString().includes(searchTerm);
+                            
+                            if (matchesSearch) {
+                                row.style.display = '';
+                                visibleCount++;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    }
+                    
+                    // Show/hide empty state based on search results
+                    if (searchEmptyState) {
+                        if (searchTerm !== '' && visibleCount === 0 && stockRows.length > 0) {
+                            searchEmptyState.style.display = '';
+                        } else {
+                            searchEmptyState.style.display = 'none';
+                        }
+                    }
+                    
+                    // Update select all state after filtering
+                    updateBulkActions();
+                });
+            }
+
+            // Initialize
+            updateBulkActions();
+        });
+    </script>
+{% endblock %}
+

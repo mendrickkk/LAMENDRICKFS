@@ -1,124 +1,220 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sign Up · KM+BP Flower Shop{% endblock %}
+{% block title %}Register · La Kurt Flowershop{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('styles/loginn.css') }}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('styles/signupp.css') }}">
+    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/footer.css">
 {% endblock %}
 
 {% block body %}
-<div class="auth-wrapper">
-    <section class="auth-panel">
-        <div class="auth-card">
-            <div class="auth-card-header">
-                <h2 class="auth-title">Create Account</h2>
-                <p class="auth-desc">Join KM+BP Flower Shop today</p>
+<div class="fv-page fv-login-page fv-register-page">
+    {% include 'client/_header.html.twig' %}
+
+    <main class="fv-main" role="main">
+        <div class="fv-login fv-register">
+            <h1 class="fv-login__title">REGISTER</h1>
+            <p class="fv-login__lead">Please fill in the information below:</p>
+
+            <div class="fv-login__alerts">
+                {% for message in app.flashes('success') %}
+                    <div class="fv-login__alert fv-login__alert--success">{{ message }}</div>
+                {% endfor %}
+                {% for message in app.flashes('warning') %}
+                    <div class="fv-login__alert fv-login__alert--warning">{{ message }}</div>
+                {% endfor %}
+                {% for message in app.flashes('error') %}
+                    <div class="fv-login__alert fv-login__alert--error">{{ message }}</div>
+                {% endfor %}
             </div>
 
-            <div class="auth-card-body">
-                {% if error is defined and error %}
-                    <div class="alert alert-danger" style="margin-bottom: 15px;">
-                        {{ error }}
-                    </div>
-                {% endif %}
-
-                {% if success is defined and success %}
-                    <div class="alert alert-success" style="margin-bottom: 15px;">
-                        {{ success }}
-                    </div>
-                {% endif %}
-
-                <form method="post" action="{{ path('app_signup') }}">
-                    <div class="form-group">
-                        <input class="form-input" type="email" id="email" name="email" placeholder="Email Address" required>
-                    </div>
-
-                    <div class="form-group">
-                        <input class="form-input" type="text" id="username" name="username" placeholder="Username" required>
-                    </div>
-
-                    <div class="form-group">
-                        <input class="form-input" type="password" id="password" name="password" placeholder="Password" required>
-                    </div>
-
-                    <div class="form-group">
-                        <input class="form-input" type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
-                    </div>
-
-                    {# ✅ Added Role dropdown #}
-                    <div class="form-group">
-    <label for="role">Account Type</label>
-    <select id="role" name="role" class="form-input" required>
-        <option value="">Select account type</option>
-        <option value="admin">Admin</option>
-        <option value="client">Client</option>
-    </select>
-</div>
-
-
-                    <div class="form-row" style="margin-top: 16px; margin-bottom: 24px;">
-                        <label class="checkbox">
-                            <input type="checkbox" name="terms" required>
-                            I agree to the Terms & Privacy Policy
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Create Account</button>
-                    </div>
-
-                    <div class="form-group">
-                        <p class="auth-footer">
-                            Already have an account?
-                            <a class="link" href="{{ path('app_login') }}">Sign In</a>
-                        </p>
-                    </div>
-
-                    <div class="auth-divider">OR</div>
-
-                    <div class="input-row">
-                        <button class="btn btn-outline" type="button">
-                            <i class="fab fa-google" style="font-size: 20px;"></i>
-                        </button>
-                        <button class="btn btn-outline" type="button">
-                            <i class="fab fa-facebook-f" style="font-size: 20px;"></i>
+            <form method="post" action="{{ path('app_signup') }}" id="signupForm" class="fv-register__form" data-turbo="false">
+                <div class="fv-login__field">
+                    <input class="fv-login__input" type="text" id="first_name" name="first_name" value="{{ last_first_name|default('') }}" placeholder="First name" required autocomplete="given-name">
+                </div>
+                <div class="fv-login__field">
+                    <input class="fv-login__input" type="text" id="last_name" name="last_name" value="{{ last_last_name|default('') }}" placeholder="Last name" required autocomplete="family-name">
+                </div>
+                <div class="fv-login__field">
+                    <input class="fv-login__input" type="email" id="email" name="email" value="{{ last_email|default('') }}" placeholder="Email" required autocomplete="email">
+                    <span class="fv-register__error" id="emailError" aria-live="polite"></span>
+                </div>
+                <div class="fv-login__field">
+                    <input class="fv-login__input" type="text" id="username" name="username" value="{{ last_username|default('') }}" placeholder="Username" required autocomplete="username">
+                    <span class="fv-register__error" id="usernameError" aria-live="polite"></span>
+                </div>
+                <div class="fv-login__field">
+                    <div class="fv-login__password-wrap">
+                        <input class="fv-login__input" type="password" id="password" name="password" placeholder="Password" required autocomplete="new-password">
+                        <button type="button" class="fv-login__eye" id="togglePassword" aria-label="Show password">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
-    </section>
+                    <div class="fv-register__requirements" id="passwordRequirements" hidden>
+                        <p class="fv-register__req-title">Password must have:</p>
+                        <div class="fv-register__req-item" id="reqLength"><span class="fv-register__req-icon">×</span> At least 8 characters (required)</div>
+                        <p class="fv-register__req-sub">And at least one of the following:</p>
+                        <div class="fv-register__req-item" id="reqUppercase"><span class="fv-register__req-icon">×</span> One uppercase letter</div>
+                        <div class="fv-register__req-item" id="reqLowercase"><span class="fv-register__req-icon">×</span> One lowercase letter</div>
+                        <div class="fv-register__req-item" id="reqNumber"><span class="fv-register__req-icon">×</span> One number</div>
+                        <div class="fv-register__req-item" id="reqSpecial"><span class="fv-register__req-icon">×</span> One special character (@$!%*?&amp;_)</div>
+                    </div>
+                    <span class="fv-register__error" id="passwordError" aria-live="polite"></span>
+                </div>
+                <div class="fv-login__field">
+                    <div class="fv-login__password-wrap">
+                        <input class="fv-login__input" type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required autocomplete="new-password">
+                        <button type="button" class="fv-login__eye" id="toggleConfirmPassword" aria-label="Show confirm password">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <span class="fv-register__error" id="confirmPasswordError" aria-live="polite"></span>
+                </div>
 
-    <section class="auth-hero">
-        <div class="auth-hero-inner">
-            <div class="brand-badge">FlowerShop</div>
-            <h1 class="brand-title">Start Your Floral Journey Today</h1>
-            <p class="brand-subtitle">
-                Join thousands of satisfied customers who trust KM+BP for their floral needs.
-                Create lasting memories with our beautiful arrangements.
-            </p>
+                <label class="fv-register__terms">
+                    <input type="checkbox" id="terms" name="terms" value="1" required>
+                    <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+                </label>
 
-            <div class="feature-list">
-                <div class="feature-item">
-                    <i class="fa fa-check-circle feature-icon"></i>
-                    <span>Exclusive member discounts</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fa fa-check-circle feature-icon"></i>
-                    <span>Fast & reliable delivery</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fa fa-check-circle feature-icon"></i>
-                    <span>Personalized recommendations</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fa fa-check-circle feature-icon"></i>
-                    <span>24/7 customer support</span>
-                </div>
-            </div>
+                <button type="submit" class="fv-login__submit fv-login__submit--register" id="createAccountBtn" disabled>CREATE MY ACCOUNT</button>
+
+                <p class="fv-login__footer">
+                    Already have an account? <a href="{{ path('app_login') }}">Log in</a>
+                </p>
+            </form>
         </div>
-    </section>
+    </main>
+
+    {% include 'client/footer.html.twig' %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('signupForm');
+    const emailInput = document.getElementById('email');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const passwordRequirements = document.getElementById('passwordRequirements');
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+    const termsCheckbox = document.getElementById('terms');
+    const createAccountBtn = document.getElementById('createAccountBtn');
+
+    function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function showError(inputId, errorId, message) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        if (input) input.classList.add('fv-register__input--error');
+        if (error) { error.textContent = message || ''; }
+    }
+
+    function clearError(inputId, errorId) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        if (input) input.classList.remove('fv-register__input--error');
+        if (error) error.textContent = '';
+    }
+
+    function updatePasswordRequirements(password) {
+        const checks = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[@$!%*?&_]/.test(password)
+        };
+        [['reqLength', checks.length], ['reqUppercase', checks.uppercase], ['reqLowercase', checks.lowercase], ['reqNumber', checks.number], ['reqSpecial', checks.special]].forEach(function(pair) {
+            const el = document.getElementById(pair[0]);
+            if (!el) return;
+            el.classList.toggle('is-valid', pair[1]);
+            const icon = el.querySelector('.fv-register__req-icon');
+            if (icon) icon.textContent = pair[1] ? '✓' : '×';
+        });
+    }
+
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePassword.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
+        });
+    }
+    if (toggleConfirmPassword && confirmPasswordInput) {
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+        });
+    }
+
+    if (passwordInput && passwordRequirements) {
+        passwordInput.addEventListener('focus', function() { passwordRequirements.hidden = false; });
+        passwordInput.addEventListener('input', function() {
+            passwordRequirements.hidden = false;
+            updatePasswordRequirements(this.value);
+            if (confirmPasswordInput.value && this.value !== confirmPasswordInput.value) {
+                showError('confirm_password', 'confirmPasswordError', 'Passwords do not match');
+            } else {
+                clearError('confirm_password', 'confirmPasswordError');
+            }
+        });
+    }
+
+    if (emailInput) {
+        emailInput.addEventListener('blur', function() {
+            if (this.value && !validateEmail(this.value)) {
+                showError('email', 'emailError', 'Please enter a valid email address');
+            } else clearError('email', 'emailError');
+        });
+        emailInput.addEventListener('input', function() {
+            if (this.value && validateEmail(this.value)) clearError('email', 'emailError');
+        });
+    }
+
+    if (confirmPasswordInput && passwordInput) {
+        confirmPasswordInput.addEventListener('input', function() {
+            if (passwordInput.value && this.value !== passwordInput.value) {
+                showError('confirm_password', 'confirmPasswordError', 'Passwords do not match');
+            } else clearError('confirm_password', 'confirmPasswordError');
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let ok = true;
+            if (!validateEmail(emailInput.value)) {
+                showError('email', 'emailError', 'Please enter a valid email address');
+                ok = false;
+            }
+            const pw = passwordInput.value;
+            const hasLen = pw.length >= 8;
+            const hasOne = /[A-Z]/.test(pw) || /[a-z]/.test(pw) || /[0-9]/.test(pw) || /[@$!%*?&_]/.test(pw);
+            if (!hasLen || !hasOne) {
+                showError('password', 'passwordError', 'Password does not meet requirements');
+                ok = false;
+            } else clearError('password', 'passwordError');
+            if (pw !== confirmPasswordInput.value) {
+                showError('confirm_password', 'confirmPasswordError', 'Passwords do not match');
+                ok = false;
+            }
+            if (!ok) e.preventDefault();
+        });
+    }
+
+    if (termsCheckbox && createAccountBtn) {
+        function updateBtn() { createAccountBtn.disabled = !termsCheckbox.checked; }
+        termsCheckbox.addEventListener('change', updateBtn);
+        updateBtn();
+    }
+});
+</script>
 {% endblock %}

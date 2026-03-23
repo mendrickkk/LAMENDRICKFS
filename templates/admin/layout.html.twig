@@ -37,25 +37,45 @@
                     <i class="fa fa-receipt menu-item-icon"></i>
                     Orders
                 </a>
-                <a class="menu-item" href="#">
-                    <i class="fa fa-receipt menu-item-icon"></i>
+                <a class="menu-item {% if 'app_stock' in app.request.attributes.get('_route') %}menu-item-active{% endif %}" href="{{ path('app_stock_index') }}">
+                    <i class="fa fa-warehouse menu-item-icon"></i>
                     Stocks
                 </a>
-                <a class="menu-item" href="#">
-                    <i class="fa fa-users menu-item-icon"></i>
+                <a class="menu-item {% if 'app_category' in app.request.attributes.get('_route') %}menu-item-active{% endif %}" href="{{ path('app_category_index') }}">
+                    <i class="fa fa-tags menu-item-icon"></i>
                     Category
                 </a>
+                {% if is_granted('ROLE_ADMIN') %}
+                <a class="menu-item {% if 'app_user' in app.request.attributes.get('_route') %}menu-item-active{% endif %}" href="{{ path('app_user_index') }}">
+                    <i class="fa fa-users menu-item-icon"></i>
+                    User Management
+                </a>
+                <a class="menu-item {% if 'app_activity_log' in app.request.attributes.get('_route') %}menu-item-active{% endif %}" href="{{ path('app_activity_log_index') }}">
+                    <i class="fa fa-history menu-item-icon"></i>
+                    Activity Logs
+                </a>
+                {% endif %}
             </div>
         </nav>
 
         <div class="sidebar-footer">
+            {% if app.user %}
             <div class="sidebar-user">
-                <div class="sidebar-user-avatar">KM</div>
+                <div class="sidebar-user-avatar">{{ app.user.userIdentifier|first|upper }}</div>
                 <div class="sidebar-user-info">
-                    <div class="sidebar-user-name">Mendrick</div>
-                    <div class="sidebar-user-role">Administrator</div>
+                    <div class="sidebar-user-name">{{ app.user.userIdentifier }}</div>
+                    <div class="sidebar-user-role">
+                        {% if app.user.roleLabel is defined %}
+                            {{ app.user.roleLabel }}
+                        {% elseif app.user.role is defined %}
+                            {{ app.user.role|replace({'ROLE_': ''})|title }}
+                        {% else %}
+                            {{ app.user.roles[0]|replace({'ROLE_': ''})|title }}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </aside>
 
@@ -83,12 +103,21 @@
                     </button>
                     
                     <!-- Account Dropdown -->
+                    {% if app.user %}
                     <div class="account-dropdown">
                         <button class="account-dropdown-toggle" aria-label="Account Menu">
-                            <div class="account-avatar">M</div>
+                            <div class="account-avatar">{{ app.user.userIdentifier|first|upper }}</div>
                             <div class="account-info">
-                                <div class="account-name">Mendrick</div>
-                                <div class="account-role">Admin</div>
+                                <div class="account-name">{{ app.user.userIdentifier }}</div>
+                                <div class="account-role">
+                                    {% if app.user.roleLabel is defined %}
+                                        {{ app.user.roleLabel }}
+                                    {% elseif app.user.role is defined %}
+                                        {{ app.user.role|replace({'ROLE_': ''})|title }}
+                                    {% else %}
+                                        {{ app.user.roles[0]|replace({'ROLE_': ''})|title }}
+                                    {% endif %}
+                                </div>
                             </div>
                             <i class="fa fa-chevron-down account-dropdown-arrow"></i>
                         </button>
@@ -96,31 +125,37 @@
                         <div class="account-menu">
                             <div class="account-menu-header">
                                 <div class="account-menu-user">
-                                    <div class="account-menu-avatar">M</div>
+                                    <div class="account-menu-avatar">{{ app.user.userIdentifier|first|upper }}</div>
                                     <div class="account-menu-info">
-                                        <div class="account-menu-name">Mendrick</div>
-                                        <div class="account-menu-role">Admin</div>
-                                        <div class="account-menu-email">mendrick@flowershop.com</div>
+                                        <div class="account-menu-name">{{ app.user.userIdentifier }}</div>
+                                        <div class="account-menu-role">
+                                            {% if app.user.roleLabel is defined %}
+                                                {{ app.user.roleLabel }}
+                                            {% elseif app.user.role is defined %}
+                                                {{ app.user.role|replace({'ROLE_': ''})|title }}
+                                            {% else %}
+                                                {{ app.user.roles[0]|replace({'ROLE_': ''})|title }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="account-menu-email">
+                                            {% if app.user.email is defined %}
+                                                {{ app.user.email }}
+                                            {% else %}
+                                                {{ app.user.userIdentifier }}@flowershop.com
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="account-menu-body">
-                                <a href="#" class="account-menu-item">
+                                <a href="{{ path('app_profile') }}" class="account-menu-item">
                                     <i class="fa fa-user"></i>
                                     My Profile
                                 </a>
-                                <a href="#" class="account-menu-item">
+                                <a href="{{ path('app_settings_index') }}" class="account-menu-item">
                                     <i class="fa fa-cog"></i>
                                     Account Settings
-                                </a>
-                                <a href="#" class="account-menu-item">
-                                    <i class="fa fa-bell"></i>
-                                    Notifications
-                                </a>
-                                <a href="#" class="account-menu-item">
-                                    <i class="fa fa-shield"></i>
-                                    Security
                                 </a>
                                 
                                 <div class="account-menu-divider"></div>
@@ -136,13 +171,17 @@
                             </div>
                             
                             <div class="account-menu-footer">
-                                <button class="account-logout-btn">
-                                    <i class="fa fa-sign-out"></i>
-                                    Sign Out
-                                </button>
+                                <form method="post" action="{{ path('app_logout') }}" style="margin: 0; padding: 0;">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                                    <button type="submit" class="account-logout-btn">
+                                        <i class="fa fa-sign-out"></i>
+                                        Sign Out
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </header>
@@ -174,22 +213,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const accountMenu = document.querySelector('.account-menu');
     
     if (accountToggle && accountMenu) {
+        // Ensure toggle button is always clickable
+        accountToggle.style.pointerEvents = 'auto';
+        accountToggle.style.cursor = 'pointer';
+        accountToggle.style.zIndex = '10001';
+        
         // Toggle dropdown on click
         accountToggle.addEventListener('click', function(e) {
+            e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             accountDropdown.classList.toggle('open');
-        });
+        }, true); // Use capture phase
+        
+        // Also handle mousedown for better responsiveness
+        accountToggle.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }, true);
         
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
-            if (!accountDropdown.contains(e.target)) {
+            if (accountDropdown && !accountDropdown.contains(e.target)) {
                 accountDropdown.classList.remove('open');
             }
-        });
+        }, true);
         
         // Close dropdown on escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
+            if (e.key === 'Escape' && accountDropdown) {
                 accountDropdown.classList.remove('open');
             }
         });
@@ -197,26 +249,56 @@ document.addEventListener('DOMContentLoaded', function() {
         // Handle menu item clicks
         const menuItems = document.querySelectorAll('.account-menu-item');
         menuItems.forEach(item => {
+            item.style.pointerEvents = 'auto';
+            item.style.cursor = 'pointer';
+            item.style.zIndex = '10003';
+            
             item.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Menu item clicked:', this.textContent.trim());
-                // Add your navigation logic here
-                accountDropdown.classList.remove('open');
-            });
+                const href = this.getAttribute('href');
+                console.log('Menu item clicked:', this.textContent.trim(), 'href:', href);
+                
+                // Only prevent default if it's a hash link (#)
+                if (href && href !== '#' && !href.startsWith('#')) {
+                    // Allow normal navigation for actual links
+                    accountDropdown.classList.remove('open');
+                    // Let the browser handle the navigation
+                    return true;
+                } else {
+                    // Prevent default only for placeholder links
+                    e.preventDefault();
+                    e.stopPropagation();
+                    accountDropdown.classList.remove('open');
+                }
+            }, true);
         });
         
-        // Handle logout button
+        // Handle logout button - ensure it's always clickable
         const logoutBtn = document.querySelector('.account-logout-btn');
         if (logoutBtn) {
+            logoutBtn.style.pointerEvents = 'auto';
+            logoutBtn.style.cursor = 'pointer';
+            logoutBtn.style.zIndex = '10004';
+            
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                console.log('Logout clicked');
-                // Add your logout logic here
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                
+                // Confirm logout
                 if (confirm('Are you sure you want to sign out?')) {
-                    // Redirect to landing page
-                    window.location.href = "{{ path('app_landing') }}";
+                    // Submit the logout form
+                    const form = logoutBtn.closest('form');
+                    if (form) {
+                        form.submit();
+                    }
                 }
-            });
+            }, true);
+            
+            // Also handle mousedown for better responsiveness
+            logoutBtn.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, true);
         }
     }
     
@@ -230,12 +312,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Sidebar toggle functionality
+    // Sidebar toggle functionality (hide brand only)
     const sidebarToggle = document.querySelector('.sidebar-toggle');
     
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', function() {
-            document.body.classList.toggle('sidebar-collapsed');
+            document.body.classList.toggle('sidebar-hide-brand');
         });
     }
 });

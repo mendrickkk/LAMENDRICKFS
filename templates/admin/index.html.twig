@@ -9,132 +9,283 @@
 {% block admin_content %}
     <!-- Stats -->
     <div class="stats-grid">
-        <div class="stat-card stat-card-pink">
-            <div class="stat-card-header">
-                <div class="stat-card-info">
-                    <div class="stat-card-label">Total Orders</div>
-                    <div class="stat-card-value">1,240</div>
+        <a href="{{ path('app_orders') }}" class="stat-card-link">
+            <div class="stat-card stat-card-pink">
+                <div class="stat-card-header">
+                    <div class="stat-card-info">
+                        <div class="stat-card-label">Total Orders</div>
+                        <div class="stat-card-value">{{ totalOrders|number_format(0, '.', ',') }}</div>
+                    </div>
+                    <div class="stat-card-icon stat-card-icon-pink">
+                        <i class="fa fa-receipt"></i>
+                    </div>
                 </div>
-                <div class="stat-card-icon stat-card-icon-pink">
-                    <i class="fa fa-receipt"></i>
+                <div class="stat-card-footer">
+                    <div class="stat-card-link-text">View all →</div>
                 </div>
             </div>
-            <div class="stat-card-footer">
-                <div class="stat-trend stat-trend-up">
-                    <i class="fa fa-arrow-up"></i>
-                    12%
-                </div>
-                <div class="stat-period">vs last week</div>
-            </div>
-        </div>
+        </a>
 
-        <div class="stat-card stat-card-green">
-            <div class="stat-card-header">
-                <div class="stat-card-info">
-                    <div class="stat-card-label">Revenue</div>
-                    <div class="stat-card-value">₱ 84,500</div>
+        {% if isAdmin %}
+        <a href="{{ path('app_orders') }}" class="stat-card-link">
+            <div class="stat-card stat-card-green">
+                <div class="stat-card-header">
+                    <div class="stat-card-info">
+                        <div class="stat-card-label">Revenue</div>
+                        <div class="stat-card-value">₱ {{ totalRevenue|number_format(2, '.', ',') }}</div>
+                    </div>
+                    <div class="stat-card-icon stat-card-icon-green">
+                        <i class="fa fa-peso-sign"></i>
+                    </div>
                 </div>
-                <div class="stat-card-icon stat-card-icon-green">
-                    <i class="fa fa-peso-sign"></i>
+                <div class="stat-card-footer">
+                    {% if revenueChange > 0 %}
+                        <div class="stat-trend stat-trend-up">
+                            <i class="fa fa-arrow-up"></i>
+                            {{ revenueChange }}%
+                        </div>
+                    {% elseif revenueChange < 0 %}
+                        <div class="stat-trend stat-trend-down">
+                            <i class="fa fa-arrow-down"></i>
+                            {{ revenueChange|abs }}%
+                        </div>
+                    {% else %}
+                        <div class="stat-trend">
+                            <i class="fa fa-minus"></i>
+                            0%
+                        </div>
+                    {% endif %}
+                    <div class="stat-period">this month</div>
                 </div>
             </div>
-            <div class="stat-card-footer">
-                <div class="stat-trend stat-trend-up">
-                    <i class="fa fa-arrow-up"></i>
-                    8%
-                </div>
-                <div class="stat-period">this month</div>
-            </div>
-        </div>
+        </a>
 
-        <div class="stat-card stat-card-blue">
-            <div class="stat-card-header">
-                <div class="stat-card-info">
-                    <div class="stat-card-label">Customers</div>
-                    <div class="stat-card-value">732</div>
+        <a href="{{ path('app_user_index') }}" class="stat-card-link">
+            <div class="stat-card stat-card-blue">
+                <div class="stat-card-header">
+                    <div class="stat-card-info">
+                        <div class="stat-card-label">Total Users</div>
+                        <div class="stat-card-value">{{ totalUsers|number_format(0, '.', ',') }}</div>
+                    </div>
+                    <div class="stat-card-icon stat-card-icon-blue">
+                        <i class="fa fa-users"></i>
+                    </div>
                 </div>
-                <div class="stat-card-icon stat-card-icon-blue">
-                    <i class="fa fa-users"></i>
+                <div class="stat-card-footer">
+                    <div class="stat-card-link-text">Manage users →</div>
                 </div>
             </div>
-            <div class="stat-card-footer">
-                <div class="stat-trend stat-trend-up">
-                    <i class="fa fa-arrow-up"></i>
-                    3%
-                </div>
-                <div class="stat-period">this week</div>
-            </div>
-        </div>
+        </a>
 
-        <div class="stat-card stat-card-purple">
-            <div class="stat-card-header">
-                <div class="stat-card-info">
-                    <div class="stat-card-label">Low Stock</div>
-                    <div class="stat-card-value">18</div>
+        <a href="{{ path('app_user_index') }}" class="stat-card-link">
+            <div class="stat-card stat-card-orange">
+                <div class="stat-card-header">
+                    <div class="stat-card-info">
+                        <div class="stat-card-label">Total Staff</div>
+                        <div class="stat-card-value">{{ totalStaff|number_format(0, '.', ',') }}</div>
+                    </div>
+                    <div class="stat-card-icon stat-card-icon-orange">
+                        <i class="fa fa-user-tie"></i>
+                    </div>
                 </div>
-                <div class="stat-card-icon stat-card-icon-purple">
-                    <i class="fa fa-box"></i>
+                <div class="stat-card-footer">
+                    <div class="stat-card-link-text">Manage staff →</div>
                 </div>
             </div>
-            <div class="stat-card-footer">
-                <div class="stat-trend stat-trend-down">
-                    <i class="fa fa-arrow-down"></i>
-                    2%
+        </a>
+        {% endif %}
+
+        <a href="{{ path('app_stock_index') }}" class="stat-card-link">
+            <div class="stat-card stat-card-purple">
+                <div class="stat-card-header">
+                    <div class="stat-card-info">
+                        <div class="stat-card-label">Low Stock</div>
+                        <div class="stat-card-value">{{ lowStockCount|number_format(0, '.', ',') }}</div>
+                    </div>
+                    <div class="stat-card-icon stat-card-icon-purple">
+                        <i class="fa fa-box"></i>
+                    </div>
                 </div>
-                <div class="stat-period">vs last week</div>
+                <div class="stat-card-footer">
+                    <div class="stat-card-link-text">Manage →</div>
+                </div>
             </div>
-        </div>
+        </a>
+
+        <a href="{{ path('app_category_index') }}" class="stat-card-link">
+            <div class="stat-card stat-card-blue">
+                <div class="stat-card-header">
+                    <div class="stat-card-info">
+                        <div class="stat-card-label">Categories</div>
+                        <div class="stat-card-value">{{ totalCategories|number_format(0, '.', ',') }}</div>
+                    </div>
+                    <div class="stat-card-icon stat-card-icon-blue">
+                        <i class="fa fa-tags"></i>
+                    </div>
+                </div>
+                <div class="stat-card-footer">
+                    <div class="stat-card-link-text">Manage →</div>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ path('app_product_index') }}" class="stat-card-link">
+            <div class="stat-card stat-card-green">
+                <div class="stat-card-header">
+                    <div class="stat-card-info">
+                        <div class="stat-card-label">Products</div>
+                        <div class="stat-card-value">{{ totalProducts|number_format(0, '.', ',') }}</div>
+                    </div>
+                    <div class="stat-card-icon stat-card-icon-green">
+                        <i class="fa fa-box-open"></i>
+                    </div>
+                </div>
+                <div class="stat-card-footer">
+                    <div class="stat-card-link-text">View all →</div>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ path('app_stock_index') }}" class="stat-card-link">
+            <div class="stat-card stat-card-pink">
+                <div class="stat-card-header">
+                    <div class="stat-card-info">
+                        <div class="stat-card-label">Stocks</div>
+                        <div class="stat-card-value">{{ totalStocks|number_format(0, '.', ',') }}</div>
+                    </div>
+                    <div class="stat-card-icon stat-card-icon-pink">
+                        <i class="fa fa-warehouse"></i>
+                    </div>
+                </div>
+                <div class="stat-card-footer">
+                    <div class="stat-card-link-text">Manage →</div>
+                </div>
+            </div>
+        </a>
     </div>
 
-    <!-- Example card with table -->
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title">
-                <i class="fa fa-receipt"></i>
-                Recent Orders
-            </div>
-            <div class="card-actions">
-                <button class="card-action-btn">Export</button>
-                <button class="card-action-btn">Refresh</button>
+    <!-- Recent Activity & Orders Row -->
+    <div class="row" style="margin-top: 20px;">
+        <!-- Recent Orders Table -->
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-receipt"></i>
+                        Recent Orders
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ path('app_orders') }}" class="card-action-btn">
+                            <i class="fa fa-external-link"></i>
+                            View All
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body card-body-no-padding">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recentOrders|length > 0 %}
+                                    {% for order in recentOrders %}
+                                        <tr>
+                                            <td>#{{ order.orderNumber }}</td>
+                                            <td>{{ order.customerName }}</td>
+                                            <td>
+                                                <span class="status-badge status-{{ order.status|lower }}">
+                                                    <span class="status-badge-dot"></span>
+                                                    {{ order.status }}
+                                                </span>
+                                            </td>
+                                            <td>₱ {{ order.total|number_format(2, '.', ',') }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 40px; color: #6b7280;">
+                                            No orders found
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="card-body card-body-no-padding">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Order #</th>
-                            <th>Customer</th>
-                            <th>Status</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>#10234</td>
-                            <td>Jane Smith</td>
-                            <td>
-                                <span class="status-badge status-processing">
-                                    <span class="status-badge-dot"></span>
-                                    Processing
-                                </span>
-                            </td>
-                            <td>₱ 1,250.00</td>
-                        </tr>
-                        <tr>
-                            <td>#10233</td>
-                            <td>John Doe</td>
-                            <td>
-                                <span class="status-badge status-completed">
-                                    <span class="status-badge-dot"></span>
-                                    Completed
-                                </span>
-                            </td>
-                            <td>₱ 980.00</td>
-                        </tr>
-                    </tbody>
-                </table>
+
+        <!-- Recent Activity Logs (Admin only) -->
+        {% if isAdmin %}
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-history"></i>
+                        Recent Activity
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ path('app_activity_log_index') }}" class="card-action-btn">
+                            <i class="fa fa-external-link"></i>
+                            View Logs
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body card-body-no-padding">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recentActivities is defined and recentActivities|length > 0 %}
+                                    {% for activity in recentActivities %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ activity.username }}</strong>
+                                                <div style="font-size: 11px; color: #6b7280;">{{ activity.role|replace({'ROLE_': ''})|title }}</div>
+                                            </td>
+                                            <td>
+                                                <span class="badge-action badge-{{ activity.action|lower }}" 
+                                                      style="padding: 2px 6px; font-size: 10px; border-radius: 4px; 
+                                                      {% if activity.action == 'CREATE' %}background-color: #dcfce7; color: #16a34a;
+                                                      {% elseif activity.action == 'UPDATE' %}background-color: #e0f2fe; color: #0284c7;
+                                                      {% elseif activity.action == 'DELETE' %}background-color: #fee2e2; color: #dc2626;
+                                                      {% else %}background-color: #f3f4f6; color: #4b5563;{% endif %}">
+                                                    {{ activity.actionLabel }}
+                                                </span>
+                                                <div style="font-size: 11px; color: #6b7280; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                    {{ activity.targetEntity }}
+                                                </div>
+                                            </td>
+                                            <td style="font-size: 12px; white-space: nowrap;">
+                                                {{ activity.createdAt|date('M d, H:i') }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" style="text-align: center; padding: 40px; color: #6b7280;">
+                                            No recent activity
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
+        {% endif %}
     </div>
 {% endblock %}

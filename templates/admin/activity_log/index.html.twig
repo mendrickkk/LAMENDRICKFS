@@ -1,0 +1,553 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Activity Logs - Flower Shop{% endblock %}
+
+{% block page_title %}SYSTEM LOGS{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+    <style>
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card-small {
+            background: white;
+            padding: 20px 16px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .stat-card-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .stat-icon-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 1.1rem;
+        }
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .stat-lbl {
+            color: #6b7280;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        /* Stat Colors */
+        .sc-blue { background: #eff6ff; color: #3b82f6; }
+        .sc-green { background: #f0fdf4; color: #22c55e; }
+        .sc-purple { background: #faf5ff; color: #a855f7; }
+        .sc-orange { background: #fff7ed; color: #f97316; }
+        .sc-red { background: #fef2f2; color: #ef4444; }
+        .sc-gray { background: #f3f4f6; color: #6b7280; }
+
+        .filter-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+        .filter-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .filter-col {
+            flex: 1;
+            min-width: 180px;
+        }
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* Table Styles - Match Admin Panel Design */
+        .table th.sortable {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.15s;
+        }
+        .table th.sortable:hover {
+            background-color: #e5e7eb !important;
+        }
+        .table th.sortable .sort-icon {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            margin-left: 4px;
+            display: inline-block;
+        }
+        .table th.sortable.sort-asc .sort-icon,
+        .table th.sortable.sort-desc .sort-icon {
+            color: #ec4899;
+        }
+        .role-badge-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .role-badge-admin {
+            background: #dc2626;
+            color: white;
+        }
+        .role-badge-staff {
+            background: #2563eb;
+            color: white;
+        }
+        .role-badge-client {
+            background: #059669;
+            color: white;
+        }
+        .action-text {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .action-login {
+            color: #22c55e;
+        }
+        .action-logout {
+            color: #111827;
+        }
+        .action-create {
+            color: #3b82f6;
+        }
+        .action-update {
+            color: #f59e0b;
+        }
+        .action-delete {
+            color: #ef4444;
+        }
+        
+        /* Ensure table matches admin panel styling */
+        .card .product-table .table thead {
+            background: #f3f4f6 !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+        .card .product-table .table thead th {
+            border-bottom: 1px solid #e5e7eb !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            color: #374151 !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.5px !important;
+            padding: 12px 14px !important;
+        }
+        .card .product-table .table tbody tr {
+            border-bottom: 1px solid #f3f4f6 !important;
+            transition: background-color 0.15s ease;
+        }
+        .card .product-table .table tbody tr:hover {
+            background: #f9fafb !important;
+        }
+        .card .product-table .table td {
+            font-size: 0.875rem !important;
+            color: #374151 !important;
+            padding: 12px 14px !important;
+        }
+        .card .product-table .table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+    <div class="stock-entry-page">
+        <div class="stock-entry-header">
+            <div class="stock-entry-header-left">
+                <div class="stock-entry-section-label">SYSTEM ADMINISTRATION</div>
+                <h1 class="stock-entry-title">Activity Logs</h1>
+                <p class="text-muted" style="margin-top: 4px; font-size: 0.9rem; color: #6b7280;">Complete audit trail of all system activities</p>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card-small">
+                <div class="stat-icon-circle sc-blue"><i class="fa fa-list"></i></div>
+                <div class="stat-val">{{ stats.total }}</div>
+                <div class="stat-lbl">Total Logs</div>
+            </div>
+            <div class="stat-card-small">
+                <div class="stat-icon-circle sc-blue"><i class="fa fa-calendar-day"></i></div>
+                <div class="stat-val">{{ stats.today }}</div>
+                <div class="stat-lbl">Today</div>
+            </div>
+            <div class="stat-card-small">
+                <div class="stat-icon-circle sc-purple"><i class="fa fa-calendar-week"></i></div>
+                <div class="stat-val">{{ stats.week }}</div>
+                <div class="stat-lbl">This Week</div>
+            </div>
+            <div class="stat-card-small">
+                <div class="stat-icon-circle sc-green"><i class="fa fa-sign-in-alt"></i></div>
+                <div class="stat-val">{{ stats.login }}</div>
+                <div class="stat-lbl">Logins</div>
+            </div>
+            <div class="stat-card-small">
+                <div class="stat-icon-circle sc-blue"><i class="fa fa-plus"></i></div>
+                <div class="stat-val">{{ stats.created }}</div>
+                <div class="stat-lbl">Created</div>
+            </div>
+            <div class="stat-card-small">
+                <div class="stat-icon-circle sc-orange"><i class="fa fa-pen"></i></div>
+                <div class="stat-val">{{ stats.updated }}</div>
+                <div class="stat-lbl">Updated</div>
+            </div>
+            <div class="stat-card-small">
+                <div class="stat-icon-circle sc-red"><i class="fa fa-trash"></i></div>
+                <div class="stat-val">{{ stats.deleted }}</div>
+                <div class="stat-lbl">Deleted</div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-body" style="padding: 16px;">
+                <div class="product-search-toolbar" style="margin: 0;">
+                    <div class="search-input-container" style="flex: 1; max-width: 500px;">
+                        <i class="fa fa-search"></i>
+                        <input type="text" placeholder="Search by username, action, target data, or ID..." id="activityLogSearch">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-card">
+            {{ form_start(form, {'attr': {'class': 'filter-form'}}) }}
+                <div class="filter-row">
+                    <div class="filter-col">
+                        {{ form_label(form.user, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.user, {'attr': {'class': 'form-control', 'placeholder': 'Search by User'}}) }}
+                    </div>
+                    <div class="filter-col">
+                        {{ form_label(form.action, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.action, {'attr': {'class': 'form-control', 'placeholder': 'All Actions'}}) }}
+                    </div>
+                    <div class="filter-col">
+                        {{ form_label(form.targetEntity, 'Entity Type', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.targetEntity, {'attr': {'class': 'form-control', 'placeholder': 'All Types'}}) }}
+                    </div>
+                    <div class="filter-col">
+                        {{ form_label(form.dateFrom, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.dateFrom, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="filter-col">
+                        {{ form_label(form.dateTo, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.dateTo, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary" style="height: 42px; min-width: 100px;">
+                            <i class="fa fa-filter"></i> Filter
+                        </button>
+                        <a href="{{ path('app_activity_log_index') }}" class="btn btn-secondary" style="height: 42px;">Reset</a>
+                    </div>
+                </div>
+            {{ form_end(form) }}
+        </div>
+
+        <!-- Logs Table -->
+        <div class="card">
+            <div class="card-body card-body-no-padding">
+                <div class="table-responsive product-table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                {% set columns = [
+                                    {'field': 'id', 'label': 'ID', 'width': '8%'},
+                                    {'field': 'userId', 'label': 'User ID', 'width': '10%'},
+                                    {'field': 'username', 'label': 'Username', 'width': '18%'},
+                                    {'field': 'role', 'label': 'Role', 'width': '12%'},
+                                    {'field': 'action', 'label': 'Action', 'width': '12%'},
+                                    {'field': 'targetEntity', 'label': 'Target Data', 'width': '20%'},
+                                    {'field': 'createdAt', 'label': 'Date & Time', 'width': '20%'}
+                                ] %}
+                                {% for col in columns %}
+                                    {% set nextOrder = (currentSort == col.field and currentOrder == 'ASC') ? 'DESC' : 'ASC' %}
+                                    {% set sortParams = queryParams|merge({'sort': col.field, 'order': nextOrder, 'page': 1}) %}
+                                    {% set sortQuery = [] %}
+                                    {% for key, value in sortParams %}
+                                        {% if value is not null and value != '' %}
+                                            {% set sortQuery = sortQuery|merge([(key|url_encode) ~ '=' ~ (value|url_encode)]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <th class="sortable {% if currentSort == col.field %}sort-{{ currentOrder|lower }}{% endif %}" 
+                                        style="width: {{ col.width }};">
+                                        <a href="{{ path('app_activity_log_index') }}?{{ sortQuery|join('&') }}" 
+                                           style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                            {{ col.label }}
+                                            <span class="sort-icon">
+                                                {% if currentSort == col.field %}
+                                                    {% if currentOrder == 'ASC' %}▲{% else %}▼{% endif %}
+                                                {% else %}
+                                                    ▲
+                                                {% endif %}
+                                            </span>
+                                        </a>
+                                    </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% if logs|length > 0 %}
+                            {% for log in logs %}
+                                <tr class="activity-log-row"
+                                    data-id="{{ log.id }}"
+                                    data-userid="{{ log.userId|default('') }}"
+                                    data-username="{{ log.username|lower }}"
+                                    data-role="{{ log.role|lower }}"
+                                    data-action="{{ log.action|lower }}"
+                                    data-target="{{ (log.targetEntity ~ ' ' ~ log.targetData)|lower }}"
+                                    data-date="{{ log.createdAt|date('Y-m-d H:i:s') }}">
+                                    <td>{{ log.id }}</td>
+                                    <td>{{ log.userId|default('N/A') }}</td>
+                                    <td>{{ log.username }}</td>
+                                    <td>
+                                        <span class="role-badge-pill 
+                                            {% if 'ADMIN' in log.role %}role-badge-admin
+                                            {% elseif 'STAFF' in log.role %}role-badge-staff
+                                            {% else %}role-badge-client{% endif %}">
+                                            {{ log.role|replace({'ROLE_': ''})|upper }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="action-text 
+                                            {% if log.action == 'LOGIN' %}action-login
+                                            {% elseif log.action == 'LOGOUT' %}action-logout
+                                            {% elseif log.action == 'CREATE' %}action-create
+                                            {% elseif log.action == 'UPDATE' %}action-update
+                                            {% elseif log.action == 'DELETE' %}action-delete
+                                            {% endif %}">
+                                            {{ log.action }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if log.action == 'LOGIN' or log.action == 'LOGOUT' %}
+                                            User {{ log.action|lower }}ed
+                                        {% elseif log.targetEntity and log.targetData %}
+                                            {{ log.targetEntity }}: {{ log.targetData }}
+                                        {% elseif log.targetEntity %}
+                                            {{ log.targetEntity }}
+                                        {% else %}
+                                            {{ log.targetData|default('N/A') }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ log.createdAt|date('Y-m-d H:i:s') }}</td>
+                                </tr>
+                            {% endfor %}
+                            <!-- Search Empty State (hidden by default) -->
+                            <tr id="activityLogSearchEmptyState" class="activity-log-search-empty-state" style="display: none;">
+                                <td colspan="7" class="stock-empty-state-cell">
+                                    <div class="stock-empty-state-message">
+                                        <i class="fa fa-search" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                                        <p style="font-size: 16px; color: #6b7280; margin: 0 0 8px 0;">No activity logs found matching your search.</p>
+                                        <p style="font-size: 14px; color: #9ca3af; margin: 0;">Try searching with a different term or adjust your filters</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="stock-empty-state-cell">
+                                    <div class="stock-empty-state-message">
+                                        No activity logs found matching your criteria.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {# Pagination Controls #}
+                {% if totalPages > 1 %}
+
+                    <div class="pagination-container" style="padding: 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: white;">
+                        <div class="pagination-info" style="color: #6b7280; font-size: 14px;">
+                            Showing {{ ((currentPage - 1) * limit) + 1 }} to {{ currentPage * limit > totalLogs ? totalLogs : currentPage * limit }} of {{ totalLogs }} entries
+                        </div>
+                        <div class="pagination-controls" style="display: flex; gap: 8px; align-items: center;">
+                            {# Previous Button #}
+                            {% if currentPage > 1 %}
+                                {% set prevParams = queryParams|merge({'page': currentPage - 1}) %}
+                                {% set prevQuery = [] %}
+                                {% for key, value in prevParams %}
+                                    {% set prevQuery = prevQuery|merge([key ~ '=' ~ value]) %}
+                                {% endfor %}
+                                <a href="{{ path('app_activity_log_index') }}?{{ prevQuery|join('&') }}" 
+                                   class="pagination-btn" 
+                                   style="padding: 8px 16px; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; background: white; transition: all 0.2s;">
+                                    <i class="fa fa-chevron-left"></i> Previous
+                                </a>
+                            {% else %}
+                                <span class="pagination-btn disabled" 
+                                      style="padding: 8px 16px; border: 1px solid #e5e7eb; border-radius: 8px; color: #9ca3af; background: #f3f4f6; cursor: not-allowed;">
+                                    <i class="fa fa-chevron-left"></i> Previous
+                                </span>
+                            {% endif %}
+
+                            {# Page Numbers #}
+                            <div class="pagination-pages" style="display: flex; gap: 4px;">
+                                {% set startPage = max(1, currentPage - 2) %}
+                                {% set endPage = min(totalPages, currentPage + 2) %}
+                                
+                                {% if startPage > 1 %}
+                                    {% set firstParams = queryParams|merge({'page': 1}) %}
+                                    {% set firstQuery = [] %}
+                                    {% for key, value in firstParams %}
+                                        {% set firstQuery = firstQuery|merge([key ~ '=' ~ value]) %}
+                                    {% endfor %}
+                                    <a href="{{ path('app_activity_log_index') }}?{{ firstQuery|join('&') }}" 
+                                       class="pagination-page" 
+                                       style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; background: white;">
+                                        1
+                                    </a>
+                                    {% if startPage > 2 %}
+                                        <span style="padding: 8px 4px; color: #9ca3af;">...</span>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% for pageNum in startPage..endPage %}
+                                    {% if pageNum == currentPage %}
+                                        <span class="pagination-page active" 
+                                              style="padding: 8px 12px; border: 1px solid #ec4899; border-radius: 8px; color: white; background: #ec4899; font-weight: 600;">
+                                            {{ pageNum }}
+                                        </span>
+                                    {% else %}
+                                        {% set pageParams = queryParams|merge({'page': pageNum}) %}
+                                        {% set pageQuery = [] %}
+                                        {% for key, value in pageParams %}
+                                            {% set pageQuery = pageQuery|merge([key ~ '=' ~ value]) %}
+                                        {% endfor %}
+                                        <a href="{{ path('app_activity_log_index') }}?{{ pageQuery|join('&') }}" 
+                                           class="pagination-page" 
+                                           style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; background: white; transition: all 0.2s;">
+                                            {{ pageNum }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if endPage < totalPages %}
+                                    {% if endPage < totalPages - 1 %}
+                                        <span style="padding: 8px 4px; color: #9ca3af;">...</span>
+                                    {% endif %}
+                                    {% set lastParams = queryParams|merge({'page': totalPages}) %}
+                                    {% set lastQuery = [] %}
+                                    {% for key, value in lastParams %}
+                                        {% set lastQuery = lastQuery|merge([key ~ '=' ~ value]) %}
+                                    {% endfor %}
+                                    <a href="{{ path('app_activity_log_index') }}?{{ lastQuery|join('&') }}" 
+                                       class="pagination-page" 
+                                       style="padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; background: white;">
+                                        {{ totalPages }}
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                            {# Next Button #}
+                            {% if currentPage < totalPages %}
+                                {% set nextParams = queryParams|merge({'page': currentPage + 1}) %}
+                                {% set nextQuery = [] %}
+                                {% for key, value in nextParams %}
+                                    {% set nextQuery = nextQuery|merge([key ~ '=' ~ value]) %}
+                                {% endfor %}
+                                <a href="{{ path('app_activity_log_index') }}?{{ nextQuery|join('&') }}" 
+                                   class="pagination-btn" 
+                                   style="padding: 8px 16px; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; background: white; transition: all 0.2s;">
+                                    Next <i class="fa fa-chevron-right"></i>
+                                </a>
+                            {% else %}
+                                <span class="pagination-btn disabled" 
+                                      style="padding: 8px 16px; border: 1px solid #e5e7eb; border-radius: 8px; color: #9ca3af; background: #f3f4f6; cursor: not-allowed;">
+                                    Next <i class="fa fa-chevron-right"></i>
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search Functionality
+            const searchInput = document.getElementById('activityLogSearch');
+            const logRows = document.querySelectorAll('.activity-log-row');
+            const searchEmptyState = document.getElementById('activityLogSearchEmptyState');
+
+            if (searchInput && logRows.length > 0) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
+                    
+                    logRows.forEach(row => {
+                        // Skip the empty state row
+                        if (row.classList.contains('activity-log-search-empty-state')) {
+                            return;
+                        }
+                        
+                        const id = row.getAttribute('data-id') || '';
+                        const userid = row.getAttribute('data-userid') || '';
+                        const username = row.getAttribute('data-username') || '';
+                        const role = row.getAttribute('data-role') || '';
+                        const action = row.getAttribute('data-action') || '';
+                        const target = row.getAttribute('data-target') || '';
+                        const date = row.getAttribute('data-date') || '';
+                        
+                        // Search in multiple fields
+                        const matchesSearch = searchTerm === '' || 
+                            id.includes(searchTerm) ||
+                            userid.includes(searchTerm) ||
+                            username.includes(searchTerm) ||
+                            role.includes(searchTerm) ||
+                            action.includes(searchTerm) ||
+                            target.includes(searchTerm) ||
+                            date.includes(searchTerm);
+                        
+                        if (matchesSearch) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                    
+                    // Show/hide empty state based on search results
+                    if (searchEmptyState) {
+                        if (searchTerm !== '' && visibleCount === 0) {
+                            searchEmptyState.style.display = '';
+                        } else {
+                            searchEmptyState.style.display = 'none';
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}
+

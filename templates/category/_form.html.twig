@@ -1,0 +1,44 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'stock-entry-form'}}) }}
+    
+    <!-- CATEGORY INFORMATION Section -->
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">CATEGORY INFORMATION</h3>
+        <p class="stock-form-section-description">
+            Enter the category details below. Category name is required.
+        </p>
+        
+        <div class="stock-form-field">
+            <label class="stock-form-label">Category Name *</label>
+            {{ form_widget(form.name, {'attr': {'placeholder': 'e.g., Bouquets, Funeral Flowers'}}) }}
+            {{ form_errors(form.name) }}
+        </div>
+
+        <div class="stock-form-field">
+            <label class="stock-form-label">Description</label>
+            {{ form_widget(form.description, {'attr': {'placeholder': 'Optional description of this category', 'rows': 4}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+    </div>
+
+    <!-- STATUS Section -->
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">STATUS</h3>
+        <div class="stock-form-field">
+            <label class="stock-form-label" style="display: flex; align-items: center; font-weight: normal; cursor: pointer;">
+                {{ form_widget(form.isActive, {'attr': {'style': 'margin-right: 8px; width: 18px; height: 18px; cursor: pointer;'}}) }}
+                Active (Enable this category)
+            </label>
+            {{ form_errors(form.isActive) }}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="stock-form-actions">
+        <button type="submit" class="stock-form-btn-primary">
+            {{ button_label|default('Create Category') }}
+        </button>
+        <a href="{{ path('app_category_index') }}" class="stock-form-btn-cancel">Cancel</a>
+    </div>
+
+{{ form_end(form) }}
+

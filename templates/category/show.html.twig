@@ -1,0 +1,89 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ category.name }} - Category Details{% endblock %}
+
+{% block page_title %}Category Details{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_admin') }}">Home</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-item">
+        <a class="breadcrumb-link" href="{{ path('app_category_index') }}">Categories</a>
+    </span>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">{{ category.name }}</span>
+</nav>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+<div class="product-container">
+    <div class="product-header">
+        <h2>Category Details</h2>
+        <p>View complete information about this category</p>
+    </div>
+
+    <div class="product-detail">
+        <div class="product-detail-grid">
+            <div class="product-detail-info">
+                <h2>{{ category.name }}</h2>
+                
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Category ID</span>
+                    <span class="product-detail-value">#{{ category.id }}</span>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Name</span>
+                    <span class="product-detail-value">{{ category.name }}</span>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Description</span>
+                    <p class="product-detail-value">{{ category.description ?: 'No description provided' }}</p>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Status</span>
+                    <span class="product-detail-value">
+                        {% if category.isActive %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactive</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Products Count</span>
+                    <span class="product-detail-value">{{ category.products|length }} product(s)</span>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Created At</span>
+                    <span class="product-detail-value">{{ category.createdAt|date('Y-m-d H:i:s') }}</span>
+                </div>
+
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Updated At</span>
+                    <span class="product-detail-value">{{ category.updatedAt|date('Y-m-d H:i:s') }}</span>
+                </div>
+
+                <div class="btn-group" style="margin-top: 3rem;">
+                    <a href="{{ path('app_category_index') }}" class="btn btn-secondary">← Back to List</a>
+                    <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="btn">Edit Category</a>
+                    {{ include('category/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
