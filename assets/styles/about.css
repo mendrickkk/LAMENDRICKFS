@@ -1,0 +1,237 @@
+/* ==========================================================================
+   ABOUT US PAGE + MEET THE TEAM
+   Loaded only on the About page to prevent overriding other pages.
+   ========================================================================== */
+
+.fv-about-page {
+  padding: 80px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+  background: #fff;
+}
+
+.fv-about-page__title {
+  font-family: var(--fv-serif);
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: #8B5E3C;
+  margin: 0 0 60px;
+}
+
+.fv-about-page__image-wrapper {
+  margin-bottom: 60px;
+  width: 100%;
+}
+
+.fv-about-page__image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.fv-about-page__content {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: var(--fv-sans);
+  font-size: 15px;
+  line-height: 1.8;
+  color: #444;
+  text-align: left;
+}
+
+.fv-about-page__content p {
+  margin-bottom: 24px;
+}
+
+.fv-about-page__content p:last-child {
+  margin-bottom: 0;
+}
+
+.fv-about-page__tagline {
+  font-weight: 600;
+  margin-top: 40px !important;
+  color: #111;
+}
+
+/* Meet the Team */
+.fv-team {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+  background: #fff;
+}
+
+.fv-team__title {
+  font-family: var(--fv-serif);
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: #8B5E3C;
+  margin: 80px 0 60px;
+  text-align: center;
+}
+
+.fv-team__ceo-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 60px;
+}
+
+.fv-team__ceo-bg {
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  min-height: 420px;
+  background: #f9f9f9;
+}
+
+.fv-team__ceo-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fv-team__ceo-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px 24px;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+.fv-team__ceo-photo-wrapper {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #f6eee7;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  background: #f9f9f9;
+  margin-bottom: 24px;
+}
+
+.fv-team__ceo-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fv-team__ceo-name {
+  font-family: var(--fv-serif);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  color: #111;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.fv-team__ceo-position {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  color: #8B5E3C;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.fv-team__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  margin-top: 20px;
+}
+
+.fv-team__member {
+  text-align: center;
+  transition: transform .3s ease;
+}
+
+.fv-team__member:hover {
+  transform: translateY(-5px);
+}
+
+.fv-team__member-image-wrapper {
+  aspect-ratio: 1 / 1;
+  background: #f9f9f9;
+  overflow: hidden;
+  margin-bottom: 18px;
+  border-radius: 4px;
+}
+
+.fv-team__member-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fv-team__member-name {
+  font-family: var(--fv-serif);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  color: #111;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.fv-team__member-position {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  color: #8B5E3C;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+@media (max-width: 992px) {
+  .fv-team__ceo-split {
+    grid-template-columns: 1fr;
+  }
+
+  .fv-team__ceo-bg {
+    min-height: 320px;
+  }
+
+  .fv-team__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .fv-about-page {
+    padding: 60px 20px;
+  }
+
+  .fv-about-page__title {
+    font-size: 20px;
+    margin-bottom: 40px;
+  }
+
+  .fv-team__title {
+    margin-top: 60px;
+    margin-bottom: 40px;
+  }
+
+  .fv-team__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fv-team__ceo-photo-wrapper {
+    width: 190px;
+    height: 190px;
+  }
+}

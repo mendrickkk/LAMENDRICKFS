@@ -5,6 +5,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('styles/client.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/about.css') }}">
     <link rel="stylesheet" href="/styles/header.css">
     <link rel="stylesheet" href="/styles/footer.css">
 {% endblock %}
@@ -31,6 +32,61 @@
                 <p>We are proud to work closely with local growers and sustainable farms, nurturing a community that cultivates beauty with care. This commitment not only guarantees the unmatched freshness of our flowers but also supports the local artistry that makes our industry blossom.</p>
 
                 <p class="fv-about-page__tagline">Here at La Kurt Flowershop, we make every moment bloom.</p>
+            </div>
+        </section>
+
+        <section class="fv-team">
+            <h2 class="fv-team__title">Meet the Team</h2>
+
+            <div class="fv-team__ceo-split">
+                <div class="fv-team__ceo-bg">
+                    <img src="/images/bgz.png" alt="La Kurt Flowershop studio background" class="fv-team__ceo-bg-img">
+                </div>
+
+                <div class="fv-team__ceo-panel">
+                    <div class="fv-team__ceo-photo-wrapper">
+                        <img src="/images/CEO.png" alt="Kurt, Founder and CEO" class="fv-team__ceo-photo">
+                    </div>
+
+                    <div class="fv-team__ceo-info">
+                        <h3 class="fv-team__ceo-name">Kurt</h3>
+                        <p class="fv-team__ceo-position">Founder &amp; CEO</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fv-team__grid">
+                <div class="fv-team__member">
+                    <div class="fv-team__member-image-wrapper">
+                        <img src="/images/Giselle.png" alt="Giselle" class="fv-team__member-image">
+                    </div>
+                    <h3 class="fv-team__member-name">Giselle</h3>
+                    <p class="fv-team__member-position">Events Coordinator</p>
+                </div>
+
+                <div class="fv-team__member">
+                    <div class="fv-team__member-image-wrapper">
+                        <img src="/images/karina.jpg" alt="Karina" class="fv-team__member-image">
+                    </div>
+                    <h3 class="fv-team__member-name">Karina</h3>
+                    <p class="fv-team__member-position">Creative Director</p>
+                </div>
+
+                <div class="fv-team__member">
+                    <div class="fv-team__member-image-wrapper">
+                        <img src="/images/Nigel.png" alt="Nigel" class="fv-team__member-image">
+                    </div>
+                    <h3 class="fv-team__member-name">Nigel</h3>
+                    <p class="fv-team__member-position">Operations Manager</p>
+                </div>
+
+                <div class="fv-team__member">
+                    <div class="fv-team__member-image-wrapper">
+                        <img src="/images/Winter.png" alt="Winter" class="fv-team__member-image">
+                    </div>
+                    <h3 class="fv-team__member-name">Winter</h3>
+                    <p class="fv-team__member-position">Head Florist</p>
+                </div>
             </div>
         </section>
     </main>

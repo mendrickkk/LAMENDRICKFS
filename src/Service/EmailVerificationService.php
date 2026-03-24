@@ -3,51 +3,49 @@
 namespace App\Service;
 
 use App\Entity\Users;
+use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class EmailVerificationService
 {
-    private const DEFAULT_TTL_SECONDS = 60 * 60 * 24; // 24h
-
     public function __construct(
+        private readonly EntityManagerInterface $entityManager,
         private readonly MailerInterface $mailer,
         private readonly UrlGeneratorInterface $urlGenerator,
+        #[Autowire('%env(MAILER_FROM_ADDRESS)%')]
         private readonly string $mailFrom,
+        #[Autowire('%env(MAILER_FROM_NAME)%')]
         private readonly string $mailFromName,
-        private readonly string $appSecret,
-    ) {}
+        private readonly LoggerInterface $logger,
+    ) {
+    }
 
-    public function createSignedVerificationUrl(Users $user, ?int $ttlSeconds = null): string
+    public function generateVerificationToken(): string
     {
-        $expires = time() + ($ttlSeconds ?? self::DEFAULT_TTL_SECONDS);
-
-        $token = $user->getVerificationToken();
-
-        $baseUrl = $this->urlGenerator->generate(
-            'app_email_verify',
-            [
-                'id' => $user->getId(),
-                'expires' => $expires,
-                'token' => $token,
-            ],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-
-        $signature = $this->generateSignature((int) $user->getId(), $expires, (string) $token);
-
-        return $baseUrl.(str_contains($baseUrl, '?') ? '&' : '?').'signature='.$signature;
+        return bin2hex(random_bytes(32));
     }
 
     public function sendVerificationEmail(Users $user): void
     {
-        if (!$user->getId() || !$user->getEmail()) {
+        if (!$user->getEmail()) {
             return;
         }
 
-        $verifyUrl = $this->createSignedVerificationUrl($user);
+        if (!$user->getVerificationToken()) {
+            $user->setVerificationToken($this->generateVerificationToken());
+            $this->entityManager->flush();
+        }
+
+        $verificationUrl = $this->urlGenerator->generate(
+            'app_verify_email',
+            ['token' => (string) $user->getVerificationToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
 
         $email = (new TemplatedEmail())
             ->from(new Address($this->mailFrom, $this->mailFromName))
@@ -56,29 +54,39 @@ final class EmailVerificationService
             ->htmlTemplate('emails/verification.html.twig')
             ->context([
                 'user' => $user,
-                'verifyUrl' => $verifyUrl,
+                'verifyUrl' => $verificationUrl,
                 'expiresInHours' => 24,
             ]);
 
-        $this->mailer->send($email);
+        try {
+            $this->mailer->send($email);
+        } catch (\Throwable $e) {
+            $this->logger->error('Failed to send verification email.', [
+                'user_id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'exception_class' => get_class($e),
+                'exception_message' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
     }
 
-    public function isSignatureValid(int $id, int $expires, ?string $token, string $signature): bool
+    public function verifyToken(string $token): ?Users
     {
-        if ($expires < time()) {
-            return false;
+        $user = $this->entityManager
+            ->getRepository(Users::class)
+            ->findOneBy(['verificationToken' => $token]);
+
+        if (!$user) {
+            return null;
         }
 
-        $expected = $this->generateSignature($id, $expires, (string) $token);
+        $user->setIsVerified(true);
+        $user->setIsActive(true);
+        $user->setVerificationToken(null);
 
-        return hash_equals($expected, $signature);
-    }
+        $this->entityManager->flush();
 
-    private function generateSignature(int $id, int $expires, string $token): string
-    {
-        $payload = $id.'|'.$expires.'|'.$token;
-
-        return hash_hmac('sha256', $payload, $this->appSecret);
+        return $user;
     }
 }
-

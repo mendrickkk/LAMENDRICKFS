@@ -23,7 +23,7 @@ security:
                 check_path: /api/login
                 username_path: email
                 password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
+                success_handler: App\Security\JWTAuthenticationSuccessHandler
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~  
 
@@ -32,12 +32,15 @@ security:
             provider: app_user_provider
             user_checker: App\Security\UserChecker
             access_denied_handler: App\EventListener\AccessDeniedHandler
+            entry_point: form_login
             form_login:
                 login_path: app_login
                 check_path: app_login
                 default_target_path: app_login_success
                 always_use_default_target_path: true
                 enable_csrf: true
+            custom_authenticators:
+                - App\Security\GoogleAuthenticator
             logout:
                 path: app_logout
                 target: app_login
@@ -55,7 +58,9 @@ security:
         - { path: ^/admin/users, roles: ROLE_ADMIN }
         - { path: ^/admin/profile, allow_if: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')" }
         - { path: ^/admin, allow_if: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')" }
+        - { path: ^/connect, roles: PUBLIC_ACCESS }
         - { path: ^/verify/email, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/signup, roles: PUBLIC_ACCESS }
         - { path: ^/landing, roles: PUBLIC_ACCESS }

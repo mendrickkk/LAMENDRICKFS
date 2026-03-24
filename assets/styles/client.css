@@ -607,86 +607,7 @@ a{ color:inherit; text-decoration:none; }
         margin-bottom: 30px;
     }
 }
-/* ==========================================================================
-   CONTACT US PAGE STYLES
-   ========================================================================== */
-.fv-contact-page {
-  background: #fff;
-  padding: 100px 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-}
-
-.fv-contact-page__inner {
-  max-width: 800px;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center; /* Changed back to center */
-}
-
-.fv-contact-page__title {
-  font-family: var(--fv-serif);
-  font-size: 24px;
-  font-weight: 400;
-  letter-spacing: .3em;
-  text-transform: uppercase;
-  color: #8B5E3C;
-  margin: 0 0 60px;
-  text-align: center; /* Keep title centered */
-}
-
-.fv-contact-page__lead {
-  font-family: var(--fv-sans);
-  font-size: 14px;
-  line-height: 1.8;
-  color: #444;
-  margin: 0 auto 40px;
-  max-width: 650px;
-  text-align: left;
-}
-
-.fv-contact-page__details {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 0 auto 40px;
-  color: #444;
-  font-size: 14px;
-  line-height: 1.6;
-  text-align: left;
-  width: fit-content;
-}
-
-.fv-contact-page__details p {
-  margin: 0;
-}
-
-.fv-contact-page__label {
-  font-weight: 400;
-}
-
-.fv-contact-page__link {
-  color: #8B5E3C;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: opacity .2s ease;
-}
-
-.fv-contact-page__link:hover {
-  opacity: .7;
-}
-
-.fv-contact-page__note {
-  font-family: var(--fv-sans);
-  font-size: 14px;
-  line-height: 1.8;
-  color: #444;
-  margin: 0 auto;
-  max-width: 650px;
-  text-align: left;
-}
+/* (Removed Contact Page CSS - now in contactus.css) */
 
 @media (max-width: 768px) {
   .fv-social-cta {
@@ -694,13 +615,6 @@ a{ color:inherit; text-decoration:none; }
   }
   .fv-social-cta__title {
     font-size: 18px;
-  }
-  .fv-contact-page {
-    padding: 60px 20px;
-  }
-  .fv-contact-page__title {
-    font-size: 20px;
-    margin-bottom: 40px;
   }
 }
 
@@ -734,74 +648,7 @@ a{ color:inherit; text-decoration:none; }
   }
 }
 
-/* ==========================================================================
-   ABOUT US PAGE STYLES
-   ========================================================================== */
-.fv-about-page {
-  padding: 80px 20px;
-  max-width: 1000px;
-  margin: 0 auto;
-  text-align: center;
-  background: #fff;
-}
-
-.fv-about-page__title {
-  font-family: var(--fv-serif);
-  font-size: 24px;
-  font-weight: 400;
-  letter-spacing: .3em;
-  text-transform: uppercase;
-  color: #8B5E3C;
-  margin: 0 0 60px;
-}
-
-.fv-about-page__image-wrapper {
-  margin-bottom: 60px;
-  width: 100%;
-}
-
-.fv-about-page__image {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-
-.fv-about-page__content {
-  max-width: 800px;
-  margin: 0 auto;
-  font-family: var(--fv-sans);
-  font-size: 15px;
-  line-height: 1.8;
-  color: #444;
-  text-align: left;
-}
-
-.fv-about-page__content p {
-  margin-bottom: 24px;
-}
-
-.fv-about-page__content p:last-child {
-  margin-bottom: 0;
-}
-
-.fv-about-page__tagline {
-  font-weight: 600;
-  margin-top: 40px !important;
-  color: #111;
-}
-
-@media (max-width: 768px) {
-  .fv-about-page {
-    padding: 60px 20px;
-  }
-  .fv-about-page__title {
-    font-size: 20px;
-    margin-bottom: 40px;
-  }
-}
-
-/* (Removed Top Bar / Header CSS - now in header.css) */
+/* (Removed About Page CSS - now in about.css) */
 
 /* Footer Responsive */
 @media (max-width: 992px){

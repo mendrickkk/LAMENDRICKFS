@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use App\Entity\Users;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -19,7 +20,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  * - As standalone: Inject this service and call load() method
  * - Via command: Create a command that uses this service
  */
-class UserFixtures
+class UserFixtures extends Fixture
 {
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher
@@ -29,26 +30,22 @@ class UserFixtures
     /**
      * Load admin user fixture
      * 
-     * @param ObjectManager $manager
-     * @param bool $append If true, skip if user already exists
-     * @return bool Returns true if user was created, false if skipped
+     * Create the default admin user if it doesn't exist.
      */
-    public function load(ObjectManager $manager, bool $append = false): bool
+    public function load(ObjectManager $manager): void
     {
         // Admin user (backup plan)
         $adminUsername = 'admin';
-        $adminEmail = 'admin@mendrick.com';
+        $adminEmail = 'narumiyazxc25@gmail.com';
         $adminPassword = 'adminkurt';
 
-        // Check if user already exists (only when using --append flag)
+        // Check if user already exists
         $existingUser = $manager->getRepository(Users::class)->findOneBy([
             'username' => $adminUsername
         ]);
 
-        // When using --append, we skip if user exists to avoid duplicates
         if ($existingUser) {
-            // User already exists, skip creation
-            return false;
+            return;
         }
 
         // Check if email already exists
@@ -57,8 +54,7 @@ class UserFixtures
         ]);
 
         if ($existingEmail) {
-            // Email already exists, skip creation
-            return false;
+            return;
         }
 
         // Create admin user
@@ -78,7 +74,5 @@ class UserFixtures
 
         $manager->persist($admin);
         $manager->flush();
-        
-        return true;
     }
 }

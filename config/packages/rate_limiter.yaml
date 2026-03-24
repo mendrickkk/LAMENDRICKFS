@@ -1,0 +1,7 @@
+framework:
+    rate_limiter:
+        verify_email_resend:
+            policy: 'fixed_window'
+            limit: 1
+            interval: '60 seconds'
+

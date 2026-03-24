@@ -5,62 +5,37 @@ namespace App\Controller;
 use App\Entity\Users;
 use App\Service\EmailVerificationService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\UriSigner;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class EmailVerificationController extends AbstractController
 {
-    #[Route('/verify/email', name: 'app_email_verify', methods: ['GET'])]
-    public function verify(
+    #[Route('/verify-email', name: 'app_verify_email', methods: ['GET'])]
+    public function verifyUserEmail(
         Request $request,
-        EntityManagerInterface $em,
-        EmailVerificationService $verificationService,
+        EmailVerificationService $emailVerificationService,
     ): Response {
-        $id = $request->query->getInt('id');
-        $expires = $request->query->getInt('expires');
-        $token = $request->query->get('token');
-        $signature = (string) $request->query->get('signature');
+        $token = (string) $request->query->get('token', '');
 
-        if (!$id || !$expires || $signature === '' || !is_string($token)) {
+        if ($token === '') {
             $this->addFlash('error', 'Invalid verification link.');
             return $this->redirectToRoute('app_login');
         }
 
-        if ($expires < time()) {
-            $this->addFlash('error', 'This verification link has expired. Please request a new one.');
-            return $this->redirectToRoute('app_login');
-        }
+        $user = $emailVerificationService->verifyToken($token);
 
-        if (!$verificationService->isSignatureValid($id, $expires, $token, $signature)) {
-            $this->addFlash('error', 'Invalid verification link.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        /** @var Users|null $user */
-        $user = $em->getRepository(Users::class)->find($id);
         if (!$user) {
-            $this->addFlash('error', 'User not found.');
+            $this->addFlash('error', 'Invalid or expired verification token.');
             return $this->redirectToRoute('app_login');
         }
 
-        if ($user->isVerified()) {
-            $this->addFlash('success', 'Your email is already verified.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        if ($user->getVerificationToken() !== $token) {
-            $this->addFlash('error', 'Invalid verification token.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        $user->setIsVerified(true);
-        $user->setVerificationToken(null);
-        $em->flush();
-
-        $this->addFlash('success', 'Email verified successfully! You can now log in.');
+        $this->addFlash('success', 'Your email has been verified! You can now log in.');
         return $this->redirectToRoute('app_login');
     }
 
@@ -68,9 +43,9 @@ final class EmailVerificationController extends AbstractController
     public function resend(
         Request $request,
         EntityManagerInterface $em,
-        EmailVerificationService $service
-    ): Response
-    {
+        EmailVerificationService $service,
+        #[Autowire(service: 'limiter.verify_email_resend')] RateLimiterFactory $rateLimiter,
+    ): Response {
         if (!$this->isCsrfTokenValid('resend_verification', (string) $request->request->get('_csrf_token'))) {
             $this->addFlash('error', 'Invalid request. Please try again.');
             return $this->redirectToRoute('app_login');
@@ -82,12 +57,19 @@ final class EmailVerificationController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
+        // Anti-spam: 1 resend per window for the same identifier.
+        $limiterKey = mb_strtolower($identifier);
+        $limit = $rateLimiter->create($limiterKey)->consume(1);
+        if (!$limit->isAccepted()) {
+            $this->addFlash('error', 'Please wait a moment before requesting another verification email.');
+            return $this->redirectToRoute('app_login');
+        }
+
         /** @var Users|null $user */
         $user = $em->getRepository(Users::class)->findOneBy(['email' => $identifier])
             ?? $em->getRepository(Users::class)->findOneBy(['username' => $identifier]);
 
         if (!$user) {
-            // Don't reveal whether the account exists
             $this->addFlash('success', 'If an account exists, we sent a verification email. Please check your inbox.');
             return $this->redirectToRoute('app_login');
         }
@@ -97,15 +79,13 @@ final class EmailVerificationController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        try {
-            $service->sendVerificationEmail($user);
-        } catch (\Throwable) {
-            $this->addFlash('error', 'We could not send the verification email right now. Please try again later.');
-            return $this->redirectToRoute('app_login');
-        }
+        // Generate a fresh token so the user gets a new link.
+        $user->setVerificationToken($service->generateVerificationToken());
+        $em->flush();
+
+        $service->sendVerificationEmail($user);
 
         $this->addFlash('success', 'Verification email sent. Please check your inbox.');
         return $this->redirectToRoute('app_login');
     }
 }
-
