@@ -1,35 +1,35 @@
-services:
-  mysql:
-    image: mysql:8.0
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "3309:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - mendrickfinals_network
+  services:
+    mysql:
+      image: mysql:8.0
+      restart: unless-stopped
+      environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      ports:
+        - "3309:3306"
+      volumes:
+        - mysql_data:/var/lib/mysql
+      networks:
+        - midterm_network
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    restart: unless-stopped
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: ${MYSQL_USER}
-      PMA_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "8080:80"
-    depends_on:
-      - mysql
-    networks:
-      - mendrickfinals_network
+    phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      restart: unless-stopped
+      environment:
+        PMA_HOST: mysql
+        PMA_USER: ${MYSQL_USER}
+        PMA_PASSWORD: ${MYSQL_PASSWORD}
+      ports:
+        - "8080:80"
+      depends_on:
+        - mysql
+      networks:
+        - midterm_network
 
-volumes:
-  mysql_data:
+  volumes:
+    mysql_data:
 
-networks:
-  mendrickfinals_network:
+  networks:
+    midterm_network:

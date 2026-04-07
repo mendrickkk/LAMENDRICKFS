@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Entity\Stock;
 use App\Form\ProductType;
+use App\Form\StockType;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,8 +46,12 @@ final class ProductController extends AbstractController
                 ->getResult();
         }
         
+        $stock = new Stock();
+        $stockForm = $this->createForm(StockType::class, $stock, ['is_edit' => false]);
+
         return $this->render('product/index.html.twig', [
             'products' => $products,
+            'stockForm' => $stockForm,
         ]);
     }
 
@@ -76,13 +82,20 @@ final class ProductController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
-    public function show(Product $product): Response
+    public function show(Request $request, Product $product): Response
     {
         // Check ownership for staff
         if (!$this->isGranted('ROLE_ADMIN')) {
             if ($product->getCreatedBy() !== $this->getUser()) {
                 throw $this->createAccessDeniedException('You can only view your own records.');
             }
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            $html = $this->renderView('product/_show_content.html.twig', [
+                'product' => $product,
+            ]);
+            return new Response($html);
         }
 
         return $this->render('product/show.html.twig', [

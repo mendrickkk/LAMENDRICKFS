@@ -8,6 +8,7 @@ use App\Repository\UsersRepository;
 use App\Service\ActivityLogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -28,8 +29,13 @@ final class UserController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        $user = new Users();
+        $user->setIsActive(true);
+        $form = $this->createForm(UserType::class, $user, ['is_edit' => false]);
+
         return $this->render('admin/users/index.html.twig', [
             'users' => $users,
+            'form' => $form,
         ]);
     }
 
@@ -45,28 +51,39 @@ final class UserController extends AbstractController
         
         $form = $this->createForm(UserType::class, $user, ['is_edit' => false]);
         $form->handleRequest($request);
+        $isAjax = $request->isXmlHttpRequest();
+
+        $renderInvalid = function (string $message) use ($isAjax, $user, $form): Response {
+            $this->addFlash('error', $message);
+            if ($isAjax) {
+                $html = $this->renderView('admin/users/_form.html.twig', [
+                    'form' => $form,
+                    'button_label' => 'Create User',
+                    'action' => $this->generateUrl('app_user_new'),
+                    'show_cancel' => false,
+                ]);
+                return new Response($html, 422);
+            }
+
+            return $this->render('admin/users/new.html.twig', [
+                'user' => $user,
+                'form' => $form,
+            ]);
+        };
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Check for duplicate username
             $existingUsername = $entityManager->getRepository(Users::class)
                 ->findOneBy(['username' => $user->getUsername()]);
             if ($existingUsername) {
-                $this->addFlash('error', 'Username already exists. Please choose a different username.');
-                return $this->render('admin/users/new.html.twig', [
-                    'user' => $user,
-                    'form' => $form,
-                ]);
+                return $renderInvalid('Username already exists. Please choose a different username.');
             }
 
             // Check for duplicate email
             $existingEmail = $entityManager->getRepository(Users::class)
                 ->findOneBy(['email' => $user->getEmail()]);
             if ($existingEmail) {
-                $this->addFlash('error', 'Email already exists. Please use a different email address.');
-                return $this->render('admin/users/new.html.twig', [
-                    'user' => $user,
-                    'form' => $form,
-                ]);
+                return $renderInvalid('Email already exists. Please use a different email address.');
             }
 
             // Validate password confirmation
@@ -74,11 +91,7 @@ final class UserController extends AbstractController
             $confirmPassword = $form->get('confirmPassword')->getData();
             
             if ($plainPassword !== $confirmPassword) {
-                $this->addFlash('error', 'Passwords do not match.');
-                return $this->render('admin/users/new.html.twig', [
-                    'user' => $user,
-                    'form' => $form,
-                ]);
+                return $renderInvalid('Passwords do not match.');
             }
             
             // Hash password
@@ -111,7 +124,23 @@ final class UserController extends AbstractController
             }
 
             $this->addFlash('success', sprintf('User "%s" has been created successfully!', $user->getUsername()));
+            if ($isAjax) {
+                return new JsonResponse([
+                    'ok' => true,
+                    'redirectUrl' => $this->generateUrl('app_user_index'),
+                ]);
+            }
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($isAjax && $form->isSubmitted() && !$form->isValid()) {
+            $html = $this->renderView('admin/users/_form.html.twig', [
+                'form' => $form,
+                'button_label' => 'Create User',
+                'action' => $this->generateUrl('app_user_new'),
+                'show_cancel' => false,
+            ]);
+            return new Response($html, 422);
         }
 
         return $this->render('admin/users/new.html.twig', [
@@ -121,8 +150,15 @@ final class UserController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
-    public function show(Users $user): Response
+    public function show(Request $request, Users $user): Response
     {
+        if ($request->isXmlHttpRequest()) {
+            $html = $this->renderView('admin/users/_show_content.html.twig', [
+                'user' => $user,
+            ]);
+            return new Response($html);
+        }
+
         return $this->render('admin/users/show.html.twig', [
             'user' => $user,
         ]);
@@ -138,6 +174,37 @@ final class UserController extends AbstractController
     ): Response {
         $form = $this->createForm(UserType::class, $user, ['is_edit' => true]);
         $form->handleRequest($request);
+        $isAjax = $request->isXmlHttpRequest();
+
+        $renderEditInvalid = function (string $message) use ($isAjax, $user, $form): Response {
+            $this->addFlash('error', $message);
+            if ($isAjax) {
+                $html = $this->renderView('admin/users/_form.html.twig', [
+                    'form' => $form,
+                    'button_label' => 'Update User',
+                    'action' => $this->generateUrl('app_user_edit', ['id' => $user->getId()]),
+                    'show_cancel' => false,
+                    'is_edit' => true,
+                ]);
+                return new Response($html, 422);
+            }
+
+            return $this->render('admin/users/edit.html.twig', [
+                'user' => $user,
+                'form' => $form,
+            ]);
+        };
+
+        if ($isAjax && !$form->isSubmitted()) {
+            $html = $this->renderView('admin/users/_form.html.twig', [
+                'form' => $form,
+                'button_label' => 'Update User',
+                'action' => $this->generateUrl('app_user_edit', ['id' => $user->getId()]),
+                'show_cancel' => false,
+                'is_edit' => true,
+            ]);
+            return new Response($html);
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Check for duplicate username (excluding current user)
@@ -151,11 +218,7 @@ final class UserController extends AbstractController
                 ->getOneOrNullResult();
             
             if ($existingUsername) {
-                $this->addFlash('error', 'Username already exists. Please choose a different username.');
-                return $this->render('admin/users/edit.html.twig', [
-                    'user' => $user,
-                    'form' => $form,
-                ]);
+                return $renderEditInvalid('Username already exists. Please choose a different username.');
             }
 
             // Check for duplicate email (excluding current user)
@@ -169,11 +232,7 @@ final class UserController extends AbstractController
                 ->getOneOrNullResult();
             
             if ($existingEmail) {
-                $this->addFlash('error', 'Email already exists. Please use a different email address.');
-                return $this->render('admin/users/edit.html.twig', [
-                    'user' => $user,
-                    'form' => $form,
-                ]);
+                return $renderEditInvalid('Email already exists. Please use a different email address.');
             }
 
             // Update password only if provided
@@ -182,19 +241,11 @@ final class UserController extends AbstractController
                 $confirmPassword = $form->get('confirmPassword')->getData();
                 
                 if (empty($confirmPassword)) {
-                    $this->addFlash('error', 'Please confirm your password.');
-                    return $this->render('admin/users/edit.html.twig', [
-                        'user' => $user,
-                        'form' => $form,
-                    ]);
+                    return $renderEditInvalid('Please confirm your password.');
                 }
                 
                 if ($plainPassword !== $confirmPassword) {
-                    $this->addFlash('error', 'Passwords do not match.');
-                    return $this->render('admin/users/edit.html.twig', [
-                        'user' => $user,
-                        'form' => $form,
-                    ]);
+                    return $renderEditInvalid('Passwords do not match.');
                 }
                 
                 $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
@@ -211,7 +262,24 @@ final class UserController extends AbstractController
             }
 
             $this->addFlash('success', sprintf('User "%s" has been updated successfully!', $user->getUsername()));
+            if ($isAjax) {
+                return new JsonResponse([
+                    'ok' => true,
+                    'redirectUrl' => $this->generateUrl('app_user_index'),
+                ]);
+            }
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($isAjax && $form->isSubmitted() && !$form->isValid()) {
+            $html = $this->renderView('admin/users/_form.html.twig', [
+                'form' => $form,
+                'button_label' => 'Update User',
+                'action' => $this->generateUrl('app_user_edit', ['id' => $user->getId()]),
+                'show_cancel' => false,
+                'is_edit' => true,
+            ]);
+            return new Response($html, 422);
         }
 
         return $this->render('admin/users/edit.html.twig', [

@@ -38,9 +38,9 @@
         <div class="stock-management-header">
             <h1 class="stock-management-title">Stock Management</h1>
             <div class="stock-management-header-actions">
-                <a href="{{ path('app_stock_new') }}" class="stock-new-entry-btn">
+                <button type="button" class="stock-new-entry-btn" id="openNewStockModal">
                     New Stock Entry
-                </a>
+                </button>
             </div>
         </div>
 
@@ -142,12 +142,14 @@
                                     <td>
                                         <div class="product-actions-cell">
                                             <a href="{{ path('app_stock_show', {'id': stock.id}) }}" 
-                                               class="card-action-btn product-action-btn" 
+                                               class="card-action-btn product-action-btn"
+                                               data-view-stock-modal="true"
                                                title="View">
                                                 <i class="fa fa-eye"></i>
                                             </a>
                                             <a href="{{ path('app_stock_edit', {'id': stock.id}) }}" 
-                                               class="card-action-btn product-action-btn product-action-btn-edit" 
+                                               class="card-action-btn product-action-btn product-action-btn-edit"
+                                               data-edit-stock-modal="true"
                                                title="Edit">
                                                 <i class="fa fa-pencil"></i>
                                             </a>
@@ -170,6 +172,41 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- View Stock Modal -->
+    <div class="admin-modal" id="viewStockModal" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="viewStockModalTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">STOCK MANAGEMENT</div>
+                    <div class="admin-modal__title" id="viewStockModalTitle">Stock Details</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal__body" id="viewStockModalBody"></div>
+        </div>
+    </div>
+
+    <!-- Edit Stock Entry Modal -->
+    <div class="admin-modal" id="editStockModal" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="editStockModalTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">STOCK MANAGEMENT</div>
+                    <div class="admin-modal__title" id="editStockModalTitle">Edit Stock Entry</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="admin-modal__body" id="editStockModalBody"></div>
         </div>
     </div>
 
@@ -304,6 +341,321 @@
 
             // Initialize
             updateBulkActions();
+        });
+    </script>
+
+    <!-- New Stock Entry Modal -->
+    <div class="admin-modal" id="newStockModal" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="newStockModalTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">STOCK MANAGEMENT</div>
+                    <div class="admin-modal__title" id="newStockModalTitle">New Stock Entry</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="admin-modal__body" id="newStockModalBody">
+                {{ include('stock/_form.html.twig', {
+                    form: form,
+                    button_label: 'Create Stock Entry',
+                    action: path('app_stock_new'),
+                    show_cancel: false
+                }) }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const openBtn = document.getElementById('openNewStockModal');
+            const modal = document.getElementById('newStockModal');
+            const modalBody = document.getElementById('newStockModalBody');
+
+            function openModal() {
+                if (!modal) return;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+
+                const firstInput = modal.querySelector('input, select, textarea, button');
+                if (firstInput) firstInput.focus();
+                initStockImageDropzone(modal);
+            }
+
+            function closeModal() {
+                if (!modal) return;
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+            }
+
+            if (openBtn) {
+                openBtn.addEventListener('click', function() {
+                    openModal();
+                });
+            }
+
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) {
+                        closeModal();
+                    }
+                });
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // AJAX submit (keeps list page visible)
+            document.addEventListener('submit', async function(e) {
+                const formEl = e.target;
+                if (!modal || !modal.classList.contains('is-open')) return;
+                if (!formEl || !formEl.matches('form[data-stock-form="true"]')) return;
+
+                e.preventDefault();
+
+                try {
+                    const res = await fetch(formEl.action, {
+                        method: 'POST',
+                        body: new FormData(formEl),
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.redirectUrl) {
+                            window.location.href = data.redirectUrl;
+                            return;
+                        }
+                        window.location.reload();
+                        return;
+                    }
+
+                    // 422: validation errors - replace modal body with returned form HTML
+                    const html = await res.text();
+                    if (modalBody) {
+                        modalBody.innerHTML = html;
+                        initStockImageDropzone(modal);
+                    }
+                } catch (err) {
+                    // fallback: allow normal submit if fetch fails
+                    formEl.submit();
+                }
+            }, true);
+
+            function initStockImageDropzone(rootEl) {
+                const root = rootEl || document;
+                const dropzone = root.querySelector('#imageDropzone');
+                let fileInput = root.querySelector('#imageFileInput');
+                if (!fileInput) fileInput = root.querySelector('input[type="file"][name*="productImage"]');
+                const previewContainer = root.querySelector('#imagePreviewContainer');
+                const preview = root.querySelector('#imagePreview');
+                const removeBtn = root.querySelector('#imageRemoveBtn');
+
+                if (!dropzone || !fileInput || !previewContainer || !preview) return;
+                if (dropzone.dataset.bound === 'true') return;
+                dropzone.dataset.bound = 'true';
+
+                const preventDefaults = (e) => { e.preventDefault(); e.stopPropagation(); };
+
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, preventDefaults, false);
+                });
+
+                dropzone.addEventListener('click', function(e) {
+                    if (e.target.closest('.image-remove-btn')) return;
+                    fileInput.click();
+                });
+
+                dropzone.addEventListener('dragover', function() {
+                    dropzone.classList.add('dragover');
+                });
+
+                dropzone.addEventListener('dragleave', function() {
+                    dropzone.classList.remove('dragover');
+                });
+
+                dropzone.addEventListener('drop', function(e) {
+                    dropzone.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (!files || files.length === 0) return;
+
+                    const file = files[0];
+                    const isImage = (file.type && file.type.startsWith('image/')) || /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name || '');
+                    if (!isImage) {
+                        alert('Please select an image file (JPG, PNG, GIF, etc.).');
+                        return;
+                    }
+
+                    try {
+                        const dt = new DataTransfer();
+                        dt.items.add(file);
+                        fileInput.files = dt.files;
+                        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    } catch (err) {
+                        // ignore
+                    }
+                });
+
+                fileInput.addEventListener('change', function() {
+                    const file = this.files && this.files[0];
+                    if (!file) return;
+
+                    const isImage = (file.type && file.type.startsWith('image/')) || /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name || '');
+                    if (!isImage) return;
+
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        preview.src = ev.target.result;
+                        preview.style.display = 'block';
+                        previewContainer.style.display = 'block';
+                        dropzone.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        try {
+                            const dt = new DataTransfer();
+                            fileInput.files = dt.files;
+                        } catch (err) {
+                            fileInput.value = '';
+                        }
+                        preview.src = '';
+                        previewContainer.style.display = 'none';
+                        dropzone.style.display = 'block';
+                    });
+                }
+            }
+
+            const editModal = document.getElementById('editStockModal');
+            const editModalBody = document.getElementById('editStockModalBody');
+            const editLinks = document.querySelectorAll('a[data-edit-stock-modal="true"]');
+            const viewModal = document.getElementById('viewStockModal');
+            const viewModalBody = document.getElementById('viewStockModalBody');
+            const viewLinks = document.querySelectorAll('a[data-view-stock-modal="true"]');
+
+            function openEditModal() {
+                if (!editModal) return;
+                editModal.classList.add('is-open');
+                editModal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+            }
+
+            function closeEditModal() {
+                if (!editModal) return;
+                editModal.classList.remove('is-open');
+                editModal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+                if (editModalBody) editModalBody.innerHTML = '';
+            }
+
+            function openViewModal() {
+                if (!viewModal) return;
+                viewModal.classList.add('is-open');
+                viewModal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+            }
+
+            function closeViewModal() {
+                if (!viewModal) return;
+                viewModal.classList.remove('is-open');
+                viewModal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+                if (viewModalBody) viewModalBody.innerHTML = '';
+            }
+
+            viewLinks.forEach(link => {
+                link.addEventListener('click', async function(ev) {
+                    ev.preventDefault();
+                    const url = this.getAttribute('href');
+                    if (!url) return;
+
+                    try {
+                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                        const html = await res.text();
+                        if (viewModalBody) viewModalBody.innerHTML = html;
+                        openViewModal();
+                    } catch (err) {
+                        window.location.href = url;
+                    }
+                });
+            });
+
+            if (viewModal) {
+                viewModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeViewModal();
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && viewModal && viewModal.classList.contains('is-open')) {
+                    closeViewModal();
+                }
+            });
+
+            editLinks.forEach(link => {
+                link.addEventListener('click', async function(ev) {
+                    ev.preventDefault();
+                    const url = this.getAttribute('href');
+                    if (!url) return;
+
+                    try {
+                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                        const html = await res.text();
+                        if (editModalBody) editModalBody.innerHTML = html;
+                        openEditModal();
+                        initStockImageDropzone(editModal);
+                    } catch (err) {
+                        window.location.href = url;
+                    }
+                });
+            });
+
+            if (editModal) {
+                editModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeEditModal();
+                });
+            }
+
+            document.addEventListener('submit', async function(e) {
+                const formEl = e.target;
+                if (!editModal || !editModal.classList.contains('is-open')) return;
+                if (!formEl || !formEl.matches('form[data-stock-form="true"]')) return;
+
+                e.preventDefault();
+                try {
+                    const res = await fetch(formEl.action, {
+                        method: 'POST',
+                        body: new FormData(formEl),
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        window.location.href = (data && data.redirectUrl) ? data.redirectUrl : window.location.href;
+                        return;
+                    }
+
+                    const html = await res.text();
+                    if (editModalBody) {
+                        editModalBody.innerHTML = html;
+                        initStockImageDropzone(editModal);
+                    }
+                } catch (err) {
+                    formEl.submit();
+                }
+            }, true);
         });
     </script>
 {% endblock %}

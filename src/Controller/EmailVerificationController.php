@@ -2,90 +2,80 @@
 
 namespace App\Controller;
 
-use App\Entity\Users;
 use App\Service\EmailVerificationService;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use App\Entity\Users;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\UriSigner;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class EmailVerificationController extends AbstractController
+class EmailVerificationController extends AbstractController
 {
-    #[Route('/verify-email', name: 'app_verify_email', methods: ['GET'])]
+    #[Route('/verify-email', name: 'app_verify_email')]
     public function verifyUserEmail(
         Request $request,
-        EmailVerificationService $emailVerificationService,
+        EmailVerificationService $emailVerificationService
     ): Response {
-        $token = (string) $request->query->get('token', '');
+        $token = $request->query->get('token');
 
-        if ($token === '') {
-            $this->addFlash('error', 'Invalid verification link.');
-            return $this->redirectToRoute('app_login');
+        if (!$token) {
+            $this->addFlash('error', 'Verification token is missing.');
+            return $this->redirectToRoute('app_signup');
         }
 
         $user = $emailVerificationService->verifyToken($token);
 
         if (!$user) {
             $this->addFlash('error', 'Invalid or expired verification token.');
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_signup');
         }
 
         $this->addFlash('success', 'Your email has been verified! You can now log in.');
+
         return $this->redirectToRoute('app_login');
     }
 
-    #[Route('/verify/email/resend', name: 'app_email_verify_resend', methods: ['POST'])]
-    public function resend(
+    #[Route('/verify-email/resend', name: 'app_email_verify_resend', methods: ['POST'])]
+    public function resendVerification(
         Request $request,
-        EntityManagerInterface $em,
-        EmailVerificationService $service,
-        #[Autowire(service: 'limiter.verify_email_resend')] RateLimiterFactory $rateLimiter,
+        EmailVerificationService $emailVerificationService,
+        EntityManagerInterface $entityManager,
     ): Response {
-        if (!$this->isCsrfTokenValid('resend_verification', (string) $request->request->get('_csrf_token'))) {
-            $this->addFlash('error', 'Invalid request. Please try again.');
+        $csrfToken = (string) $request->request->get('_csrf_token', '');
+        if (!$this->isCsrfTokenValid('resend_verification', $csrfToken)) {
+            $this->addFlash('error', 'Invalid CSRF token. Please try again.');
+
             return $this->redirectToRoute('app_login');
         }
 
         $identifier = trim((string) $request->request->get('identifier', ''));
         if ($identifier === '') {
-            $this->addFlash('error', 'Please enter your email or username.');
-            return $this->redirectToRoute('app_login');
-        }
+            $this->addFlash('error', 'Email is required.');
 
-        // Anti-spam: 1 resend per window for the same identifier.
-        $limiterKey = mb_strtolower($identifier);
-        $limit = $rateLimiter->create($limiterKey)->consume(1);
-        if (!$limit->isAccepted()) {
-            $this->addFlash('error', 'Please wait a moment before requesting another verification email.');
             return $this->redirectToRoute('app_login');
         }
 
         /** @var Users|null $user */
-        $user = $em->getRepository(Users::class)->findOneBy(['email' => $identifier])
-            ?? $em->getRepository(Users::class)->findOneBy(['username' => $identifier]);
+        $user = $entityManager->getRepository(Users::class)->findOneBy(['email' => $identifier]);
 
-        if (!$user) {
-            $this->addFlash('success', 'If an account exists, we sent a verification email. Please check your inbox.');
-            return $this->redirectToRoute('app_login');
+        // Avoid account enumeration: don't reveal whether email exists.
+        if ($user instanceof Users && !$user->isVerified()) {
+            $user->setVerificationToken($emailVerificationService->generateVerificationToken());
+            $entityManager->flush();
+
+            $verificationUrl = $this->generateUrl(
+                'app_verify_email',
+                ['token' => $user->getVerificationToken()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+
+            $emailVerificationService->sendVerificationEmail($user, $verificationUrl);
         }
 
-        if ($user->isVerified()) {
-            $this->addFlash('success', 'Your email is already verified.');
-            return $this->redirectToRoute('app_login');
-        }
+        $this->addFlash('success', 'We sent a verification link to your email. Please verify to activate your account.');
 
-        // Generate a fresh token so the user gets a new link.
-        $user->setVerificationToken($service->generateVerificationToken());
-        $em->flush();
-
-        $service->sendVerificationEmail($user);
-
-        $this->addFlash('success', 'Verification email sent. Please check your inbox.');
         return $this->redirectToRoute('app_login');
     }
 }

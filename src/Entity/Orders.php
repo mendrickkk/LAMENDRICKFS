@@ -47,6 +47,10 @@ class Orders
     #[ORM\Column]
     private ?\DateTime $createdAt = null;
 
+    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\JoinColumn(name: 'client_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?Users $client = null;
+
     #[ORM\ManyToMany(targetEntity: Product::class)]
     #[ORM\JoinTable(name: 'order_product')]
     private Collection $products;
@@ -117,6 +121,18 @@ class Orders
     public function setCreatedAt(\DateTime $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getClient(): ?Users
+    {
+        return $this->client;
+    }
+
+    public function setClient(?Users $client): static
+    {
+        $this->client = $client;
 
         return $this;
     }

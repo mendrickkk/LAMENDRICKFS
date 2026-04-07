@@ -1,0 +1,48 @@
+<div class="product-detail">
+    <div class="product-detail-grid">
+        <div class="product-detail-info">
+            <h2>{{ category.name }}</h2>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Category ID</span>
+                <span class="product-detail-value">#{{ category.id }}</span>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Name</span>
+                <span class="product-detail-value">{{ category.name }}</span>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Description</span>
+                <p class="product-detail-value">{{ category.description ?: 'No description provided' }}</p>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Status</span>
+                <span class="product-detail-value">
+                    {% if category.isActive %}
+                        <span class="badge badge-success">Active</span>
+                    {% else %}
+                        <span class="badge badge-danger">Inactive</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Products Count</span>
+                <span class="product-detail-value">{{ category.products|length }} product(s)</span>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Created At</span>
+                <span class="product-detail-value">{{ category.createdAt|date('Y-m-d H:i:s') }}</span>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Updated At</span>
+                <span class="product-detail-value">{{ category.updatedAt|date('Y-m-d H:i:s') }}</span>
+            </div>
+        </div>
+    </div>
+</div>

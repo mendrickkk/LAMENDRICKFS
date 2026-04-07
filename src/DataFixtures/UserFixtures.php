@@ -36,7 +36,7 @@ class UserFixtures extends Fixture
     {
         // Admin user (backup plan)
         $adminUsername = 'admin';
-        $adminEmail = 'narumiyazxc25@gmail.com';
+        $adminEmail = 'kurttruk1234@gmail.com';
         $adminPassword = 'adminkurt';
 
         // Check if user already exists

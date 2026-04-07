@@ -1,0 +1,39 @@
+<div class="product-detail">
+    <div class="product-detail-grid">
+        <div class="product-detail-image">
+            {% if product.image %}
+                <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.Name }}">
+            {% else %}
+                <div class="no-image">
+                    <span>🌺 No image available</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="product-detail-info">
+            <h2>{{ product.Name }}</h2>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Product ID</span>
+                <span class="product-detail-value">#{{ product.id }}</span>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Description</span>
+                <p class="product-detail-value">{{ product.description }}</p>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Price</span>
+                <div class="product-price">₱{{ product.price|number_format(2) }}</div>
+            </div>
+
+            {% if product.image %}
+                <div class="product-detail-item">
+                    <span class="product-detail-label">Image File</span>
+                    <span class="product-detail-value">{{ product.image }}</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

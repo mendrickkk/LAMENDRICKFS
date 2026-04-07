@@ -4,73 +4,51 @@ namespace App\Service;
 
 use App\Entity\Users;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class EmailVerificationService
+class EmailVerificationService
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly MailerInterface $mailer,
-        private readonly UrlGeneratorInterface $urlGenerator,
-        #[Autowire('%env(MAILER_FROM_ADDRESS)%')]
-        private readonly string $mailFrom,
-        #[Autowire('%env(MAILER_FROM_NAME)%')]
-        private readonly string $mailFromName,
-        private readonly LoggerInterface $logger,
-    ) {
-    }
+        private EntityManagerInterface $entityManager,
+        private MailerInterface $mailer,
+        private string $fromAddress,
+        private string $fromName,
+    ) {}
 
+    /**
+     * Generate a unique verification token
+     */
     public function generateVerificationToken(): string
     {
         return bin2hex(random_bytes(32));
     }
 
-    public function sendVerificationEmail(Users $user): void
+    /**
+     * Send verification email to user
+     *
+     * @param string|null $logoUrl Absolute URL to the logo image (e.g. https://yoursite.com/img/logomain.png)
+     */
+    public function sendVerificationEmail(Users $user, string $verificationUrl, ?string $logoUrl = null): void
     {
-        if (!$user->getEmail()) {
-            return;
-        }
-
-        if (!$user->getVerificationToken()) {
-            $user->setVerificationToken($this->generateVerificationToken());
-            $this->entityManager->flush();
-        }
-
-        $verificationUrl = $this->urlGenerator->generate(
-            'app_verify_email',
-            ['token' => (string) $user->getVerificationToken()],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-
         $email = (new TemplatedEmail())
-            ->from(new Address($this->mailFrom, $this->mailFromName))
-            ->to(new Address($user->getEmail(), $user->getFullName()))
-            ->subject('Verify your email address')
+            ->from(new Address($this->fromAddress, $this->fromName))
+            ->to(new Address($user->getEmail()))
+            ->subject('Please verify your email address')
             ->htmlTemplate('emails/verification.html.twig')
             ->context([
                 'user' => $user,
-                'verifyUrl' => $verificationUrl,
-                'expiresInHours' => 24,
+                'verificationUrl' => $verificationUrl,
+                'logoUrl' => $logoUrl,
             ]);
 
-        try {
-            $this->mailer->send($email);
-        } catch (\Throwable $e) {
-            $this->logger->error('Failed to send verification email.', [
-                'user_id' => $user->getId(),
-                'email' => $user->getEmail(),
-                'exception_class' => get_class($e),
-                'exception_message' => $e->getMessage(),
-            ]);
-            throw $e;
-        }
+        $this->mailer->send($email);
     }
 
+    /**
+     * Verify a token and mark user as verified
+     */
     public function verifyToken(string $token): ?Users
     {
         $user = $this->entityManager
@@ -81,12 +59,20 @@ final class EmailVerificationService
             return null;
         }
 
+        // Mark user as verified
         $user->setIsVerified(true);
-        $user->setIsActive(true);
-        $user->setVerificationToken(null);
+        $user->setVerificationToken(null); // Clear the token
 
         $this->entityManager->flush();
 
         return $user;
+    }
+
+    /**
+     * Check if a user needs verification
+     */
+    public function needsVerification(Users $user): bool
+    {
+        return !$user->isVerified();
     }
 }

@@ -6,9 +6,11 @@ use App\Entity\Users;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
+use League\OAuth2\Client\Provider\GoogleUser;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -23,6 +25,7 @@ class GoogleAuthenticator extends OAuth2Authenticator
         private ClientRegistry $clientRegistry,
         private EntityManagerInterface $em,
         private RouterInterface $router,
+        private UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
@@ -36,19 +39,30 @@ class GoogleAuthenticator extends OAuth2Authenticator
         $client = $this->clientRegistry->getClient('google');
         $accessToken = $this->fetchAccessToken($client);
         $googleUser = $client->fetchUserFromToken($accessToken);
+
+        if (!$googleUser instanceof GoogleUser) {
+            throw new CustomUserMessageAuthenticationException('Unexpected Google account response.');
+        }
+
         $email = $googleUser->getEmail();
+        if ($email === null || $email === '') {
+            throw new CustomUserMessageAuthenticationException('Google did not return an email address.');
+        }
+
+        if ($googleUser->getEmailVerified() !== true) {
+            throw new CustomUserMessageAuthenticationException(
+                'Your Google account email is not verified. Please verify it with Google and try again.'
+            );
+        }
 
         return new SelfValidatingPassport(
-            new UserBadge($email, function () use ($email) {
+            new UserBadge($email, function () use ($googleUser, $email) {
                 $user = $this->em->getRepository(Users::class)->findOneBy(['email' => $email]);
 
                 if (!$user) {
-                    throw new CustomUserMessageAuthenticationException(
-                        'No staff account found for this email. Please contact your administrator.'
-                    );
-                }
-
-                if (!in_array($user->getRole(), ['ROLE_STAFF', 'ROLE_ADMIN'])) {
+                    $user = $this->createStaffFromGoogle($googleUser, $email);
+                    $this->em->persist($user);
+                } elseif (!in_array($user->getRole(), ['ROLE_STAFF', 'ROLE_ADMIN'], true)) {
                     throw new CustomUserMessageAuthenticationException(
                         'Google sign-in is only available for staff accounts.'
                     );
@@ -56,11 +70,39 @@ class GoogleAuthenticator extends OAuth2Authenticator
 
                 $user->setIsVerified(true);
                 $user->setIsActive(true);
+                $user->setVerificationToken(null);
+
                 $this->em->flush();
 
                 return $user;
             })
         );
+    }
+
+    private function createStaffFromGoogle(GoogleUser $googleUser, string $email): Users
+    {
+        $user = new Users();
+        $user->setEmail($email);
+        $user->setUsername($email);
+
+        $firstName = $googleUser->getFirstName();
+        $lastName = $googleUser->getLastName();
+        if (($firstName === null || $firstName === '') && $googleUser->getName() !== '') {
+            $parts = preg_split('/\s+/', trim($googleUser->getName()), 2) ?: [];
+            $firstName = $parts[0] ?? null;
+            $lastName = $lastName ?? ($parts[1] ?? null);
+        }
+        $user->setFirstName($firstName ?: null);
+        $user->setLastName($lastName ?: null);
+
+        $user->setRole('ROLE_STAFF');
+        $user->setIsActive(true);
+        $user->setIsVerified(true);
+
+        $randomPassword = bin2hex(random_bytes(32));
+        $user->setPassword($this->passwordHasher->hashPassword($user, $randomPassword));
+
+        return $user;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

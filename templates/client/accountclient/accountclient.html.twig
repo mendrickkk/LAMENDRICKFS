@@ -1,0 +1,245 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My account · La Kurt Flowershop{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('styles/loginn.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/accountclient.css') }}">
+    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+{% endblock %}
+
+{% block body %}
+{% set avatar_initial = user.firstName ? user.firstName|slice(0, 1)|upper : user.username|slice(0, 1)|upper %}
+
+<div class="fv-page fv-acct-page">
+    {% include 'client/_header.html.twig' %}
+
+    <main class="fv-main fv-acct" role="main">
+        <div class="fv-acct__layout">
+            <aside class="fv-acct__sidebar" aria-label="Account menu">
+                <div class="fv-acct__sidebar-profile">
+                    <div class="fv-acct__avatar" aria-hidden="true">{{ avatar_initial }}</div>
+                    <p class="fv-acct__sidebar-name">{{ user.fullName }}</p>
+                    <p class="fv-acct__sidebar-email">{{ user.email }}</p>
+                </div>
+                <nav class="fv-acct__sidebar-nav" aria-label="Sections">
+                    <a class="fv-acct__side-link is-active" href="#profile" data-ac-nav data-ac-panel="profile">Profile Info</a>
+                    <a class="fv-acct__side-link" href="#orders" data-ac-nav data-ac-panel="orders">My Orders</a>
+                    <a class="fv-acct__side-link" href="#wishlist" data-ac-nav data-ac-panel="wishlist">My Wishlist</a>
+                    <a class="fv-acct__side-link" href="#password" data-ac-nav data-ac-panel="password">Change Password</a>
+                    <a class="fv-acct__side-link fv-acct__side-link--danger" href="#logout" data-ac-nav data-ac-panel="logout">Sign out</a>
+                </nav>
+            </aside>
+
+            <div class="fv-acct__content">
+                {% for message in app.flashes('success') %}
+                    <div class="fv-acct__flash fv-acct__flash--ok" role="status">{{ message }}</div>
+                {% endfor %}
+                {% for message in app.flashes('error') %}
+                    <div class="fv-acct__flash fv-acct__flash--err" role="alert">{{ message }}</div>
+                {% endfor %}
+
+                <div class="fv-acct__panels" id="acct-panels">
+                {# Card 1 — Profile #}
+                <article class="fv-acct__card fv-acct__panel is-active" id="profile" data-ac-panel="profile">
+                    <h1 class="fv-acct__card-kicker">My account</h1>
+                    <p class="fv-acct__card-intro">Manage your profile, orders, and security.</p>
+                    <div class="fv-acct__card-rule"></div>
+                    <div class="fv-acct__section-head">
+                        <h2 class="fv-acct__card-h2 fv-acct__card-h2--inline">Personal information</h2>
+                        <button type="button" class="fv-acct__btn fv-acct__btn--solid fv-acct__btn--with-icon" id="profile-edit-focus" aria-label="Edit personal information">
+                            <span>Edit</span>
+                            <svg class="fv-acct__btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 20h9"/>
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <form class="fv-acct__form" method="post" action="{{ path('app_client_account_profile') }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('client_profile') }}">
+                        <div class="fv-acct__grid2">
+                            <div class="fv-acct__field">
+                                <label class="fv-acct__label" for="first_name">First name</label>
+                                <input class="fv-acct__input" id="first_name" name="first_name" type="text" value="{{ user.firstName|default('') }}" autocomplete="given-name">
+                            </div>
+                            <div class="fv-acct__field">
+                                <label class="fv-acct__label" for="last_name">Last name</label>
+                                <input class="fv-acct__input" id="last_name" name="last_name" type="text" value="{{ user.lastName|default('') }}" autocomplete="family-name">
+                            </div>
+                            <div class="fv-acct__field">
+                                <label class="fv-acct__label" for="email_ro">Email</label>
+                                <input class="fv-acct__input fv-acct__input--ro" id="email_ro" type="email" value="{{ user.email }}" readonly tabindex="-1" autocomplete="username">
+                            </div>
+                            <div class="fv-acct__field">
+                                <label class="fv-acct__label" for="username_ro">Username</label>
+                                <input class="fv-acct__input fv-acct__input--ro" id="username_ro" type="text" value="{{ user.username }}" readonly tabindex="-1">
+                            </div>
+                            <div class="fv-acct__field fv-acct__field--full">
+                                <label class="fv-acct__label" for="phone_preview">Phone</label>
+                                <input class="fv-acct__input fv-acct__input--ro" id="phone_preview" type="tel" value="" placeholder="Add when profile supports phone" readonly tabindex="-1" title="Design placeholder — not saved yet">
+                            </div>
+                        </div>
+                        <button type="submit" class="fv-acct__btn fv-acct__btn--outline-primary">Save profile</button>
+                    </form>
+                </article>
+
+                {# Card 2 — Orders: real rows only; no demo data #}
+                <article class="fv-acct__card fv-acct__panel" id="orders" data-ac-panel="orders">
+                    <h2 class="fv-acct__card-h2">My orders</h2>
+                    <p class="fv-acct__card-sub">Order history, status, and reference for tracking.</p>
+                    <div class="fv-acct__card-rule"></div>
+                    {% if orders is empty %}
+                        <p class="fv-acct__empty">No orders yet. When you place an order linked to your account, it will show here.</p>
+                    {% else %}
+                        <div class="fv-acct__table-scroll">
+                            <table class="fv-acct__table">
+                                <thead>
+                                    <tr>
+                                        <th>Order #</th>
+                                        <th>Item</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                        {% set st = order.status|lower|trim %}
+                                        {% if st == 'delivered' %}
+                                            {% set badge = 'delivered' %}
+                                        {% elseif st == 'processing' %}
+                                            {% set badge = 'processing' %}
+                                        {% elseif st == 'pending' %}
+                                            {% set badge = 'pending' %}
+                                        {% else %}
+                                            {% set badge = 'default' %}
+                                        {% endif %}
+                                        <tr>
+                                            <td>{{ order.orderNumber }}</td>
+                                            <td>
+                                                {% if order.products is empty %}
+                                                    —
+                                                {% else %}
+                                                    {% set firstP = order.products|first %}
+                                                    {{ firstP.name }}{% if order.products|length > 1 %} <span class="fv-acct__td-muted">+{{ order.products|length - 1 }}</span>{% endif %}
+                                                {% endif %}
+                                            </td>
+                                            <td>₱{{ order.total|number_format(2) }}</td>
+                                            <td><span class="fv-acct__badge fv-acct__badge--{{ badge }}">{{ order.status }}</span></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </article>
+
+                {# Card 3 — Wishlist: design + empty state only (no sample products) #}
+                <article class="fv-acct__card fv-acct__panel" id="wishlist" data-ac-panel="wishlist">
+                    <h2 class="fv-acct__card-h2">My wishlist</h2>
+                    <p class="fv-acct__card-sub">Saved flower arrangements.</p>
+                    <div class="fv-acct__card-rule"></div>
+                    <p class="fv-acct__empty fv-acct__empty--center">Nothing saved yet. Wishlist items will show here when that feature is connected.</p>
+                </article>
+
+                {# Card 4 — Password #}
+                <article class="fv-acct__card fv-acct__panel" id="password" data-ac-panel="password">
+                    <h2 class="fv-acct__card-h2">Change password</h2>
+                    <p class="fv-acct__card-sub">Update your account password.</p>
+                    <div class="fv-acct__card-rule"></div>
+                    <form class="fv-acct__form fv-acct__form--narrow" method="post" action="{{ path('app_client_account_password') }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('client_password') }}">
+                        <div class="fv-acct__field">
+                            <label class="fv-acct__label" for="current_password">Current password</label>
+                            <input class="fv-acct__input" id="current_password" name="current_password" type="password" required autocomplete="current-password">
+                        </div>
+                        <div class="fv-acct__field">
+                            <label class="fv-acct__label" for="new_password">New password</label>
+                            <input class="fv-acct__input" id="new_password" name="new_password" type="password" required minlength="8" autocomplete="new-password" placeholder="Enter new password">
+                        </div>
+                        <div class="fv-acct__field">
+                            <label class="fv-acct__label" for="confirm_password">Confirm new password</label>
+                            <input class="fv-acct__input" id="confirm_password" name="confirm_password" type="password" required minlength="8" autocomplete="new-password" placeholder="Confirm new password">
+                        </div>
+                        <button type="submit" class="fv-acct__btn fv-acct__btn--outline-primary">Update password</button>
+                    </form>
+                </article>
+
+                {# Card 5 — Logout #}
+                <article class="fv-acct__card fv-acct__card--row fv-acct__panel" id="logout" data-ac-panel="logout">
+                    <div class="fv-acct__logout-text">
+                        <h2 class="fv-acct__card-h2 fv-acct__card-h2--tight">Logout</h2>
+                        <p class="fv-acct__logout-desc">Sign out of your account on this device.</p>
+                    </div>
+                    <form method="post" action="{{ path('app_logout') }}">
+                        <button type="submit" class="fv-acct__btn fv-acct__btn--outline-dark">Sign out</button>
+                    </form>
+                </article>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'client/footer.html.twig' %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var links = document.querySelectorAll('[data-ac-nav]');
+    var panels = document.querySelectorAll('.fv-acct__panel');
+    var valid = { profile: 1, orders: 1, wishlist: 1, password: 1, logout: 1 };
+
+    function panelIdFromHash(hash) {
+        var id = (hash || '').replace(/^#/, '');
+        return valid[id] ? id : 'profile';
+    }
+
+    function showPanel(panelId) {
+        panelId = panelIdFromHash(panelId);
+        panels.forEach(function(p) {
+            var match = p.getAttribute('data-ac-panel') === panelId;
+            p.classList.toggle('is-active', match);
+            p.setAttribute('aria-hidden', match ? 'false' : 'true');
+        });
+        links.forEach(function(a) {
+            var pid = a.getAttribute('data-ac-panel');
+            a.classList.toggle('is-active', pid === panelId);
+        });
+        if (history.replaceState) {
+            history.replaceState(null, '', '#' + panelId);
+        }
+        var main = document.querySelector('.fv-acct__content');
+        if (main && window.matchMedia('(max-width: 960px)').matches) {
+            main.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    links.forEach(function(a) {
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            showPanel(a.getAttribute('data-ac-panel'));
+        });
+    });
+
+    showPanel(panelIdFromHash(location.hash));
+    window.addEventListener('hashchange', function() {
+        showPanel(panelIdFromHash(location.hash));
+    });
+
+    var editProfileBtn = document.getElementById('profile-edit-focus');
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', function() {
+            var el = document.getElementById('first_name');
+            if (el) {
+                el.focus({ preventScroll: true });
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

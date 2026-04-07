@@ -44,6 +44,9 @@ final class ClientController extends AbstractController
     #[Route('/contact', name: 'app_contact')]
     public function contact(): Response
     {
-        return $this->render('client/contact/index.html.twig');
+        return $this->render('client/contact/index.html.twig', [
+            // Google Form (third-party): submissions & confirmation are handled by Google Forms.
+            'googleContactFormUrl' => 'https://docs.google.com/forms/d/e/1FAIpQLSfHy5yXvudMYdqULVF2F0gas32ZRDeH1kqKfpmkHrOJykTH6g/viewform?usp=header',
+        ]);
     }
 }

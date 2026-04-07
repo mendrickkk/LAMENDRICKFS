@@ -10,6 +10,7 @@ use App\Service\ActivityLogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -51,8 +52,12 @@ final class StockController extends AbstractController
                 ->getResult();
         }
         
+        $stock = new Stock();
+        $form = $this->createForm(StockType::class, $stock, ['is_edit' => false]);
+
         return $this->render('stock/index.html.twig', [
             'stocks' => $stocks,
+            'form' => $form,
         ]);
     }
 
@@ -62,6 +67,8 @@ final class StockController extends AbstractController
         $stock = new Stock();
         $form = $this->createForm(StockType::class, $stock, ['is_edit' => false]);
         $form->handleRequest($request);
+
+        $isAjax = $request->isXmlHttpRequest();
 
         if ($form->isSubmitted() && $form->isValid()) {
             $existingProduct = $form->get('existingProduct')->getData();
@@ -304,7 +311,25 @@ final class StockController extends AbstractController
             }
 
             $this->addFlash('success', 'Stock entry created successfully!');
+            if ($isAjax) {
+                return new JsonResponse([
+                    'ok' => true,
+                    'redirectUrl' => $this->generateUrl('app_stock_index'),
+                ]);
+            }
+
             return $this->redirectToRoute('app_stock_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($isAjax && $form->isSubmitted() && !$form->isValid()) {
+            $html = $this->renderView('stock/_form.html.twig', [
+                'form' => $form,
+                'button_label' => 'Create Stock Entry',
+                'action' => $this->generateUrl('app_stock_new'),
+                'show_cancel' => false,
+            ]);
+
+            return new Response($html, 422);
         }
 
         return $this->render('stock/new.html.twig', [
@@ -314,13 +339,20 @@ final class StockController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_stock_show', methods: ['GET'])]
-    public function show(Stock $stock): Response
+    public function show(Request $request, Stock $stock): Response
     {
         // Check ownership for staff
         if (!$this->isGranted('ROLE_ADMIN')) {
             if ($stock->getCreatedBy() !== $this->getUser()) {
                 throw $this->createAccessDeniedException('You can only view your own records.');
             }
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            $html = $this->renderView('stock/_show_content.html.twig', [
+                'stock' => $stock,
+            ]);
+            return new Response($html);
         }
 
         return $this->render('stock/show.html.twig', [
@@ -340,6 +372,17 @@ final class StockController extends AbstractController
 
         $form = $this->createForm(StockType::class, $stock, ['is_edit' => true]);
         $form->handleRequest($request);
+        $isAjax = $request->isXmlHttpRequest();
+
+        if ($isAjax && !$form->isSubmitted()) {
+            $html = $this->renderView('stock/_form.html.twig', [
+                'form' => $form,
+                'button_label' => 'Update Stock Entry',
+                'action' => $this->generateUrl('app_stock_edit', ['id' => $stock->getId()]),
+                'show_cancel' => false,
+            ]);
+            return new Response($html);
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $existingProduct = $form->get('existingProduct')->getData();
@@ -428,7 +471,23 @@ final class StockController extends AbstractController
             }
 
             $this->addFlash('success', 'Stock entry updated successfully!');
+            if ($isAjax) {
+                return new JsonResponse([
+                    'ok' => true,
+                    'redirectUrl' => $this->generateUrl('app_stock_index'),
+                ]);
+            }
             return $this->redirectToRoute('app_stock_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($isAjax && $form->isSubmitted() && !$form->isValid()) {
+            $html = $this->renderView('stock/_form.html.twig', [
+                'form' => $form,
+                'button_label' => 'Update Stock Entry',
+                'action' => $this->generateUrl('app_stock_edit', ['id' => $stock->getId()]),
+                'show_cancel' => false,
+            ]);
+            return new Response($html, 422);
         }
 
         return $this->render('stock/edit.html.twig', [

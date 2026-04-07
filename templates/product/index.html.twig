@@ -37,10 +37,10 @@
                 Products
             </div>
             <div class="card-actions">
-                <a href="{{ path('app_stock_new') }}" class="card-action-btn product-new-btn">
+                <button type="button" class="card-action-btn product-new-btn" id="openNewStockModalFromProducts">
                     <i class="fa fa-plus"></i>
                     Add via Stocks
-                </a>
+                </button>
             </div>
         </div>
 
@@ -141,7 +141,8 @@
                                 <td>
                                     <div class="product-actions-cell">
                                         <a href="{{ path('app_product_show', {'id': product.id}) }}" 
-                                           class="card-action-btn product-action-btn" 
+                                           class="card-action-btn product-action-btn"
+                                           data-view-product-modal="true"
                                            title="View">
                                             <i class="fa fa-eye"></i>
                                         </a>
@@ -163,6 +164,23 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- View Product Modal -->
+    <div class="admin-modal" id="viewProductModal" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="viewProductModalTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">PRODUCT MANAGEMENT</div>
+                    <div class="admin-modal__title" id="viewProductModalTitle">Product Details</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal__body" id="viewProductModalBody"></div>
         </div>
     </div>
 
@@ -218,6 +236,229 @@
                     }
                 });
             }
+        });
+    </script>
+
+    <!-- New Stock Entry Modal (from Products) -->
+    <div class="admin-modal" id="newStockModalFromProducts" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="newStockModalFromProductsTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">STOCK MANAGEMENT</div>
+                    <div class="admin-modal__title" id="newStockModalFromProductsTitle">New Stock Entry</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="admin-modal__body" id="newStockModalFromProductsBody">
+                {{ include('stock/_form.html.twig', {
+                    form: stockForm,
+                    button_label: 'Create Stock Entry',
+                    action: path('app_stock_new'),
+                    show_cancel: false
+                }) }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const openBtn = document.getElementById('openNewStockModalFromProducts');
+            const modal = document.getElementById('newStockModalFromProducts');
+            const modalBody = document.getElementById('newStockModalFromProductsBody');
+            const viewModal = document.getElementById('viewProductModal');
+            const viewModalBody = document.getElementById('viewProductModalBody');
+            const viewLinks = document.querySelectorAll('a[data-view-product-modal="true"]');
+
+            function openModal() {
+                if (!modal) return;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+                initStockImageDropzone(modal);
+            }
+
+            function closeModal() {
+                if (!modal) return;
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+            }
+
+            function initStockImageDropzone(rootEl) {
+                const root = rootEl || document;
+                const dropzone = root.querySelector('#imageDropzone');
+                let fileInput = root.querySelector('#imageFileInput');
+                if (!fileInput) fileInput = root.querySelector('input[type="file"][name*="productImage"]');
+                const previewContainer = root.querySelector('#imagePreviewContainer');
+                const preview = root.querySelector('#imagePreview');
+                const removeBtn = root.querySelector('#imageRemoveBtn');
+
+                if (!dropzone || !fileInput || !previewContainer || !preview) return;
+                if (dropzone.dataset.bound === 'true') return;
+                dropzone.dataset.bound = 'true';
+
+                const preventDefaults = (e) => { e.preventDefault(); e.stopPropagation(); };
+
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, preventDefaults, false);
+                });
+
+                dropzone.addEventListener('click', function(e) {
+                    if (e.target.closest('.image-remove-btn')) return;
+                    fileInput.click();
+                });
+
+                dropzone.addEventListener('dragover', function() {
+                    dropzone.classList.add('dragover');
+                });
+
+                dropzone.addEventListener('dragleave', function() {
+                    dropzone.classList.remove('dragover');
+                });
+
+                dropzone.addEventListener('drop', function(e) {
+                    dropzone.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (!files || files.length === 0) return;
+
+                    const file = files[0];
+                    const isImage = (file.type && file.type.startsWith('image/')) || /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name || '');
+                    if (!isImage) {
+                        alert('Please select an image file (JPG, PNG, GIF, etc.).');
+                        return;
+                    }
+
+                    try {
+                        const dt = new DataTransfer();
+                        dt.items.add(file);
+                        fileInput.files = dt.files;
+                        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    } catch (err) {
+                        // ignore
+                    }
+                });
+
+                fileInput.addEventListener('change', function() {
+                    const file = this.files && this.files[0];
+                    if (!file) return;
+
+                    const isImage = (file.type && file.type.startsWith('image/')) || /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name || '');
+                    if (!isImage) return;
+
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        preview.src = ev.target.result;
+                        preview.style.display = 'block';
+                        previewContainer.style.display = 'block';
+                        dropzone.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        try {
+                            const dt = new DataTransfer();
+                            fileInput.files = dt.files;
+                        } catch (err) {
+                            fileInput.value = '';
+                        }
+                        preview.src = '';
+                        previewContainer.style.display = 'none';
+                        dropzone.style.display = 'block';
+                    });
+                }
+            }
+
+            if (openBtn) openBtn.addEventListener('click', openModal);
+
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close=\"true\"]')) closeModal();
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+                });
+            }
+
+            function openViewModal() {
+                if (!viewModal) return;
+                viewModal.classList.add('is-open');
+                viewModal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+            }
+
+            function closeViewModal() {
+                if (!viewModal) return;
+                viewModal.classList.remove('is-open');
+                viewModal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+                if (viewModalBody) viewModalBody.innerHTML = '';
+            }
+
+            viewLinks.forEach(link => {
+                link.addEventListener('click', async function(ev) {
+                    ev.preventDefault();
+                    const url = this.getAttribute('href');
+                    if (!url) return;
+
+                    try {
+                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                        const html = await res.text();
+                        if (viewModalBody) viewModalBody.innerHTML = html;
+                        openViewModal();
+                    } catch (err) {
+                        window.location.href = url;
+                    }
+                });
+            });
+
+            if (viewModal) {
+                viewModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeViewModal();
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && viewModal && viewModal.classList.contains('is-open')) {
+                    closeViewModal();
+                }
+            });
+
+            document.addEventListener('submit', async function(e) {
+                const formEl = e.target;
+                if (!modal || !modal.classList.contains('is-open')) return;
+                if (!formEl || !formEl.matches('form[data-stock-form=\"true\"]')) return;
+
+                e.preventDefault();
+                try {
+                    const res = await fetch(formEl.action, {
+                        method: 'POST',
+                        body: new FormData(formEl),
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        window.location.href = (data && data.redirectUrl) ? data.redirectUrl : window.location.href;
+                        return;
+                    }
+
+                    const html = await res.text();
+                    if (modalBody) {
+                        modalBody.innerHTML = html;
+                        initStockImageDropzone(modal);
+                    }
+                } catch (err) {
+                    formEl.submit();
+                }
+            }, true);
         });
     </script>
 {% endblock %}

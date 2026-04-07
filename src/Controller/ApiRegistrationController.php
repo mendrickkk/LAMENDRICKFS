@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/api')]
 final class ApiRegistrationController extends AbstractController
@@ -86,7 +87,12 @@ final class ApiRegistrationController extends AbstractController
 
         // Best-effort: registration should succeed even if mail fails.
         try {
-            $this->emailVerificationService->sendVerificationEmail($user);
+            $verificationUrl = $this->generateUrl(
+                'app_verify_email',
+                ['token' => $user->getVerificationToken()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+            $this->emailVerificationService->sendVerificationEmail($user, $verificationUrl);
         } catch (\Throwable) {
             // Swallow mail errors; user can request resend later.
         }

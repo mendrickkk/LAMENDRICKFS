@@ -31,44 +31,6 @@
   border-color: #c62828 !important;
 }
 
-.fv-register__requirements {
-  margin-top: 12px;
-  padding: 12px 14px;
-  background: #fafafa;
-  border: 1px solid #eee;
-  font-family: var(--fv-sans);
-  font-size: 11px;
-  color: #555;
-  line-height: 1.5;
-}
-
-.fv-register__req-title,
-.fv-register__req-sub {
-  margin: 0 0 8px;
-  font-weight: 600;
-}
-
-.fv-register__req-sub {
-  margin-top: 10px;
-}
-
-.fv-register__req-item {
-  margin: 4px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.fv-register__req-item.is-valid {
-  color: #2e7d32;
-}
-
-.fv-register__req-icon {
-  font-weight: 700;
-  width: 1em;
-  display: inline-block;
-}
-
 .fv-register__terms {
   display: flex;
   align-items: flex-start;

@@ -9,11 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use App\Service\EmailVerificationService;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class SignupController extends AbstractController
 {
@@ -22,8 +19,6 @@ final class SignupController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher,
-        TokenStorageInterface $tokenStorage,
-        EventDispatcherInterface $eventDispatcher,
         EmailVerificationService $emailVerificationService
     ): Response {
         if ($request->isMethod('POST')) {
@@ -78,6 +73,12 @@ final class SignupController extends AbstractController
                 $verificationToken = bin2hex(random_bytes(16));
             }
 
+            $verificationUrl = $this->generateUrl(
+                'app_verify_email',
+                ['token' => $verificationToken],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+
             $user->setFirstName($firstName);
             $user->setLastName($lastName);
             $user->setUsername($username);
@@ -93,33 +94,16 @@ final class SignupController extends AbstractController
 
             // Send verification email (non-blocking of signup flow if mailer fails)
             try {
-                $emailVerificationService->sendVerificationEmail($user);
-                $this->addFlash('success', 'We sent a verification link to your email. Please verify to activate your account.');
+                $verificationUrl = $this->generateUrl('app_verify_email', ['token' => $verificationToken], UrlGeneratorInterface::ABSOLUTE_URL);
+                $emailVerificationService->sendVerificationEmail($user, $verificationUrl);
+                $this->addFlash('success', 'Account created successfully! Please check your email to verify your account.');
             } catch (\Throwable) {
                 $this->addFlash('warning', 'Account created, but we could not send the verification email right now.');
             }
 
-            // Automatically log in the user after account creation
-            // Create authentication token
-            $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
-            
-            // Set the token in the security token storage
-            $tokenStorage->setToken($token);
-            
-            // Fire the interactive login event (this triggers the login listener for activity logging)
-            $loginEvent = new InteractiveLoginEvent($request, $token);
-            $eventDispatcher->dispatch($loginEvent, 'security.interactive_login');
-            
-            // Show appropriate success message based on role created
-            if ($role === 'ROLE_ADMIN') {
-                $this->addFlash('success', 'Admin account created successfully! You have been automatically logged in.');
-                // Redirect admin to admin page
-                return $this->redirectToRoute('app_admin');
-            } else {
-                $this->addFlash('success', 'Account created successfully! You have been automatically logged in.');
-                // Redirect client to client page
-                return $this->redirectToRoute('app_client');
-            }
+            // Do not auto-login newly registered users.
+            // They must verify their email first, then login manually.
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('signup/index.html.twig');

@@ -18,13 +18,18 @@
 
 body {
   margin: 0;
+  overflow-x: hidden;
 }
 
 .fv-login-page {
+  width: 100vw;
+  max-width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #fff;
+  margin: 0;
+  overflow-x: hidden;
 }
 
 .fv-login-page .fv-main {
@@ -34,9 +39,20 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
+  max-width: 100%;
   min-height: min(60vh, 640px);
   padding: 56px 24px 72px;
   background: #fff;
+  overflow-x: hidden;
+}
+
+.fv-login-page .fv-topbar,
+.fv-login-page .fv-nav,
+.fv-login-page .fv-topbar__inner,
+.fv-login-page .fv-nav__list {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .fv-login {
@@ -98,87 +114,95 @@ body {
 }
 
 .fv-login__field {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   text-align: left;
 }
 
 .fv-login__input {
   width: 100%;
+  height: 50px;
+  box-sizing: border-box;
   font-family: var(--fv-sans);
   font-size: 14px;
-  padding: 14px 16px;
-  border: 1px solid var(--fv-input-border);
-  border-radius: 0;
+  padding: 0 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
   background: #fff;
   color: #111;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .fv-login__input::placeholder {
   color: #9ca3af;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.fv-login__input:not(:placeholder-shown)::placeholder {
+  opacity: 0;
 }
 
 .fv-login__input:focus {
   outline: none;
   border-color: var(--fv-maroon);
+  box-shadow: 0 0 0 3px rgba(110, 15, 15, 0.12);
 }
 
 .fv-login__password-row {
   display: flex;
+  flex-direction: column;
   align-items: stretch;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 0;
 }
 
-@media (min-width: 480px) {
-  .fv-login__password-row {
-    flex-wrap: nowrap;
-    align-items: center;
-  }
-}
-
 .fv-login__password-wrap {
-  flex: 1;
+  width: 100%;
   min-width: 0;
   position: relative;
 }
 
 .fv-login__password-wrap .fv-login__input {
-  padding-right: 44px;
+  padding-right: 52px;
 }
 
 .fv-login__eye {
   position: absolute;
-  right: 12px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   padding: 4px;
   cursor: pointer;
-  color: #888;
+  color: #8f8f8f;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: color 0.2s ease;
 }
 
 .fv-login__eye:hover {
-  color: #333;
+  color: var(--fv-maroon);
 }
 
 .fv-login__forgot {
   font-family: var(--fv-sans);
   font-size: 12px;
-  color: #777;
+  color: var(--fv-maroon);
   text-decoration: none;
   white-space: nowrap;
-  align-self: center;
-  transition: color 0.2s ease;
+  align-self: flex-end;
+  line-height: 1.4;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
 .fv-login__forgot:hover {
-  color: var(--fv-maroon);
+  color: var(--fv-maroon-dark);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .fv-login__submit {

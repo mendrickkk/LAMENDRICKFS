@@ -1,4 +1,12 @@
-{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'stock-entry-form', 'enctype': 'multipart/form-data'}}) }}
+{{ form_start(form, {
+    'action': action|default(null),
+    'attr': {
+        'novalidate': 'novalidate',
+        'class': (form_class|default('stock-entry-form')),
+        'enctype': 'multipart/form-data',
+        'data-stock-form': 'true'
+    }
+}) }}
     
     <!-- EXISTING PRODUCT Section -->
     <div class="stock-form-section">
@@ -77,7 +85,11 @@
         <button type="submit" class="stock-form-btn-primary">
             {{ button_label|default('Create Stock Entry') }}
         </button>
-        <a href="{{ path('app_stock_index') }}" class="stock-form-btn-cancel">Cancel</a>
+        {% if show_cancel is defined and show_cancel == false %}
+            <button type="button" class="stock-form-btn-cancel" data-modal-close="true">Cancel</button>
+        {% else %}
+            <a href="{{ path('app_stock_index') }}" class="stock-form-btn-cancel">Cancel</a>
+        {% endif %}
     </div>
 
 {{ form_end(form) }}

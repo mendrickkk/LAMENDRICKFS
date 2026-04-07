@@ -37,17 +37,17 @@
                         {{ error.messageKey|trans(error.messageData, 'security') }}
                     </div>
                 {% endif %}
-            </div>
 
-            {% if error and 'verify your email' in (error.messageKey|lower) %}
-                <form class="fv-login__resend" method="post" action="{{ path('app_email_verify_resend') }}">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('resend_verification') }}">
-                    <div class="fv-login__field">
-                        <input class="fv-login__input" type="email" name="identifier" value="{{ last_username }}" placeholder="Email" required autocomplete="email">
-                    </div>
-                    <button id="resend-verification-submit" class="fv-login__submit" type="submit">Resend verification email</button>
-                </form>
-            {% endif %}
+                {% if error and 'verify your email' in (error.messageKey|lower) %}
+                    <form class="fv-login__resend" method="post" action="{{ path('app_email_verify_resend') }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('resend_verification') }}">
+                        <div class="fv-login__field">
+                            <input class="fv-login__input" type="email" name="identifier" value="{{ last_username }}" placeholder="Email" required autocomplete="email">
+                        </div>
+                        <button id="resend-verification-submit" class="fv-login__submit" type="submit">Resend verification email</button>
+                    </form>
+                {% endif %}
+            </div>
 
             <form method="post" action="{{ path('app_login') }}">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">

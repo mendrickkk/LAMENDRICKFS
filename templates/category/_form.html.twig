@@ -1,4 +1,11 @@
-{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'stock-entry-form'}}) }}
+{{ form_start(form, {
+    'action': action|default(null),
+    'attr': {
+        'novalidate': 'novalidate',
+        'class': (form_class|default('stock-entry-form')),
+        'data-category-form': 'true'
+    }
+}) }}
     
     <!-- CATEGORY INFORMATION Section -->
     <div class="stock-form-section">
@@ -37,7 +44,11 @@
         <button type="submit" class="stock-form-btn-primary">
             {{ button_label|default('Create Category') }}
         </button>
-        <a href="{{ path('app_category_index') }}" class="stock-form-btn-cancel">Cancel</a>
+        {% if show_cancel is defined and show_cancel == false %}
+            <button type="button" class="stock-form-btn-cancel" data-modal-close="true">Cancel</button>
+        {% else %}
+            <a href="{{ path('app_category_index') }}" class="stock-form-btn-cancel">Cancel</a>
+        {% endif %}
     </div>
 
 {{ form_end(form) }}

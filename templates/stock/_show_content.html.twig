@@ -1,0 +1,49 @@
+<div class="product-detail">
+    <div class="product-detail-grid">
+        <div class="product-detail-info">
+            <h2>{{ stock.product.Name }}</h2>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Stock ID</span>
+                <span class="product-detail-value">#{{ stock.id }}</span>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Product Name</span>
+                <span class="product-detail-value">{{ stock.product.Name }}</span>
+            </div>
+
+            {% if stock.product.description %}
+            <div class="product-detail-item">
+                <span class="product-detail-label">Product Description</span>
+                <p class="product-detail-value">{{ stock.product.description }}</p>
+            </div>
+            {% endif %}
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Price</span>
+                <div class="product-price">₱{{ stock.product.price|number_format(2) }}</div>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Category</span>
+                <span class="product-detail-value">{{ stock.product.category ? stock.product.category.name : '-' }}</span>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Stock Quantity</span>
+                <div class="product-price">{{ stock.quantity }}</div>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Created At</span>
+                <span class="product-detail-value">{{ stock.createdAt|date('Y-m-d H:i:s') }}</span>
+            </div>
+
+            <div class="product-detail-item">
+                <span class="product-detail-label">Updated At</span>
+                <span class="product-detail-value">{{ stock.updatedAt|date('Y-m-d H:i:s') }}</span>
+            </div>
+        </div>
+    </div>
+</div>

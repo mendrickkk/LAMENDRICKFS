@@ -2,6 +2,9 @@
 
 {% block stylesheets %}
     {{ parent() }}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 {% endblock %}
@@ -96,10 +99,6 @@
                 <div class="header-actions">
                     <button class="header-action-btn" aria-label="Notifications">
                         <i class="fa fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
-                    <button class="header-action-btn" aria-label="Settings">
-                        <i class="fa fa-gear"></i>
                     </button>
                     
                     <!-- Account Dropdown -->

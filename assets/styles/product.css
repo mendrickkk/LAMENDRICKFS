@@ -2084,3 +2084,146 @@ input[type="checkbox"]:checked {
         padding: 80px 16px !important;
     }
 }
+
+/* ========================================
+   Stock Table Compact Desktop Fit
+   ======================================== */
+.card .table-responsive.stock-table {
+    overflow-x: hidden !important;
+}
+
+.card .stock-table .table {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+.card .stock-table .table th,
+.card .stock-table .table td {
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+    vertical-align: middle !important;
+}
+
+.card .stock-table .table thead th {
+    font-size: 11px !important;
+    letter-spacing: 0.3px !important;
+}
+
+/* Column widths (includes checkbox column as col 1) */
+.card .stock-table .table th:nth-child(1),
+.card .stock-table .table td:nth-child(1) { width: 3% !important; }
+
+.card .stock-table .table th:nth-child(2),
+.card .stock-table .table td:nth-child(2) {
+    width: 5% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+.card .stock-table .table th:nth-child(3),
+.card .stock-table .table td:nth-child(3) {
+    width: 6% !important;
+    text-align: center !important;
+}
+
+/* PRODUCT NAME now compact/proportional (not overly wide) */
+.card .stock-table .table th:nth-child(4),
+.card .stock-table .table td:nth-child(4) {
+    width: 18% !important;
+    min-width: 0 !important;
+    text-align: left !important;
+}
+
+.card .stock-table .table td:nth-child(4) strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card .stock-table .table th:nth-child(5),
+.card .stock-table .table td:nth-child(5) {
+    width: 12% !important;
+    white-space: nowrap !important;
+}
+
+.card .stock-table .table th:nth-child(6),
+.card .stock-table .table td:nth-child(6) {
+    width: 10% !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+}
+
+.card .stock-table .table th:nth-child(7),
+.card .stock-table .table td:nth-child(7) {
+    width: 8% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+.card .stock-table .table th:nth-child(8),
+.card .stock-table .table td:nth-child(8) {
+    width: 14% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.card .stock-table .table th:nth-child(9),
+.card .stock-table .table td:nth-child(9),
+.card .stock-table .table th:nth-child(10),
+.card .stock-table .table td:nth-child(10) {
+    width: 9% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+.card .stock-table .table th:nth-child(11),
+.card .stock-table .table td:nth-child(11) {
+    width: 6% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+/* Compact image */
+.card .stock-table .table td:nth-child(3) .table-product-image,
+.card .stock-table .table td:nth-child(3) .table-product-image-placeholder {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 5px !important;
+}
+
+/* Compact created-by cell content */
+.card .stock-table .table td:nth-child(8) > div {
+    display: block !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+.card .stock-table .table td:nth-child(8) strong,
+.card .stock-table .table td:nth-child(8) span {
+    display: block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
+}
+
+/* Compact action buttons */
+.card .stock-table .product-actions-cell {
+    gap: 4px !important;
+    justify-content: center !important;
+}
+
+.card .stock-table .product-action-btn {
+    min-width: 26px !important;
+    width: 26px !important;
+    height: 26px !important;
+    padding: 0 !important;
+    border-radius: 6px !important;
+}
+
+.card .stock-table .product-action-btn i {
+    font-size: 11px !important;
+}

@@ -37,10 +37,10 @@
                 Categories
             </div>
             <div class="card-actions">
-                <a href="{{ path('app_category_new') }}" class="card-action-btn product-new-btn">
+                <button type="button" class="card-action-btn product-new-btn" id="openNewCategoryModal">
                     <i class="fa fa-plus"></i>
                     New Category
-                </a>
+                </button>
             </div>
         </div>
 
@@ -130,12 +130,14 @@
                                 <td>
                                     <div class="product-actions-cell">
                                         <a href="{{ path('app_category_show', {'id': category.id}) }}" 
-                                           class="card-action-btn product-action-btn" 
+                                           class="card-action-btn product-action-btn"
+                                           data-view-category-modal="true"
                                            title="View">
                                             <i class="fa fa-eye"></i>
                                         </a>
                                         <a href="{{ path('app_category_edit', {'id': category.id}) }}" 
-                                           class="card-action-btn product-action-btn product-action-btn-edit" 
+                                           class="card-action-btn product-action-btn product-action-btn-edit"
+                                           data-edit-category-modal="true"
                                            title="Edit">
                                             <i class="fa fa-pencil"></i>
                                         </a>
@@ -157,6 +159,40 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- View Category Modal -->
+    <div class="admin-modal" id="viewCategoryModal" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="viewCategoryModalTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">CATEGORY MANAGEMENT</div>
+                    <div class="admin-modal__title" id="viewCategoryModalTitle">Category Details</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal__body" id="viewCategoryModalBody"></div>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div class="admin-modal" id="editCategoryModal" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="editCategoryModalTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">CATEGORY MANAGEMENT</div>
+                    <div class="admin-modal__title" id="editCategoryModalTitle">Edit Category</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal__body" id="editCategoryModalBody"></div>
         </div>
     </div>
 
@@ -289,6 +325,207 @@
 
             // Initialize
             updateBulkActions();
+        });
+    </script>
+
+    <!-- New Category Modal -->
+    <div class="admin-modal" id="newCategoryModal" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="newCategoryModalTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">CATEGORY MANAGEMENT</div>
+                    <div class="admin-modal__title" id="newCategoryModalTitle">New Category</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="admin-modal__body" id="newCategoryModalBody">
+                {{ include('category/_form.html.twig', {
+                    form: form,
+                    button_label: 'Create Category',
+                    action: path('app_category_new'),
+                    show_cancel: false
+                }) }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const openBtn = document.getElementById('openNewCategoryModal');
+            const modal = document.getElementById('newCategoryModal');
+            const modalBody = document.getElementById('newCategoryModalBody');
+
+            function openModal() {
+                if (!modal) return;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+                const firstInput = modal.querySelector('input, select, textarea, button');
+                if (firstInput) firstInput.focus();
+            }
+
+            function closeModal() {
+                if (!modal) return;
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+            }
+
+            if (openBtn) openBtn.addEventListener('click', openModal);
+
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeModal();
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+                });
+            }
+
+            document.addEventListener('submit', async function(e) {
+                const formEl = e.target;
+                if (!modal || !modal.classList.contains('is-open')) return;
+                if (!formEl || !formEl.matches('form[data-category-form="true"]')) return;
+
+                e.preventDefault();
+                try {
+                    const res = await fetch(formEl.action, {
+                        method: 'POST',
+                        body: new FormData(formEl),
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        window.location.href = (data && data.redirectUrl) ? data.redirectUrl : window.location.href;
+                        return;
+                    }
+
+                    const html = await res.text();
+                    if (modalBody) modalBody.innerHTML = html;
+                } catch (err) {
+                    formEl.submit();
+                }
+            }, true);
+
+            const editModal = document.getElementById('editCategoryModal');
+            const editModalBody = document.getElementById('editCategoryModalBody');
+            const editLinks = document.querySelectorAll('a[data-edit-category-modal="true"]');
+            const viewModal = document.getElementById('viewCategoryModal');
+            const viewModalBody = document.getElementById('viewCategoryModalBody');
+            const viewLinks = document.querySelectorAll('a[data-view-category-modal="true"]');
+
+            function openEditModal() {
+                if (!editModal) return;
+                editModal.classList.add('is-open');
+                editModal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+            }
+
+            function closeEditModal() {
+                if (!editModal) return;
+                editModal.classList.remove('is-open');
+                editModal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+                if (editModalBody) editModalBody.innerHTML = '';
+            }
+
+            function openViewModal() {
+                if (!viewModal) return;
+                viewModal.classList.add('is-open');
+                viewModal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+            }
+
+            function closeViewModal() {
+                if (!viewModal) return;
+                viewModal.classList.remove('is-open');
+                viewModal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+                if (viewModalBody) viewModalBody.innerHTML = '';
+            }
+
+            viewLinks.forEach(link => {
+                link.addEventListener('click', async function(ev) {
+                    ev.preventDefault();
+                    const url = this.getAttribute('href');
+                    if (!url) return;
+
+                    try {
+                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                        const html = await res.text();
+                        if (viewModalBody) viewModalBody.innerHTML = html;
+                        openViewModal();
+                    } catch (err) {
+                        window.location.href = url;
+                    }
+                });
+            });
+
+            if (viewModal) {
+                viewModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeViewModal();
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && viewModal && viewModal.classList.contains('is-open')) {
+                    closeViewModal();
+                }
+            });
+
+            editLinks.forEach(link => {
+                link.addEventListener('click', async function(ev) {
+                    ev.preventDefault();
+                    const url = this.getAttribute('href');
+                    if (!url) return;
+
+                    try {
+                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                        const html = await res.text();
+                        if (editModalBody) editModalBody.innerHTML = html;
+                        openEditModal();
+                    } catch (err) {
+                        window.location.href = url;
+                    }
+                });
+            });
+
+            if (editModal) {
+                editModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeEditModal();
+                });
+            }
+
+            document.addEventListener('submit', async function(e) {
+                const formEl = e.target;
+                if (!editModal || !editModal.classList.contains('is-open')) return;
+                if (!formEl || !formEl.matches('form[data-category-form="true"]')) return;
+
+                e.preventDefault();
+                try {
+                    const res = await fetch(formEl.action, {
+                        method: 'POST',
+                        body: new FormData(formEl),
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        window.location.href = (data && data.redirectUrl) ? data.redirectUrl : window.location.href;
+                        return;
+                    }
+
+                    const html = await res.text();
+                    if (editModalBody) editModalBody.innerHTML = html;
+                } catch (err) {
+                    formEl.submit();
+                }
+            }, true);
         });
     </script>
 {% endblock %}

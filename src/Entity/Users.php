@@ -217,12 +217,30 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->syncVerificationToken();
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTime();
+        $this->syncVerificationToken();
+    }
+
+    /**
+     * Unverified accounts must always carry a token; verified accounts must not.
+     */
+    private function syncVerificationToken(): void
+    {
+        if ($this->isVerified) {
+            $this->verificationToken = null;
+
+            return;
+        }
+
+        if ($this->verificationToken === null || $this->verificationToken === '') {
+            $this->verificationToken = bin2hex(random_bytes(32));
+        }
     }
 
     // --- Security interface methods ---

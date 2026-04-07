@@ -8,6 +8,7 @@ use App\Repository\CategoryRepository;
 use App\Service\ActivityLogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -40,8 +41,12 @@ final class CategoryController extends AbstractController
                 ->getResult();
         }
         
+        $category = new Category();
+        $form = $this->createForm(CategoryType::class, $category);
+
         return $this->render('category/index.html.twig', [
             'categories' => $categories,
+            'form' => $form,
         ]);
     }
 
@@ -51,6 +56,8 @@ final class CategoryController extends AbstractController
         $category = new Category();
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
+
+        $isAjax = $request->isXmlHttpRequest();
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Set createdBy to current user
@@ -79,7 +86,25 @@ final class CategoryController extends AbstractController
             }
 
             $this->addFlash('success', 'Category created successfully!');
+            if ($isAjax) {
+                return new JsonResponse([
+                    'ok' => true,
+                    'redirectUrl' => $this->generateUrl('app_category_index'),
+                ]);
+            }
+
             return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($isAjax && $form->isSubmitted() && !$form->isValid()) {
+            $html = $this->renderView('category/_form.html.twig', [
+                'form' => $form,
+                'button_label' => 'Create Category',
+                'action' => $this->generateUrl('app_category_new'),
+                'show_cancel' => false,
+            ]);
+
+            return new Response($html, 422);
         }
 
         return $this->render('category/new.html.twig', [
@@ -89,13 +114,20 @@ final class CategoryController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_category_show', methods: ['GET'])]
-    public function show(Category $category): Response
+    public function show(Request $request, Category $category): Response
     {
         // Check ownership for staff
         if (!$this->isGranted('ROLE_ADMIN')) {
             if ($category->getCreatedBy() !== $this->getUser()) {
                 throw $this->createAccessDeniedException('You can only view your own records.');
             }
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            $html = $this->renderView('category/_show_content.html.twig', [
+                'category' => $category,
+            ]);
+            return new Response($html);
         }
 
         return $this->render('category/show.html.twig', [
@@ -115,6 +147,17 @@ final class CategoryController extends AbstractController
 
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
+        $isAjax = $request->isXmlHttpRequest();
+
+        if ($isAjax && !$form->isSubmitted()) {
+            $html = $this->renderView('category/_form.html.twig', [
+                'form' => $form,
+                'button_label' => 'Update Category',
+                'action' => $this->generateUrl('app_category_edit', ['id' => $category->getId()]),
+                'show_cancel' => false,
+            ]);
+            return new Response($html);
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
@@ -127,7 +170,23 @@ final class CategoryController extends AbstractController
             }
 
             $this->addFlash('success', 'Category updated successfully!');
+            if ($isAjax) {
+                return new JsonResponse([
+                    'ok' => true,
+                    'redirectUrl' => $this->generateUrl('app_category_index'),
+                ]);
+            }
             return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($isAjax && $form->isSubmitted() && !$form->isValid()) {
+            $html = $this->renderView('category/_form.html.twig', [
+                'form' => $form,
+                'button_label' => 'Update Category',
+                'action' => $this->generateUrl('app_category_edit', ['id' => $category->getId()]),
+                'show_cancel' => false,
+            ]);
+            return new Response($html, 422);
         }
 
         return $this->render('category/edit.html.twig', [

@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 #[Route('/api')]
@@ -73,7 +74,12 @@ final class ApiEmailVerificationController extends AbstractController
         $user->setVerificationToken($this->emailVerificationService->generateVerificationToken());
         $this->entityManager->flush();
 
-        $this->emailVerificationService->sendVerificationEmail($user);
+        $verificationUrl = $this->generateUrl(
+            'app_verify_email',
+            ['token' => $user->getVerificationToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $this->emailVerificationService->sendVerificationEmail($user, $verificationUrl);
 
         return $this->json([
             'success' => true,

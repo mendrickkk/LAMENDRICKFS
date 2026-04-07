@@ -1,6 +1,10 @@
 <header class="fv-topbar" role="banner">
-    <div class="fv-topbar__inner">
-        <div class="fv-topbar__left" aria-hidden="true"></div>
+    <div class="fv-topbar__inner{% if is_granted('ROLE_CLIENT') %} fv-topbar__inner--with-greet{% endif %}">
+        <div class="fv-topbar__left"{% if not is_granted('ROLE_CLIENT') %} aria-hidden="true"{% endif %}>
+            {% if is_granted('ROLE_CLIENT') %}
+                <span class="fv-topbar__greet">Hi, {{ app.user.firstName|default(app.user.username) }}</span>
+            {% endif %}
+        </div>
 
         <a class="fv-brand" href="{{ path('app_client') }}">
             <img class="fv-brand__mark" src="{{ asset('img/logo1.png') }}" alt="La Kurt Flowershop">
@@ -11,7 +15,16 @@
         </a>
 
         <nav class="fv-topbar__right" aria-label="Utility">
-            <a class="fv-link {{ app.request.get('_route') in ['app_login', 'app_signup'] ? 'is-active' : '' }}" href="{{ path('app_login') }}">ACCOUNT</a>
+            {% if is_granted('ROLE_CLIENT') %}
+                <a class="fv-link fv-topbar__account {{ app.request.get('_route') == 'app_client_account' ? 'is-active' : '' }}"
+                   href="{{ path('app_client_account') }}"
+                   title="My account"
+                   aria-label="My account">
+                    <span class="fv-topbar__account-icon" aria-hidden="true">👤</span>
+                </a>
+            {% else %}
+                <a class="fv-link {{ app.request.get('_route') in ['app_login', 'app_signup'] ? 'is-active' : '' }}" href="{{ path('app_login') }}">ACCOUNT</a>
+            {% endif %}
             <a class="fv-link" href="#">SEARCH</a>
             <a class="fv-link" href="#">CART (0)</a>
         </nav>
@@ -24,6 +37,9 @@
             <li class="fv-nav__item {{ app.request.get('_route') == 'app_about' ? 'is-active' : '' }}"><a href="{{ path('app_about') }}">ABOUT</a></li>
             <li class="fv-nav__item {{ app.request.get('_route') == 'app_faq' ? 'is-active' : '' }}"><a href="{{ path('app_faq') }}">FAQ</a></li>
             <li class="fv-nav__item {{ app.request.get('_route') == 'app_contact' ? 'is-active' : '' }}"><a href="{{ path('app_contact') }}">CONTACT US</a></li>
+            {% if is_granted('ROLE_CLIENT') %}
+                <li class="fv-nav__item {{ app.request.get('_route') == 'app_client_account' ? 'is-active' : '' }}"><a href="{{ path('app_client_account') }}">MY ACCOUNT</a></li>
+            {% endif %}
         </ul>
     </nav>
 </header>

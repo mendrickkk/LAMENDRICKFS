@@ -45,72 +45,11 @@
         </div>
 
         <div class="stock-entry-form-container">
-            {{ form_start(form, {'attr': {'class': 'stock-entry-form'}}) }}
-                <div class="form-section">
-                    <div class="form-section-title">Account Information</div>
-                    <div class="form-group">
-                        <label for="user_firstName" class="form-label">First Name</label>
-                        {{ form_widget(form.firstName, {'attr': {'class': 'form-control', 'id': 'user_firstName', 'name': 'user[firstName]'}}) }}
-                        {{ form_errors(form.firstName) }}
-                        <small class="form-text">Enter the user's first name</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="user_lastName" class="form-label">Last Name</label>
-                        {{ form_widget(form.lastName, {'attr': {'class': 'form-control', 'id': 'user_lastName', 'name': 'user[lastName]'}}) }}
-                        {{ form_errors(form.lastName) }}
-                        <small class="form-text">Enter the user's last name</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="user_username" class="form-label">Username</label>
-                        {{ form_widget(form.username, {'attr': {'class': 'form-control', 'id': 'user_username', 'name': 'user[username]'}}) }}
-                        {{ form_errors(form.username) }}
-                        <small class="form-text">Enter a unique username (3-255 characters)</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="user_email" class="form-label">Email</label>
-                        {{ form_widget(form.email, {'attr': {'class': 'form-control', 'id': 'user_email', 'name': 'user[email]'}}) }}
-                        {{ form_errors(form.email) }}
-                        <small class="form-text">Enter a valid email address</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="user_plainPassword" class="form-label">Password</label>
-                        {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control', 'id': 'user_plainPassword', 'name': 'user[plainPassword]'}}) }}
-                        {{ form_errors(form.plainPassword) }}
-                        <small class="form-text">Password must be at least 6 characters</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="user_confirmPassword" class="form-label">Confirm Password</label>
-                        {{ form_widget(form.confirmPassword, {'attr': {'class': 'form-control', 'id': 'user_confirmPassword', 'name': 'user[confirmPassword]'}}) }}
-                        {{ form_errors(form.confirmPassword) }}
-                        <small class="form-text">Re-enter the password to confirm</small>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <div class="form-section-title">Role & Status</div>
-                    <div class="form-group">
-                        {{ form_label(form.role, 'Role', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.role, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.role) }}
-                        <small class="form-text">Select the user's role</small>
-                    </div>
-                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                        {{ form_widget(form.isActive) }}
-                        {{ form_label(form.isActive, 'Active', {'label_attr': {'class': 'form-label', 'style': 'margin: 0;'}}) }}
-                        {{ form_errors(form.isActive) }}
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-plus"></i>
-                        Create User
-                    </button>
-                    <a href="{{ path('app_user_index') }}" class="btn btn-secondary">
-                        Cancel
-                    </a>
-                </div>
-            {{ form_end(form) }}
+            {{ include('admin/users/_form.html.twig', {
+                form: form,
+                button_label: 'Create User',
+                is_edit: false
+            }) }}
         </div>
     </div>
 {% endblock %}

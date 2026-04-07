@@ -17,24 +17,98 @@
     <main class="fv-main">
         <section class="fv-contact-page">
             <div class="fv-contact-page__inner">
-                <h1 class="fv-contact-page__title">TALK TO US</h1>
+                <header class="fv-contact-hero">
+                    <h1 class="fv-contact-hero__title">Contact us</h1>
+                    <p class="fv-contact-hero__subtitle">
+                        Get in touch with our team. We're here to help with support, partnerships, and press.
+                    </p>
+                </header>
 
-                <p class="fv-contact-page__lead">
-                    Below are our contact details. Please feel free to message us anytime for any queries
-                    <br>or concerns.
-                </p>
+                <p class="fv-contact-section-label">Reach out anytime</p>
 
-                <div class="fv-contact-page__details">
-                    <p><span class="fv-contact-page__label">Facebook:</span> <a class="fv-contact-page__link" href="#">Fig & Vine Floral Studio</a></p>
-                    <p><span class="fv-contact-page__label">Instagram:</span> <a class="fv-contact-page__link" href="#">@figvineph</a></p>
-                    <p><span class="fv-contact-page__label">Mobile Number:</span> <a class="fv-contact-page__link" href="tel:+639176274718">+63917-627-4718</a></p>
-                    <p><span class="fv-contact-page__label">Email Address:</span> <a class="fv-contact-page__link" href="mailto:figvineph@gmail.com">figvineph@gmail.com</a></p>
+                <div class="fv-contact-cards">
+                    <article class="fv-contact-card">
+                        <div class="fv-contact-card__icon" aria-hidden="true">
+                            <svg class="fv-contact-card__svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h2 class="fv-contact-card__title">Shop Assistance</h2>
+                        <p class="fv-contact-card__text">Need help with products, availability, or placing an order in our flower shop.</p>
+                        <a class="fv-contact-card__link" href="{{ path('app_shop') }}">Go to Shop</a>
+                    </article>
+
+                    <article class="fv-contact-card">
+                        <div class="fv-contact-card__icon" aria-hidden="true">
+                            <svg class="fv-contact-card__svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h2 class="fv-contact-card__title">Order and Account Help</h2>
+                        <p class="fv-contact-card__text">Get support for checkout, order updates, and account questions in the system.</p>
+                        <a class="fv-contact-card__link" href="{{ path('app_faq') }}">View FAQ</a>
+                    </article>
+
+                    <article class="fv-contact-card">
+                        <div class="fv-contact-card__icon" aria-hidden="true">
+                            <svg class="fv-contact-card__svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h2 class="fv-contact-card__title">Reports</h2>
+                        <p class="fv-contact-card__text">For concerns and requests. Please submit the form below.</p>
+                        <a class="fv-contact-card__link"
+                           href="{{ googleContactFormUrl }}"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            Open Google Form
+                        </a>
+                    </article>
                 </div>
 
-                <p class="fv-contact-page__note">
-                    You may also visit us at Ground Flr. G and A Building 2303 Chino Roces Ave, Makati,
-                    <br>Metro Manila. Our showroom is open from 9 am to 5 pm Mondays to Sundays.
-                </p>
+                <p class="fv-contact-section-label">Our Location</p>
+
+                <div class="fv-location">
+                    <article class="fv-location-card">
+                        <div class="fv-location-card__map" aria-label="Map">
+                            <iframe
+                                title="LA KURT FLOWERSHOP location map"
+                                src="https://www.google.com/maps?q=West%20Balabag%2C%20Valencia&output=embed"
+                                loading="lazy"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                            ></iframe>
+                        </div>
+                        <div class="fv-location-card__body">
+                            <div class="fv-location-card__name">LA KURT FLOWERSHOP</div>
+                            <div class="fv-location-card__address">West Balabag, Valencia</div>
+                            <div class="fv-location-card__hours">Mon–Sat: 8am – 7pm</div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="fv-contact-talk">
+                    <h2 class="fv-contact-page__title">TALK TO US</h2>
+                    <p class="fv-contact-page__lead">
+                        Below are our contact details. Please feel free to message us anytime for any queries
+                        or concerns.
+                    </p>
+                    <div class="fv-contact-page__details">
+                        <p><span class="fv-contact-page__label">Facebook:</span> kurt &amp; lakurtfs</p>
+                        <p><span class="fv-contact-page__label">Instagram:</span> @lakurtfs</p>
+                        <p>
+                            <span class="fv-contact-page__label">Mobile Number:</span>
+                            <a class="fv-contact-page__link" href="tel:+639176274718">+63917-627-4718</a>
+                        </p>
+                        <p>
+                            <span class="fv-contact-page__label">Email Address:</span>
+                            <a class="fv-contact-page__link" href="mailto:lakurtfs@gmail.com">lakurtfs@gmail.com</a>
+                        </p>
+                    </div>
+                    <p class="fv-contact-page__note">
+                        You may also visit us at Ground Flr. G and A Building 2303 West Balabag Ave, Valencia,
+                        <br>Negros Oriental. Our showroom is open from 9 am to 5 pm Mondays to Sundays.
+                    </p>
+                </div>
             </div>
         </section>
     </main>

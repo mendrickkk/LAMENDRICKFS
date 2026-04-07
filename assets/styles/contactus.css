@@ -1,33 +1,209 @@
 /* ==========================================================================
-   CONTACT US PAGE STYLES (scoped to Contact page only)
-   Loaded on `templates/client/contact/index.html.twig`.
+   CONTACT US PAGE (client /contact)
+   Matches flower shop client theme + card layout
    ========================================================================== */
 
 .fv-contact-page {
-  background: #fff;
-  padding: 100px 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
+  background: #f9fafb;
+  padding: 52px 24px 72px;
+  flex: 1;
 }
 
 .fv-contact-page__inner {
-  max-width: 800px;
+  max-width: 1120px;
   width: 100%;
   margin: 0 auto;
-  text-align: center; /* Changed back to center */
+}
+
+/* Hero */
+.fv-contact-hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.fv-contact-hero__title {
+  font-family: var(--fv-sans, system-ui, sans-serif);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.fv-contact-hero__subtitle {
+  font-family: var(--fv-sans, system-ui, sans-serif);
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: #6b7280;
+  margin: 0 auto;
+  max-width: 380px;
+}
+
+.fv-contact-section-label {
+  font-family: var(--fv-sans, system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin: 48px 0 20px;
+  text-align: center;
+}
+
+/* Cards */
+.fv-contact-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 0;
+  align-items: stretch;
+}
+
+.fv-contact-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 30px 26px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 10px;
+  min-height: 290px;
+  height: 100%;
+}
+
+.fv-contact-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.fv-contact-card__svg {
+  width: 22px;
+  height: 22px;
+}
+
+.fv-contact-card__title {
+  font-family: var(--fv-sans, system-ui, sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.fv-contact-card__text {
+  font-family: var(--fv-sans, system-ui, sans-serif);
+  font-size: 15px;
+  line-height: 1.55;
+  color: #6b7280;
+  margin: 0;
+  flex: 1;
+}
+
+.fv-contact-card__link {
+  font-family: var(--fv-sans, system-ui, sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+  margin-top: 4px;
+}
+
+.fv-contact-card__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Our Location */
+.fv-location {
+  margin-top: 0;
+  margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.fv-location-card {
+  width: min(1080px, 100%);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 22px;
+  padding: 18px;
+  align-items: center;
+}
+
+.fv-location-card__map {
+  height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.fv-location-card__map iframe {
+  width: 100%;
+  height: 320px;
+  border: 0;
+  display: block;
+}
+
+.fv-location-card__body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.fv-location-card__name {
+  font-family: var(--fv-sans, system-ui, sans-serif);
+  font-weight: 800;
+  color: #111827;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.fv-location-card__address {
+  font-family: var(--fv-sans, system-ui, sans-serif);
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.fv-location-card__hours {
+  font-family: var(--fv-sans, system-ui, sans-serif);
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Talk to us (below) */
+.fv-contact-talk {
+  margin-top: 56px;
+  padding: 36px 0 0;
+  border-top: 1px solid #e5e9f0;
 }
 
 .fv-contact-page__title {
   font-family: var(--fv-serif);
   font-size: 24px;
   font-weight: 400;
-  letter-spacing: .3em;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   color: #8B5E3C;
-  margin: 0 0 60px;
-  text-align: center; /* Keep title centered */
+  margin: 0 0 16px;
+  text-align: center;
 }
 
 .fv-contact-page__lead {
@@ -35,21 +211,25 @@
   font-size: 14px;
   line-height: 1.8;
   color: #444;
-  margin: 0 auto 40px;
+  margin: 0 auto 24px;
   max-width: 650px;
-  text-align: left;
+  text-align: center;
 }
 
 .fv-contact-page__details {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 0 auto 40px;
+  gap: 14px;
+  margin: 0 auto 24px;
   color: #444;
   font-size: 14px;
   line-height: 1.6;
-  text-align: left;
-  width: fit-content;
+  text-align: center;
+  width: min(620px, 100%);
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 22px 20px;
 }
 
 .fv-contact-page__details p {
@@ -64,11 +244,11 @@
   color: #8B5E3C;
   text-decoration: underline;
   text-underline-offset: 3px;
-  transition: opacity .2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .fv-contact-page__link:hover {
-  opacity: .7;
+  opacity: 0.7;
 }
 
 .fv-contact-page__note {
@@ -78,16 +258,31 @@
   color: #444;
   margin: 0 auto;
   max-width: 650px;
-  text-align: left;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .fv-contact-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .fv-location-card {
+    grid-template-columns: 1fr;
+  }
+
+  .fv-location-card__map,
+  .fv-location-card__map iframe {
+    height: 240px;
+  }
 }
 
 @media (max-width: 768px) {
   .fv-contact-page {
-    padding: 60px 20px;
+    padding: 40px 16px 60px;
   }
 
   .fv-contact-page__title {
     font-size: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 16px;
   }
 }

@@ -14,66 +14,10 @@
 
 {% block body %}
 {% if header_only is defined and header_only %}
-    <header class="fv-topbar" role="banner">
-        <div class="fv-topbar__inner">
-            <div class="fv-topbar__left" aria-hidden="true"></div>
-
-            <a class="fv-brand" href="{{ path('app_client') }}">
-                <img class="fv-brand__mark" src="{{ asset('img/logo1.png') }}" alt="La Kurt Flowershop">
-                <span class="fv-brand__text">
-                    <span class="fv-brand__name">LA KURT</span>
-                    <span class="fv-brand__tag">FLOWERSHOP</span>
-                </span>
-            </a>
-
-            <nav class="fv-topbar__right" aria-label="Utility">
-                <a class="fv-link" href="{{ path('app_login') }}">ACCOUNT</a>
-                <a class="fv-link" href="#">SEARCH</a>
-                <a class="fv-link" href="#">CART (0)</a>
-            </nav>
-        </div>
-
-        <nav class="fv-nav" aria-label="Primary">
-            <ul class="fv-nav__list">
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_client' ? 'is-active' : '' }}"><a href="{{ path('app_client') }}">HOME</a></li>
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_shop' ? 'is-active' : '' }}"><a href="{{ path('app_shop') }}">SHOP</a></li>
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_about' ? 'is-active' : '' }}"><a href="{{ path('app_about') }}">ABOUT</a></li>
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_faq' ? 'is-active' : '' }}"><a href="{{ path('app_faq') }}">FAQ</a></li>
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_contact' ? 'is-active' : '' }}"><a href="{{ path('app_contact') }}">CONTACT US</a></li>
-            </ul>
-        </nav>
-    </header>
+    {% include 'client/_header.html.twig' %}
 {% else %}
 <div class="fv-page">
-    <header class="fv-topbar" role="banner">
-        <div class="fv-topbar__inner">
-            <div class="fv-topbar__left" aria-hidden="true"></div>
-
-            <a class="fv-brand" href="{{ path('app_client') }}">
-                <img class="fv-brand__mark" src="{{ asset('img/logo1.png') }}" alt="La Kurt Flowershop">
-                <span class="fv-brand__text">
-                    <span class="fv-brand__name">LA KURT</span>
-                    <span class="fv-brand__tag">FLOWERSHOP</span>
-                </span>
-            </a>
-
-            <nav class="fv-topbar__right" aria-label="Utility">
-                <a class="fv-link" href="{{ path('app_login') }}">ACCOUNT</a>
-                <a class="fv-link" href="#">SEARCH</a>
-                <a class="fv-link" href="#">CART (0)</a>
-            </nav>
-        </div>
-
-        <nav class="fv-nav" aria-label="Primary">
-            <ul class="fv-nav__list">
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_client' ? 'is-active' : '' }}"><a href="{{ path('app_client') }}">HOME</a></li>
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_shop' ? 'is-active' : '' }}"><a href="{{ path('app_shop') }}">SHOP</a></li>
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_about' ? 'is-active' : '' }}"><a href="{{ path('app_about') }}">ABOUT</a></li>
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_faq' ? 'is-active' : '' }}"><a href="{{ path('app_faq') }}">FAQ</a></li>
-                <li class="fv-nav__item {{ app.request.get('_route') == 'app_contact' ? 'is-active' : '' }}"><a href="{{ path('app_contact') }}">CONTACT US</a></li>
-            </ul>
-        </nav>
-    </header>
+    {% include 'client/_header.html.twig' %}
 
     <main class="fv-main" role="main">
         <section class="fv-hero">
