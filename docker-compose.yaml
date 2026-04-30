@@ -12,7 +12,7 @@
       volumes:
         - mysql_data:/var/lib/mysql
       networks:
-        - midterm_network
+        - mendrick_network
 
     phpmyadmin:
       image: phpmyadmin/phpmyadmin
@@ -26,10 +26,10 @@
       depends_on:
         - mysql
       networks:
-        - midterm_network
+        - mendrick_network
 
   volumes:
     mysql_data:
 
   networks:
-    midterm_network:
+    mendrick_network:
