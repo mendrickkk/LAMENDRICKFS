@@ -121,11 +121,14 @@
                                         <tr>
                                             <td>{{ order.orderNumber }}</td>
                                             <td>
-                                                {% if order.products is empty %}
-                                                    —
-                                                {% else %}
+                                                {% if order.lines is not empty %}
+                                                    {% set firstL = order.lines|first %}
+                                                    {{ firstL.product.name }}{% if order.lines|length > 1 %} <span class="fv-acct__td-muted">+{{ order.lines|length - 1 }}</span>{% endif %}
+                                                {% elseif order.products is not empty %}
                                                     {% set firstP = order.products|first %}
                                                     {{ firstP.name }}{% if order.products|length > 1 %} <span class="fv-acct__td-muted">+{{ order.products|length - 1 }}</span>{% endif %}
+                                                {% else %}
+                                                    —
                                                 {% endif %}
                                             </td>
                                             <td>₱{{ order.total|number_format(2) }}</td>
