@@ -1,0 +1,69 @@
+{# Flowers in order — shown inside view modal #}
+<div class="stock-form-section order-flowers-section">
+    <h3 class="stock-form-section-title">FLOWERS IN THIS ORDER</h3>
+
+    {% if order.lines is not empty %}
+        <div class="order-flowers-grid">
+            {% for line in order.lines %}
+                {% set product = line.product %}
+                <article class="order-flower-card">
+                    <div class="order-flower-card__image">
+                        {% if product and product.image %}
+                            <img
+                                src="{{ asset('uploads/products/' ~ product.image) }}"
+                                alt="{{ product.name }}"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="order-flower-card__placeholder">
+                                <span>🌺</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="order-flower-card__body">
+                        <h4 class="order-flower-card__name">{{ product ? product.name : 'Product' }}</h4>
+                        {% if product and product.description %}
+                            <p class="order-flower-card__desc">{{ product.description|length > 80 ? product.description|slice(0, 80) ~ '…' : product.description }}</p>
+                        {% endif %}
+                        <p class="order-flower-card__meta">
+                            <span>Qty: <strong>{{ line.quantity }}</strong></span>
+                            <span>₱{{ line.unitPrice|number_format(2) }} each</span>
+                        </p>
+                        <p class="order-flower-card__subtotal">₱{{ line.subtotal|number_format(2) }}</p>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% elseif order.products is not empty %}
+        <div class="order-flowers-grid">
+            {% for product in order.products %}
+                <article class="order-flower-card">
+                    <div class="order-flower-card__image">
+                        {% if product.image %}
+                            <img
+                                src="{{ asset('uploads/products/' ~ product.image) }}"
+                                alt="{{ product.name }}"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="order-flower-card__placeholder">
+                                <span>🌺</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="order-flower-card__body">
+                        <h4 class="order-flower-card__name">{{ product.name }}</h4>
+                        {% if product.description %}
+                            <p class="order-flower-card__desc">{{ product.description|length > 80 ? product.description|slice(0, 80) ~ '…' : product.description }}</p>
+                        {% endif %}
+                        <p class="order-flower-card__meta">
+                            <span>₱{{ product.price|number_format(2) }}</span>
+                        </p>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="orders-detail-muted">No flower products on this order.</p>
+    {% endif %}
+</div>

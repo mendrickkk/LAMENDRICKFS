@@ -1,0 +1,54 @@
+{{ form_start(form, {
+    'action': action|default(null),
+    'attr': {
+        'class': 'stock-entry-form',
+        'data-order-form': 'true',
+        'novalidate': 'novalidate'
+    }
+}) }}
+
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">ORDER DETAILS</h3>
+        <p class="stock-form-section-description">
+            Order <strong>#{{ order.orderNumber }}</strong> — {{ order.customerName }}
+        </p>
+        <div class="stock-form-field">
+            <label class="stock-form-label">Current status</label>
+            <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+        </div>
+        <div class="stock-form-field">
+            <label class="stock-form-label">Total</label>
+            <p class="stock-form-static-value">₱{{ order.total|number_format(2) }}</p>
+        </div>
+        {% if order.deliveryAddress %}
+        <div class="stock-form-field">
+            <label class="stock-form-label">Delivery address</label>
+            <p class="stock-form-static-value">{{ order.deliveryAddress }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">UPDATE STATUS</h3>
+        <p class="stock-form-section-description">
+            Choose the new status for this order. Customers will see the update in the mobile app after refresh.
+        </p>
+        <div class="stock-form-field">
+            <label class="stock-form-label">Order status <span style="color: #ef4444;">*</span></label>
+            {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.status) }}
+        </div>
+    </div>
+
+    <div class="stock-form-actions">
+        <button type="submit" class="stock-form-btn-primary">
+            {{ button_label|default('Update Order Status') }}
+        </button>
+        {% if show_cancel is defined and show_cancel == false %}
+            <button type="button" class="stock-form-btn-cancel" data-modal-close="true">Cancel</button>
+        {% else %}
+            <a href="{{ path('app_orders') }}" class="stock-form-btn-cancel">Cancel</a>
+        {% endif %}
+    </div>
+
+{{ form_end(form) }}

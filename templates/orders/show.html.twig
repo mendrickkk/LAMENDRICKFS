@@ -1,0 +1,41 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Order {{ order.orderNumber }}{% endblock %}
+
+{% block page_title %}Orders{% endblock %}
+
+{% block breadcrumb_current %}{{ order.orderNumber }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/orders.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    <div class="stock-entry-page">
+        <div class="stock-entry-header">
+            <div class="stock-entry-header-left">
+                <div class="stock-entry-section-label">ORDER MANAGEMENT</div>
+                <h1 class="stock-entry-title">View · #{{ order.orderNumber }}</h1>
+            </div>
+            <div class="stock-entry-header-right">
+                <a href="{{ path('app_orders') }}" class="stock-entry-back-btn">
+                    <i class="fa fa-arrow-left"></i>
+                    Back to orders
+                </a>
+            </div>
+        </div>
+
+        <div class="order-view-actions">
+            <a href="{{ path('app_orders_edit', { id: order.id }) }}" class="stock-form-btn-primary order-view-edit-btn">
+                <i class="fa fa-pencil"></i>
+                Edit status
+            </a>
+        </div>
+
+        <div class="stock-entry-form-container">
+            {{ include('orders/_show_content.html.twig', { order: order }) }}
+        </div>
+    </div>
+{% endblock %}

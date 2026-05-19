@@ -1,0 +1,55 @@
+{# Shared by view modal (eye) and full /orders/{id} page — matches edit status form layout #}
+<div class="order-view-panel">
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">ORDER DETAILS</h3>
+        <p class="stock-form-section-description">
+            Order <strong>#{{ order.orderNumber }}</strong> — {{ order.customerName }}
+        </p>
+
+        <div class="order-view-fields">
+            <div class="stock-form-field">
+                <label class="stock-form-label">Status</label>
+                <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Total</label>
+                <p class="stock-form-static-value order-view-total">₱{{ order.total|number_format(2) }}</p>
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Placed</label>
+                <p class="stock-form-static-value">{{ order.createdAt|date('M d, Y g:i A') }}</p>
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Customer</label>
+                <p class="stock-form-static-value">{{ order.customerName }}</p>
+                {% if order.client %}
+                    <p class="orders-detail-muted">{{ order.client.email }}</p>
+                {% endif %}
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Delivery address</label>
+                <p class="stock-form-static-value">{{ order.deliveryAddress|default('—') }}</p>
+            </div>
+            {% if order.notes %}
+            <div class="stock-form-field order-view-field-full">
+                <label class="stock-form-label">Notes</label>
+                <p class="stock-form-static-value">{{ order.notes }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {{ include('orders/_line_items.html.twig', { order: order }) }}
+
+    <div class="stock-form-actions order-view-modal-actions">
+        <button
+            type="button"
+            class="stock-form-btn-primary"
+            data-open-edit-order="{{ order.id }}"
+            data-order-number="{{ order.orderNumber }}"
+        >
+            Edit status
+        </button>
+        <button type="button" class="stock-form-btn-cancel" data-modal-close="true">Close</button>
+    </div>
+</div>
