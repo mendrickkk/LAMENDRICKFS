@@ -27,6 +27,12 @@ final class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHand
             ], 401);
         }
 
+        if (!$user->isCustomer()) {
+            return new JsonResponse([
+                'message' => CustomerApiAccess::NON_CUSTOMER_MESSAGE,
+            ], 403);
+        }
+
         if (!$user->isVerified()) {
             return new JsonResponse([
                 'success' => false,

@@ -9,43 +9,65 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('styles/orders.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/product.css') }}">
 {% endblock %}
 
 {% block admin_content %}
+    {% for message in app.flashes('success') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-success">{{ message }}</div>
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="flash-messages">
+            <div class="flash-message flash-error">{{ message }}</div>
+        </div>
+    {% endfor %}
+
     <div class="card">
         <div class="card-header">
             <div class="card-title">
                 <i class="fa fa-receipt"></i>
                 Recent Orders
             </div>
-            <div class="card-actions">
-                <button class="card-action-btn">
-                    <i class="fa fa-download"></i>
-                    Export
-                </button>
-                <button class="card-action-btn">
-                    <i class="fa fa-refresh"></i>
-                    Refresh
-                </button>
-            </div>
         </div>
         <div class="card-body card-body-no-padding">
-            <div class="table-responsive">
-                <table class="table">
+            <div class="orders-bulk-actions" id="ordersBulkActions" style="display: none;">
+                <span id="ordersSelectedCount" class="orders-bulk-actions__count">0 selected</span>
+                <form method="post" action="{{ path('app_orders_bulk_delete') }}" id="ordersBulkDeleteForm" onsubmit="return confirm('Delete the selected orders? This cannot be undone.');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('bulk_delete') }}">
+                    <input type="hidden" name="ids" id="ordersBulkDeleteIds">
+                    <button type="submit" class="card-action-btn product-action-btn product-action-btn-delete orders-bulk-delete-btn">
+                        <i class="fa fa-trash"></i>
+                        Delete Selected
+                    </button>
+                </form>
+            </div>
+            <div class="table-responsive orders-table-wrap">
+                <table class="table orders-table">
                     <thead>
                         <tr>
+                            <th class="orders-table-checkbox-col">
+                                <input type="checkbox" id="selectAllOrders" aria-label="Select all orders">
+                            </th>
                             <th>Order #</th>
                             <th>Customer</th>
                             <th>Status</th>
                             <th>Total</th>
                             <th>Date</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% if recentOrders is not empty %}
                             {% for order in recentOrders %}
-                                <tr>
-                                    <td style="font-weight: 600; color: #ec4899; font-family: 'Courier New', monospace;">#{{ order.orderNumber }}</td>
+                                <tr class="order-row" data-id="{{ order.id }}">
+                                    <td class="orders-table-checkbox-col">
+                                        <input type="checkbox" class="order-checkbox" value="{{ order.id }}" aria-label="Select order {{ order.orderNumber }}">
+                                    </td>
+                                    <td style="font-weight: 600; color: #ec4899; font-family: 'Courier New', monospace;">
+                                        #{{ order.orderNumber }}
+                                    </td>
                                     <td style="font-weight: 500; color: #111827;">{{ order.customerName }}</td>
                                     <td>
                                         <span class="status-badge status-{{ order.status|lower }}">
@@ -55,11 +77,31 @@
                                     </td>
                                     <td style="font-weight: 600; color: #059669; font-family: 'Courier New', monospace;">₱{{ order.total|number_format(2, '.', ',') }}</td>
                                     <td style="color: #6b7280; font-size: 13px;">{{ order.createdAt|date('M d, Y') }}</td>
+                                    <td>
+                                        <div class="product-actions-cell">
+                                            <a href="{{ path('app_orders_show', { id: order.id }) }}"
+                                               class="card-action-btn product-action-btn"
+                                               data-view-order-modal="true"
+                                               data-order-id="{{ order.id }}"
+                                               data-order-number="{{ order.orderNumber }}"
+                                               title="View order">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('app_orders_edit', { id: order.id }) }}"
+                                               class="card-action-btn product-action-btn product-action-btn-edit"
+                                               data-edit-order-modal="true"
+                                               data-order-id="{{ order.id }}"
+                                               data-order-number="{{ order.orderNumber }}"
+                                               title="Update status">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         {% else %}
                             <tr>
-                                <td colspan="5" style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+                                <td colspan="7" style="text-align: center; padding: 40px 20px; color: #9ca3af;">
                                     <i class="fa fa-inbox" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
                                     <span>No orders found</span>
                                 </td>
@@ -70,4 +112,260 @@
             </div>
         </div>
     </div>
+
+    {# View order modal #}
+    <div class="admin-modal" id="viewOrderModal" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="viewOrderModalTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">ORDER MANAGEMENT</div>
+                    <div class="admin-modal__title" id="viewOrderModalTitle">Order Details</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal__body" id="viewOrderModalBody"></div>
+        </div>
+    </div>
+
+    {# Update status modal (same pattern as stock edit) #}
+    <div class="admin-modal" id="editOrderModal" aria-hidden="true">
+        <div class="admin-modal__overlay" data-modal-close="true"></div>
+        <div class="admin-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="editOrderModalTitle">
+            <div class="admin-modal__header">
+                <div>
+                    <div class="admin-modal__kicker">ORDER MANAGEMENT</div>
+                    <div class="admin-modal__title" id="editOrderModalTitle">Update Order Status</div>
+                </div>
+                <button type="button" class="admin-modal__close" aria-label="Close" data-modal-close="true">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal__body" id="editOrderModalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAllOrders = document.getElementById('selectAllOrders');
+            const bulkActionsBar = document.getElementById('ordersBulkActions');
+            const selectedCountEl = document.getElementById('ordersSelectedCount');
+            const bulkDeleteIdsInput = document.getElementById('ordersBulkDeleteIds');
+
+            function getOrderCheckboxes() {
+                return Array.from(document.querySelectorAll('.order-checkbox'));
+            }
+
+            function updateBulkActionsBar() {
+                const checked = getOrderCheckboxes().filter(function(cb) { return cb.checked; });
+                const count = checked.length;
+
+                if (!bulkActionsBar || !selectedCountEl || !bulkDeleteIdsInput) {
+                    return;
+                }
+
+                if (count > 0) {
+                    bulkActionsBar.style.display = 'flex';
+                    bulkActionsBar.style.alignItems = 'center';
+                    bulkActionsBar.style.justifyContent = 'space-between';
+                    selectedCountEl.textContent = count + ' selected';
+                    bulkDeleteIdsInput.value = checked.map(function(cb) { return cb.value; }).join(',');
+                } else {
+                    bulkActionsBar.style.display = 'none';
+                    bulkDeleteIdsInput.value = '';
+                }
+
+                if (selectAllOrders) {
+                    const all = getOrderCheckboxes();
+                    selectAllOrders.checked = all.length > 0 && count === all.length;
+                    selectAllOrders.indeterminate = count > 0 && count < all.length;
+                }
+            }
+
+            if (selectAllOrders) {
+                selectAllOrders.addEventListener('change', function() {
+                    const checked = selectAllOrders.checked;
+                    getOrderCheckboxes().forEach(function(cb) {
+                        cb.checked = checked;
+                    });
+                    updateBulkActionsBar();
+                });
+            }
+
+            getOrderCheckboxes().forEach(function(cb) {
+                cb.addEventListener('change', updateBulkActionsBar);
+            });
+
+            const viewModal = document.getElementById('viewOrderModal');
+            const viewModalBody = document.getElementById('viewOrderModalBody');
+            const viewLinks = document.querySelectorAll('a[data-view-order-modal="true"]');
+
+            const editModal = document.getElementById('editOrderModal');
+            const editModalBody = document.getElementById('editOrderModalBody');
+            const editModalTitle = document.getElementById('editOrderModalTitle');
+            const editLinks = document.querySelectorAll('a[data-edit-order-modal="true"]');
+
+            function openModal(modal) {
+                if (!modal) return;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+            }
+
+            function closeModal(modal, body) {
+                if (!modal) return;
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+                if (body) body.innerHTML = '';
+            }
+
+            const viewModalTitle = document.getElementById('viewOrderModalTitle');
+
+            async function loadOrderView(url, orderNumber) {
+                if (!url || !viewModalBody) return;
+                if (viewModalTitle && orderNumber) {
+                    viewModalTitle.textContent = 'View · #' + orderNumber;
+                }
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) throw new Error('Could not load order');
+                viewModalBody.innerHTML = await res.text();
+                openModal(viewModal);
+            }
+
+            async function loadOrderEdit(url, orderNumber) {
+                if (!url || !editModalBody) return;
+                if (editModalTitle && orderNumber) {
+                    editModalTitle.textContent = 'Update · #' + orderNumber;
+                }
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) throw new Error('Could not load form');
+                editModalBody.innerHTML = await res.text();
+                openModal(editModal);
+            }
+
+            function findOrderLink(kind, orderId) {
+                const selector = kind === 'view'
+                    ? 'a[data-view-order-modal="true"][data-order-id="' + orderId + '"]'
+                    : 'a[data-edit-order-modal="true"][data-order-id="' + orderId + '"]';
+                return document.querySelector(selector);
+            }
+
+            async function openOrderViewById(orderId) {
+                const link = findOrderLink('view', orderId);
+                if (!link) return;
+                await loadOrderView(link.getAttribute('href'), link.getAttribute('data-order-number'));
+            }
+
+            async function openOrderEditById(orderId) {
+                const link = findOrderLink('edit', orderId);
+                if (!link) return;
+                await loadOrderEdit(link.getAttribute('href'), link.getAttribute('data-order-number'));
+            }
+
+            viewLinks.forEach(link => {
+                link.addEventListener('click', async function(ev) {
+                    ev.preventDefault();
+                    try {
+                        await loadOrderView(this.getAttribute('href'), this.getAttribute('data-order-number'));
+                    } catch (err) {
+                        console.error(err);
+                    }
+                });
+            });
+
+            editLinks.forEach(link => {
+                link.addEventListener('click', async function(ev) {
+                    ev.preventDefault();
+                    try {
+                        await loadOrderEdit(this.getAttribute('href'), this.getAttribute('data-order-number'));
+                    } catch (err) {
+                        console.error(err);
+                    }
+                });
+            });
+
+            document.addEventListener('click', async function(ev) {
+                const editBtn = ev.target.closest('[data-open-edit-order]');
+                if (!editBtn) return;
+                ev.preventDefault();
+                const orderId = editBtn.getAttribute('data-open-edit-order');
+                closeModal(viewModal, viewModalBody);
+                try {
+                    await openOrderEditById(orderId);
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+
+            const params = new URLSearchParams(window.location.search);
+            const openViewId = params.get('openView');
+            const openEditId = params.get('openEdit');
+            if (openViewId || openEditId) {
+                const cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete('openView');
+                cleanUrl.searchParams.delete('openEdit');
+                window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search);
+            }
+            if (openViewId) {
+                openOrderViewById(openViewId).catch(console.error);
+            } else if (openEditId) {
+                openOrderEditById(openEditId).catch(console.error);
+            }
+
+            if (viewModal) {
+                viewModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) {
+                        closeModal(viewModal, viewModalBody);
+                    }
+                });
+            }
+
+            if (editModal) {
+                editModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) {
+                        closeModal(editModal, editModalBody);
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key !== 'Escape') return;
+                if (viewModal && viewModal.classList.contains('is-open')) {
+                    closeModal(viewModal, viewModalBody);
+                }
+                if (editModal && editModal.classList.contains('is-open')) {
+                    closeModal(editModal, editModalBody);
+                }
+            });
+
+            document.addEventListener('submit', async function(e) {
+                const formEl = e.target;
+                if (!editModal || !editModal.classList.contains('is-open')) return;
+                if (!formEl || !formEl.matches('form[data-order-form="true"]')) return;
+
+                e.preventDefault();
+                try {
+                    const res = await fetch(formEl.action, {
+                        method: 'POST',
+                        body: new FormData(formEl),
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        window.location.href = (data && data.redirectUrl) ? data.redirectUrl : window.location.href;
+                        return;
+                    }
+
+                    const html = await res.text();
+                    if (editModalBody) editModalBody.innerHTML = html;
+                } catch (err) {
+                    formEl.submit();
+                }
+            });
+        });
+    </script>
 {% endblock %}

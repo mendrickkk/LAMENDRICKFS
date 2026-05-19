@@ -8,17 +8,20 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\OrderLine;
 use App\Entity\Orders;
-use App\Repository\StockRepository;
+use App\Service\StockService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
+/**
+ * Creates customer orders (status pending) and reduces Stock.quantity at checkout — not on admin status change.
+ */
 final class OrderCheckoutProcessor implements ProcessorInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly Security $security,
-        private readonly StockRepository $stockRepository,
+        private readonly StockService $stockService,
     ) {
     }
 
@@ -26,73 +29,51 @@ final class OrderCheckoutProcessor implements ProcessorInterface
     {
         assert($data instanceof Orders);
 
-        $user = $this->security->getUser();
+        return $this->em->wrapInTransaction(function () use ($data): Orders {
+            $user = $this->security->getUser();
 
-        // Enforce delivery address
-        if (empty(trim((string) $data->getDeliveryAddress()))) {
-            throw new BadRequestHttpException('deliveryAddress is required and must not be empty.');
-        }
-
-        // Enforce at least one line
-        $lines = $data->getLines();
-        if ($lines->isEmpty()) {
-            throw new BadRequestHttpException('lines must not be empty. Send at least one product line.');
-        }
-
-        $total = 0.0;
-
-        foreach ($lines as $line) {
-            assert($line instanceof OrderLine);
-
-            $product = $line->getProduct();
-            if ($product === null) {
-                throw new BadRequestHttpException('Each line must reference a valid product IRI.');
+            if (empty(trim((string) $data->getDeliveryAddress()))) {
+                throw new BadRequestHttpException('deliveryAddress is required and must not be empty.');
             }
 
-            $qty = $line->getQuantity();
-            if ($qty < 1) {
-                throw new BadRequestHttpException(sprintf(
-                    'Quantity for product "%s" must be at least 1.',
-                    $product->getName()
-                ));
+            $lines = $data->getLines();
+            if ($lines->isEmpty()) {
+                throw new BadRequestHttpException('lines must not be empty. Send at least one product line.');
             }
 
-            // Stock validation — sum all stock entries for this product
-            $stocks = $product->getStocks();
-            $available = 0;
-            foreach ($stocks as $stock) {
-                $available += $stock->getQuantity();
+            // Stock checks first — no order row and no stock.quantity changes on failure
+            $this->stockService->validateOrderLines($lines);
+
+            $total = 0.0;
+
+            foreach ($lines as $line) {
+                assert($line instanceof OrderLine);
+
+                $product = $line->getProduct();
+                if ($product === null) {
+                    throw new BadRequestHttpException('Each line must reference a valid product IRI.');
+                }
+
+                $unitPrice = (float) $product->getPrice();
+                $line->setUnitPrice($unitPrice);
+                $line->setOrder($data);
+
+                $total += $unitPrice * $line->getQuantity();
             }
 
-            if ($available > 0 && $available < $qty) {
-                throw new BadRequestHttpException(sprintf(
-                    'Insufficient stock for "%s". Available: %d, requested: %d.',
-                    $product->getName(),
-                    $available,
-                    $qty
-                ));
-            }
+            $this->stockService->reserveOrderLines($lines);
 
-            // Snapshot unit price at order time
-            $unitPrice = (float) $product->getPrice();
-            $line->setUnitPrice($unitPrice);
-            $line->setOrder($data);
+            $data->setClient($user);
+            $data->setCustomerName(method_exists($user, 'getFullName') ? $user->getFullName() : ($user->getUserIdentifier()));
+            $data->setStatus('pending');
+            $data->setCreatedAt(new \DateTime());
+            $data->setTotal(round($total, 2));
+            $data->setOrderNumber($this->generateOrderNumber());
 
-            $total += $unitPrice * $qty;
-        }
+            $this->em->persist($data);
 
-        // Server-side fields — never trust the client body for these
-        $data->setClient($user);
-        $data->setCustomerName(method_exists($user, 'getFullName') ? $user->getFullName() : ($user->getUserIdentifier()));
-        $data->setStatus('pending');
-        $data->setCreatedAt(new \DateTime());
-        $data->setTotal(round($total, 2));
-        $data->setOrderNumber($this->generateOrderNumber());
-
-        $this->em->persist($data);
-        $this->em->flush();
-
-        return $data;
+            return $data;
+        });
     }
 
     private function generateOrderNumber(): string

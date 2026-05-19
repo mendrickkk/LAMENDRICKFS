@@ -1,49 +1,59 @@
-<div class="product-detail">
-    <div class="product-detail-grid">
-        <div class="product-detail-info">
-            <h2>{{ stock.product.Name }}</h2>
+<div class="stock-view-panel">
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">STOCK DETAILS</h3>
+        <p class="stock-form-section-description">
+            Stock entry <strong>#{{ stock.id }}</strong> — {{ stock.product.Name }}
+        </p>
 
-            <div class="product-detail-item">
-                <span class="product-detail-label">Stock ID</span>
-                <span class="product-detail-value">#{{ stock.id }}</span>
+        <div class="stock-view-fields">
+            <div class="stock-form-field">
+                <label class="stock-form-label">Product Name</label>
+                <p class="stock-form-static-value">{{ stock.product.Name }}</p>
             </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Product Name</span>
-                <span class="product-detail-value">{{ stock.product.Name }}</span>
-            </div>
-
             {% if stock.product.description %}
-            <div class="product-detail-item">
-                <span class="product-detail-label">Product Description</span>
-                <p class="product-detail-value">{{ stock.product.description }}</p>
+            <div class="stock-form-field stock-view-field-full">
+                <label class="stock-form-label">Description</label>
+                <p class="stock-form-static-value">{{ stock.product.description }}</p>
             </div>
             {% endif %}
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Price</span>
-                <div class="product-price">₱{{ stock.product.price|number_format(2) }}</div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Price</label>
+                <p class="stock-form-static-value">₱{{ stock.product.price|number_format(2) }}</p>
             </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Category</span>
-                <span class="product-detail-value">{{ stock.product.category ? stock.product.category.name : '-' }}</span>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Category</label>
+                <p class="stock-form-static-value">{{ stock.product.category ? stock.product.category.name : '—' }}</p>
             </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Stock Quantity</span>
-                <div class="product-price">{{ stock.quantity }}</div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Quantity</label>
+                <p class="stock-form-static-value">{{ stock.quantity }}</p>
             </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Created At</span>
-                <span class="product-detail-value">{{ stock.createdAt|date('Y-m-d H:i:s') }}</span>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Created</label>
+                <p class="stock-form-static-value">{{ stock.createdAt|date('M d, Y g:i A') }}</p>
             </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Updated At</span>
-                <span class="product-detail-value">{{ stock.updatedAt|date('Y-m-d H:i:s') }}</span>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Last updated</label>
+                <p class="stock-form-static-value">{{ stock.updatedAt|date('M d, Y g:i A') }}</p>
             </div>
+            {% if stock.createdBy %}
+            <div class="stock-form-field">
+                <label class="stock-form-label">Created by</label>
+                <p class="stock-form-static-value">{{ stock.createdBy.getFullName() }} ({{ stock.createdBy.getRoleLabel() }})</p>
+            </div>
+            {% endif %}
         </div>
+    </div>
+
+    <div class="stock-form-actions stock-view-modal-actions">
+        <button
+            type="button"
+            class="stock-form-btn-primary"
+            data-open-edit-stock="{{ stock.id }}"
+            data-product-name="{{ stock.product.Name }}"
+        >
+            Edit entry
+        </button>
+        <button type="button" class="stock-form-btn-cancel" data-modal-close="true">Close</button>
     </div>
 </div>

@@ -16,28 +16,27 @@ class StockRepository extends ServiceEntityRepository
         parent::__construct($registry, Stock::class);
     }
 
-//    /**
-//     * @return Stock[] Returns an array of Stock objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /** Sum of stock.quantity for a product — matches admin QUANTITY column source. */
+    public function getAvailableQuantityForProduct(int $productId): int
+    {
+        return (int) $this->createQueryBuilder('s')
+            ->select('COALESCE(SUM(s.quantity), 0)')
+            ->andWhere('s.product = :productId')
+            ->setParameter('productId', $productId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-//    public function findOneBySomeField($value): ?Stock
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @return Stock[]
+     */
+    public function findByProductOrdered(int $productId): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.product = :productId')
+            ->setParameter('productId', $productId)
+            ->orderBy('s.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
-

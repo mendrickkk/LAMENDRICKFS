@@ -129,15 +129,19 @@
                                 <td>{{ category.updatedAt|date('Y-m-d') }}</td>
                                 <td>
                                     <div class="product-actions-cell">
-                                        <a href="{{ path('app_category_show', {'id': category.id}) }}" 
+                                        <a href="{{ path('app_category_show', {'id': category.id}) }}"
                                            class="card-action-btn product-action-btn"
                                            data-view-category-modal="true"
+                                           data-category-id="{{ category.id }}"
+                                           data-category-name="{{ category.name }}"
                                            title="View">
                                             <i class="fa fa-eye"></i>
                                         </a>
-                                        <a href="{{ path('app_category_edit', {'id': category.id}) }}" 
+                                        <a href="{{ path('app_category_edit', {'id': category.id}) }}"
                                            class="card-action-btn product-action-btn product-action-btn-edit"
                                            data-edit-category-modal="true"
+                                           data-category-id="{{ category.id }}"
+                                           data-category-name="{{ category.name }}"
                                            title="Edit">
                                             <i class="fa fa-pencil"></i>
                                         </a>
@@ -359,7 +363,7 @@
             const modal = document.getElementById('newCategoryModal');
             const modalBody = document.getElementById('newCategoryModalBody');
 
-            function openModal() {
+            function openNewCategoryModal() {
                 if (!modal) return;
                 modal.classList.add('is-open');
                 modal.setAttribute('aria-hidden', 'false');
@@ -368,21 +372,18 @@
                 if (firstInput) firstInput.focus();
             }
 
-            function closeModal() {
+            function closeNewCategoryModal() {
                 if (!modal) return;
                 modal.classList.remove('is-open');
                 modal.setAttribute('aria-hidden', 'true');
                 document.body.classList.remove('modal-open');
             }
 
-            if (openBtn) openBtn.addEventListener('click', openModal);
+            if (openBtn) openBtn.addEventListener('click', openNewCategoryModal);
 
             if (modal) {
                 modal.addEventListener('click', function(e) {
-                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeModal();
-                });
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeNewCategoryModal();
                 });
             }
 
@@ -414,92 +415,151 @@
 
             const editModal = document.getElementById('editCategoryModal');
             const editModalBody = document.getElementById('editCategoryModalBody');
+            const editModalTitle = document.getElementById('editCategoryModalTitle');
             const editLinks = document.querySelectorAll('a[data-edit-category-modal="true"]');
             const viewModal = document.getElementById('viewCategoryModal');
             const viewModalBody = document.getElementById('viewCategoryModalBody');
+            const viewModalTitle = document.getElementById('viewCategoryModalTitle');
             const viewLinks = document.querySelectorAll('a[data-view-category-modal="true"]');
 
-            function openEditModal() {
-                if (!editModal) return;
-                editModal.classList.add('is-open');
-                editModal.setAttribute('aria-hidden', 'false');
+            function openCategoryModal(el) {
+                if (!el) return;
+                el.classList.add('is-open');
+                el.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('modal-open');
             }
 
-            function closeEditModal() {
-                if (!editModal) return;
-                editModal.classList.remove('is-open');
-                editModal.setAttribute('aria-hidden', 'true');
+            function closeCategoryModal(el, body) {
+                if (!el) return;
+                el.classList.remove('is-open');
+                el.setAttribute('aria-hidden', 'true');
                 document.body.classList.remove('modal-open');
-                if (editModalBody) editModalBody.innerHTML = '';
+                if (body) body.innerHTML = '';
             }
 
-            function openViewModal() {
-                if (!viewModal) return;
-                viewModal.classList.add('is-open');
-                viewModal.setAttribute('aria-hidden', 'false');
-                document.body.classList.add('modal-open');
+            async function loadCategoryView(url, categoryName) {
+                if (!url || !viewModalBody) return;
+                if (viewModalTitle && categoryName) {
+                    viewModalTitle.textContent = 'View · ' + categoryName;
+                }
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) throw new Error('Could not load category');
+                viewModalBody.innerHTML = await res.text();
+                openCategoryModal(viewModal);
             }
 
-            function closeViewModal() {
-                if (!viewModal) return;
-                viewModal.classList.remove('is-open');
-                viewModal.setAttribute('aria-hidden', 'true');
-                document.body.classList.remove('modal-open');
-                if (viewModalBody) viewModalBody.innerHTML = '';
+            async function loadCategoryEdit(url, categoryName) {
+                if (!url || !editModalBody) return;
+                if (editModalTitle && categoryName) {
+                    editModalTitle.textContent = 'Edit · ' + categoryName;
+                }
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) throw new Error('Could not load form');
+                editModalBody.innerHTML = await res.text();
+                openCategoryModal(editModal);
+            }
+
+            function findCategoryLink(kind, categoryId) {
+                const selector = kind === 'view'
+                    ? 'a[data-view-category-modal="true"][data-category-id="' + categoryId + '"]'
+                    : 'a[data-edit-category-modal="true"][data-category-id="' + categoryId + '"]';
+                return document.querySelector(selector);
+            }
+
+            async function openCategoryViewById(categoryId) {
+                const link = findCategoryLink('view', categoryId);
+                if (!link) return;
+                await loadCategoryView(link.getAttribute('href'), link.getAttribute('data-category-name'));
+            }
+
+            async function openCategoryEditById(categoryId) {
+                const link = findCategoryLink('edit', categoryId);
+                if (!link) return;
+                await loadCategoryEdit(link.getAttribute('href'), link.getAttribute('data-category-name'));
             }
 
             viewLinks.forEach(link => {
                 link.addEventListener('click', async function(ev) {
                     ev.preventDefault();
-                    const url = this.getAttribute('href');
-                    if (!url) return;
-
                     try {
-                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                        const html = await res.text();
-                        if (viewModalBody) viewModalBody.innerHTML = html;
-                        openViewModal();
+                        await loadCategoryView(this.getAttribute('href'), this.getAttribute('data-category-name'));
                     } catch (err) {
-                        window.location.href = url;
+                        console.error(err);
                     }
                 });
-            });
-
-            if (viewModal) {
-                viewModal.addEventListener('click', function(e) {
-                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeViewModal();
-                });
-            }
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && viewModal && viewModal.classList.contains('is-open')) {
-                    closeViewModal();
-                }
             });
 
             editLinks.forEach(link => {
                 link.addEventListener('click', async function(ev) {
                     ev.preventDefault();
-                    const url = this.getAttribute('href');
-                    if (!url) return;
-
                     try {
-                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                        const html = await res.text();
-                        if (editModalBody) editModalBody.innerHTML = html;
-                        openEditModal();
+                        await loadCategoryEdit(this.getAttribute('href'), this.getAttribute('data-category-name'));
                     } catch (err) {
-                        window.location.href = url;
+                        console.error(err);
                     }
                 });
             });
 
-            if (editModal) {
-                editModal.addEventListener('click', function(e) {
-                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeEditModal();
+            document.addEventListener('click', async function(ev) {
+                const editBtn = ev.target.closest('[data-open-edit-category]');
+                if (!editBtn) return;
+                ev.preventDefault();
+                const categoryId = editBtn.getAttribute('data-open-edit-category');
+                const categoryName = editBtn.getAttribute('data-category-name');
+                closeCategoryModal(viewModal, viewModalBody);
+                try {
+                    const link = findCategoryLink('edit', categoryId);
+                    if (link) {
+                        await loadCategoryEdit(link.getAttribute('href'), categoryName || link.getAttribute('data-category-name'));
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+
+            const params = new URLSearchParams(window.location.search);
+            const openViewId = params.get('openView');
+            const openEditId = params.get('openEdit');
+            if (openViewId || openEditId) {
+                const cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete('openView');
+                cleanUrl.searchParams.delete('openEdit');
+                window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search);
+            }
+            if (openViewId) {
+                openCategoryViewById(openViewId).catch(console.error);
+            } else if (openEditId) {
+                openCategoryEditById(openEditId).catch(console.error);
+            }
+
+            if (viewModal) {
+                viewModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) {
+                        closeCategoryModal(viewModal, viewModalBody);
+                    }
                 });
             }
+
+            if (editModal) {
+                editModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) {
+                        closeCategoryModal(editModal, editModalBody);
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key !== 'Escape') return;
+                if (modal && modal.classList.contains('is-open')) {
+                    closeNewCategoryModal();
+                }
+                if (viewModal && viewModal.classList.contains('is-open')) {
+                    closeCategoryModal(viewModal, viewModalBody);
+                }
+                if (editModal && editModal.classList.contains('is-open')) {
+                    closeCategoryModal(editModal, editModalBody);
+                }
+            });
 
             document.addEventListener('submit', async function(e) {
                 const formEl = e.target;

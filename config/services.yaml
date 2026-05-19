@@ -23,6 +23,13 @@ services:
     App\Security\UserChecker:
         tags: []
 
+    App\Security\ApiUserChecker:
+        tags: []
+
+    App\Security\ApiAuthenticationFailureHandler:
+        arguments:
+            $lexikFailureHandler: '@lexik_jwt_authentication.handler.authentication_failure'
+
     App\Service\EmailVerificationService:
         arguments:
             $fromAddress: '%env(MAILER_FROM_ADDRESS)%'

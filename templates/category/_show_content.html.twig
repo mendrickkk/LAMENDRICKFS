@@ -1,48 +1,59 @@
-<div class="product-detail">
-    <div class="product-detail-grid">
-        <div class="product-detail-info">
-            <h2>{{ category.name }}</h2>
+<div class="stock-view-panel">
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">CATEGORY DETAILS</h3>
+        <p class="stock-form-section-description">
+            Category <strong>#{{ category.id }}</strong> — {{ category.name }}
+        </p>
 
-            <div class="product-detail-item">
-                <span class="product-detail-label">Category ID</span>
-                <span class="product-detail-value">#{{ category.id }}</span>
+        <div class="stock-view-fields">
+            <div class="stock-form-field">
+                <label class="stock-form-label">Name</label>
+                <p class="stock-form-static-value">{{ category.name }}</p>
             </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Name</span>
-                <span class="product-detail-value">{{ category.name }}</span>
-            </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Description</span>
-                <p class="product-detail-value">{{ category.description ?: 'No description provided' }}</p>
-            </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Status</span>
-                <span class="product-detail-value">
+            <div class="stock-form-field">
+                <label class="stock-form-label">Status</label>
+                <p class="stock-form-static-value">
                     {% if category.isActive %}
                         <span class="badge badge-success">Active</span>
                     {% else %}
                         <span class="badge badge-danger">Inactive</span>
                     {% endif %}
-                </span>
+                </p>
             </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Products Count</span>
-                <span class="product-detail-value">{{ category.products|length }} product(s)</span>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Products</label>
+                <p class="stock-form-static-value">{{ category.products|length }} product(s)</p>
             </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Created At</span>
-                <span class="product-detail-value">{{ category.createdAt|date('Y-m-d H:i:s') }}</span>
+            <div class="stock-form-field stock-view-field-full">
+                <label class="stock-form-label">Description</label>
+                <p class="stock-form-static-value">{{ category.description ?: '—' }}</p>
             </div>
-
-            <div class="product-detail-item">
-                <span class="product-detail-label">Updated At</span>
-                <span class="product-detail-value">{{ category.updatedAt|date('Y-m-d H:i:s') }}</span>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Created</label>
+                <p class="stock-form-static-value">{{ category.createdAt|date('M d, Y g:i A') }}</p>
             </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Last updated</label>
+                <p class="stock-form-static-value">{{ category.updatedAt|date('M d, Y g:i A') }}</p>
+            </div>
+            {% if category.createdBy %}
+            <div class="stock-form-field">
+                <label class="stock-form-label">Created by</label>
+                <p class="stock-form-static-value">{{ category.createdBy.getFullName() }} ({{ category.createdBy.getRoleLabel() }})</p>
+            </div>
+            {% endif %}
         </div>
+    </div>
+
+    <div class="stock-form-actions stock-view-modal-actions">
+        <button
+            type="button"
+            class="stock-form-btn-primary"
+            data-open-edit-category="{{ category.id }}"
+            data-category-name="{{ category.name }}"
+        >
+            Edit category
+        </button>
+        <button type="button" class="stock-form-btn-cancel" data-modal-close="true">Close</button>
     </div>
 </div>

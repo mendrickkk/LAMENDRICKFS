@@ -20,6 +20,34 @@ class OrdersRepository extends ServiceEntityRepository
     /**
      * @return Orders[]
      */
+    public function findRecentForAdmin(int $limit = 50): array
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.lines', 'ol')->addSelect('ol')
+            ->leftJoin('ol.product', 'olp')->addSelect('olp')
+            ->leftJoin('o.client', 'c')->addSelect('c')
+            ->orderBy('o.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOneWithDetails(int $id): ?Orders
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.lines', 'ol')->addSelect('ol')
+            ->leftJoin('ol.product', 'olp')->addSelect('olp')
+            ->leftJoin('o.products', 'op')->addSelect('op')
+            ->leftJoin('o.client', 'c')->addSelect('c')
+            ->andWhere('o.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @return Orders[]
+     */
     public function findByClientOrdered(Users $client, int $limit = 50): array
     {
         return $this->createQueryBuilder('o')

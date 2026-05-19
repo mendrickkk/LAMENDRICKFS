@@ -348,16 +348,13 @@ final class StockController extends AbstractController
             }
         }
 
-        if ($request->isXmlHttpRequest()) {
-            $html = $this->renderView('stock/_show_content.html.twig', [
-                'stock' => $stock,
-            ]);
-            return new Response($html);
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirectToRoute('app_stock_index', ['openView' => $stock->getId()], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('stock/show.html.twig', [
+        return new Response($this->renderView('stock/_show_content.html.twig', [
             'stock' => $stock,
-        ]);
+        ]));
     }
 
     #[Route('/{id}/edit', name: 'app_stock_edit', methods: ['GET', 'POST'])]
@@ -490,10 +487,7 @@ final class StockController extends AbstractController
             return new Response($html, 422);
         }
 
-        return $this->render('stock/edit.html.twig', [
-            'stock' => $stock,
-            'form' => $form,
-        ]);
+        return $this->redirectToRoute('app_stock_index', ['openEdit' => $stock->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/bulk-delete', name: 'app_stock_bulk_delete', methods: ['POST'])]

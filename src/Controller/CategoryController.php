@@ -123,16 +123,13 @@ final class CategoryController extends AbstractController
             }
         }
 
-        if ($request->isXmlHttpRequest()) {
-            $html = $this->renderView('category/_show_content.html.twig', [
-                'category' => $category,
-            ]);
-            return new Response($html);
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirectToRoute('app_category_index', ['openView' => $category->getId()], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('category/show.html.twig', [
+        return new Response($this->renderView('category/_show_content.html.twig', [
             'category' => $category,
-        ]);
+        ]));
     }
 
     #[Route('/{id}/edit', name: 'app_category_edit', methods: ['GET', 'POST'])]
@@ -189,10 +186,7 @@ final class CategoryController extends AbstractController
             return new Response($html, 422);
         }
 
-        return $this->render('category/edit.html.twig', [
-            'category' => $category,
-            'form' => $form,
-        ]);
+        return $this->redirectToRoute('app_category_index', ['openEdit' => $category->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/bulk-delete', name: 'app_category_bulk_delete', methods: ['POST'])]

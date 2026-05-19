@@ -141,15 +141,19 @@
                                     <td>{{ stock.updatedAt|date('Y-m-d') }}</td>
                                     <td>
                                         <div class="product-actions-cell">
-                                            <a href="{{ path('app_stock_show', {'id': stock.id}) }}" 
+                                            <a href="{{ path('app_stock_show', {'id': stock.id}) }}"
                                                class="card-action-btn product-action-btn"
                                                data-view-stock-modal="true"
+                                               data-stock-id="{{ stock.id }}"
+                                               data-product-name="{{ stock.product.Name }}"
                                                title="View">
                                                 <i class="fa fa-eye"></i>
                                             </a>
-                                            <a href="{{ path('app_stock_edit', {'id': stock.id}) }}" 
+                                            <a href="{{ path('app_stock_edit', {'id': stock.id}) }}"
                                                class="card-action-btn product-action-btn product-action-btn-edit"
                                                data-edit-stock-modal="true"
+                                               data-stock-id="{{ stock.id }}"
+                                               data-product-name="{{ stock.product.Name }}"
                                                title="Edit">
                                                 <i class="fa fa-pencil"></i>
                                             </a>
@@ -375,7 +379,7 @@
             const modal = document.getElementById('newStockModal');
             const modalBody = document.getElementById('newStockModalBody');
 
-            function openModal() {
+            function openNewStockModal() {
                 if (!modal) return;
                 modal.classList.add('is-open');
                 modal.setAttribute('aria-hidden', 'false');
@@ -386,7 +390,7 @@
                 initStockImageDropzone(modal);
             }
 
-            function closeModal() {
+            function closeNewStockModal() {
                 if (!modal) return;
                 modal.classList.remove('is-open');
                 modal.setAttribute('aria-hidden', 'true');
@@ -395,20 +399,20 @@
 
             if (openBtn) {
                 openBtn.addEventListener('click', function() {
-                    openModal();
+                    openNewStockModal();
                 });
             }
 
             if (modal) {
                 modal.addEventListener('click', function(e) {
                     if (e.target && e.target.matches('[data-modal-close="true"]')) {
-                        closeModal();
+                        closeNewStockModal();
                     }
                 });
 
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape' && modal.classList.contains('is-open')) {
-                        closeModal();
+                        closeNewStockModal();
                     }
                 });
             }
@@ -540,93 +544,152 @@
 
             const editModal = document.getElementById('editStockModal');
             const editModalBody = document.getElementById('editStockModalBody');
+            const editModalTitle = document.getElementById('editStockModalTitle');
             const editLinks = document.querySelectorAll('a[data-edit-stock-modal="true"]');
             const viewModal = document.getElementById('viewStockModal');
             const viewModalBody = document.getElementById('viewStockModalBody');
+            const viewModalTitle = document.getElementById('viewStockModalTitle');
             const viewLinks = document.querySelectorAll('a[data-view-stock-modal="true"]');
 
-            function openEditModal() {
-                if (!editModal) return;
-                editModal.classList.add('is-open');
-                editModal.setAttribute('aria-hidden', 'false');
+            function openModal(el) {
+                if (!el) return;
+                el.classList.add('is-open');
+                el.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('modal-open');
             }
 
-            function closeEditModal() {
-                if (!editModal) return;
-                editModal.classList.remove('is-open');
-                editModal.setAttribute('aria-hidden', 'true');
+            function closeModal(el, body) {
+                if (!el) return;
+                el.classList.remove('is-open');
+                el.setAttribute('aria-hidden', 'true');
                 document.body.classList.remove('modal-open');
-                if (editModalBody) editModalBody.innerHTML = '';
+                if (body) body.innerHTML = '';
             }
 
-            function openViewModal() {
-                if (!viewModal) return;
-                viewModal.classList.add('is-open');
-                viewModal.setAttribute('aria-hidden', 'false');
-                document.body.classList.add('modal-open');
+            async function loadStockView(url, productName) {
+                if (!url || !viewModalBody) return;
+                if (viewModalTitle && productName) {
+                    viewModalTitle.textContent = 'View · ' + productName;
+                }
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) throw new Error('Could not load stock entry');
+                viewModalBody.innerHTML = await res.text();
+                openModal(viewModal);
             }
 
-            function closeViewModal() {
-                if (!viewModal) return;
-                viewModal.classList.remove('is-open');
-                viewModal.setAttribute('aria-hidden', 'true');
-                document.body.classList.remove('modal-open');
-                if (viewModalBody) viewModalBody.innerHTML = '';
+            async function loadStockEdit(url, productName) {
+                if (!url || !editModalBody) return;
+                if (editModalTitle && productName) {
+                    editModalTitle.textContent = 'Edit · ' + productName;
+                }
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) throw new Error('Could not load form');
+                editModalBody.innerHTML = await res.text();
+                openModal(editModal);
+                initStockImageDropzone(editModal);
+            }
+
+            function findStockLink(kind, stockId) {
+                const selector = kind === 'view'
+                    ? 'a[data-view-stock-modal="true"][data-stock-id="' + stockId + '"]'
+                    : 'a[data-edit-stock-modal="true"][data-stock-id="' + stockId + '"]';
+                return document.querySelector(selector);
+            }
+
+            async function openStockViewById(stockId) {
+                const link = findStockLink('view', stockId);
+                if (!link) return;
+                await loadStockView(link.getAttribute('href'), link.getAttribute('data-product-name'));
+            }
+
+            async function openStockEditById(stockId) {
+                const link = findStockLink('edit', stockId);
+                if (!link) return;
+                await loadStockEdit(link.getAttribute('href'), link.getAttribute('data-product-name'));
             }
 
             viewLinks.forEach(link => {
                 link.addEventListener('click', async function(ev) {
                     ev.preventDefault();
-                    const url = this.getAttribute('href');
-                    if (!url) return;
-
                     try {
-                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                        const html = await res.text();
-                        if (viewModalBody) viewModalBody.innerHTML = html;
-                        openViewModal();
+                        await loadStockView(this.getAttribute('href'), this.getAttribute('data-product-name'));
                     } catch (err) {
-                        window.location.href = url;
+                        console.error(err);
                     }
                 });
-            });
-
-            if (viewModal) {
-                viewModal.addEventListener('click', function(e) {
-                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeViewModal();
-                });
-            }
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && viewModal && viewModal.classList.contains('is-open')) {
-                    closeViewModal();
-                }
             });
 
             editLinks.forEach(link => {
                 link.addEventListener('click', async function(ev) {
                     ev.preventDefault();
-                    const url = this.getAttribute('href');
-                    if (!url) return;
-
                     try {
-                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                        const html = await res.text();
-                        if (editModalBody) editModalBody.innerHTML = html;
-                        openEditModal();
-                        initStockImageDropzone(editModal);
+                        await loadStockEdit(this.getAttribute('href'), this.getAttribute('data-product-name'));
                     } catch (err) {
-                        window.location.href = url;
+                        console.error(err);
                     }
                 });
             });
 
-            if (editModal) {
-                editModal.addEventListener('click', function(e) {
-                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeEditModal();
+            document.addEventListener('click', async function(ev) {
+                const editBtn = ev.target.closest('[data-open-edit-stock]');
+                if (!editBtn) return;
+                ev.preventDefault();
+                const stockId = editBtn.getAttribute('data-open-edit-stock');
+                const productName = editBtn.getAttribute('data-product-name');
+                closeModal(viewModal, viewModalBody);
+                try {
+                    const link = findStockLink('edit', stockId);
+                    if (link) {
+                        await loadStockEdit(link.getAttribute('href'), productName || link.getAttribute('data-product-name'));
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+
+            const params = new URLSearchParams(window.location.search);
+            const openViewId = params.get('openView');
+            const openEditId = params.get('openEdit');
+            if (openViewId || openEditId) {
+                const cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete('openView');
+                cleanUrl.searchParams.delete('openEdit');
+                window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search);
+            }
+            if (openViewId) {
+                openStockViewById(openViewId).catch(console.error);
+            } else if (openEditId) {
+                openStockEditById(openEditId).catch(console.error);
+            }
+
+            if (viewModal) {
+                viewModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) {
+                        closeModal(viewModal, viewModalBody);
+                    }
                 });
             }
+
+            if (editModal) {
+                editModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) {
+                        closeModal(editModal, editModalBody);
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key !== 'Escape') return;
+                if (modal && modal.classList.contains('is-open')) {
+                    closeNewStockModal();
+                }
+                if (viewModal && viewModal.classList.contains('is-open')) {
+                    closeModal(viewModal, viewModalBody);
+                }
+                if (editModal && editModal.classList.contains('is-open')) {
+                    closeModal(editModal, editModalBody);
+                }
+            });
 
             document.addEventListener('submit', async function(e) {
                 const formEl = e.target;

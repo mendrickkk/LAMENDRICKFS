@@ -146,6 +146,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isCustomer(): bool
+    {
+        return ($this->role ?? 'ROLE_CLIENT') === 'ROLE_CLIENT';
+    }
+
     public function isActive(): bool
     {
         return $this->isActive;

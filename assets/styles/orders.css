@@ -188,34 +188,85 @@
     box-sizing: border-box;
 }
 
-/* Order # Column - Fixed width */
-.card .table-responsive .table th:nth-child(1),
-.card .table-responsive .table td:nth-child(1) {
+/* Checkbox column */
+.orders-table-checkbox-col {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    text-align: center !important;
+    padding-left: 12px !important;
+    padding-right: 8px !important;
+}
+
+.orders-table-checkbox-col input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+/* 7-column orders table widths */
+.card .orders-table-wrap .table th:nth-child(2),
+.card .orders-table-wrap .table td:nth-child(2) {
+    width: 13% !important;
+}
+
+.card .orders-table-wrap .table th:nth-child(3),
+.card .orders-table-wrap .table td:nth-child(3) {
+    width: 22% !important;
+}
+
+.card .orders-table-wrap .table th:nth-child(4),
+.card .orders-table-wrap .table td:nth-child(4) {
+    width: 14% !important;
+}
+
+.card .orders-table-wrap .table th:nth-child(5),
+.card .orders-table-wrap .table td:nth-child(5) {
+    width: 14% !important;
+}
+
+.card .orders-table-wrap .table th:nth-child(6),
+.card .orders-table-wrap .table td:nth-child(6) {
     width: 15% !important;
 }
 
-/* Customer Column - Flexible width */
-.card .table-responsive .table th:nth-child(2),
-.card .table-responsive .table td:nth-child(2) {
-    width: 25% !important;
+.card .orders-table-wrap .table th:nth-child(7),
+.card .orders-table-wrap .table td:nth-child(7) {
+    width: 12% !important;
+    min-width: 100px !important;
+    max-width: 120px !important;
+    padding-right: 12px !important;
 }
 
-/* Status Column - Fixed width for status badges */
-.card .table-responsive .table th:nth-child(3),
-.card .table-responsive .table td:nth-child(3) {
-    width: 18% !important;
+.card .orders-table-wrap .product-actions-cell {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: fit-content;
 }
 
-/* Total Column - Fixed width for price */
-.card .table-responsive .table th:nth-child(4),
-.card .table-responsive .table td:nth-child(4) {
-    width: 15% !important;
+/* No horizontal scrollbar / bottom arrow on orders table */
+.orders-table-wrap {
+    overflow-x: hidden !important;
 }
 
-/* Date Column - Fixed width */
-.card .table-responsive .table th:nth-child(5),
-.card .table-responsive .table td:nth-child(5) {
-    width: 27% !important;
+/* Bulk delete bar (matches stock list) */
+.orders-bulk-actions {
+    padding: 12px 16px;
+    background: #f3f4f6;
+    border-bottom: 1px solid #e5e7eb;
+    gap: 16px;
+}
+
+.orders-bulk-actions__count {
+    font-weight: 600;
+    color: #374151;
+}
+
+.orders-bulk-delete-btn {
+    margin: 0;
 }
 
 /* Table Cell Styles */
@@ -315,6 +366,383 @@
     background: #a855f7;
 }
 
+/* Order list — inline status update */
+.order-number-link {
+    color: #ec4899;
+    text-decoration: none;
+}
+
+.order-number-link:hover {
+    text-decoration: underline;
+}
+
+.order-status-inline-form,
+.order-status-quick-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.order-status-select {
+    padding: 6px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #fff;
+}
+
+.order-status-btn,
+.order-complete-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.order-status-btn {
+    background: #8b5cf6;
+    color: #fff;
+}
+
+.order-status-btn:hover {
+    background: #7c3aed;
+}
+
+.order-complete-btn {
+    background: #10b981;
+    color: #fff;
+    margin-top: 4px;
+}
+
+.order-complete-btn:hover {
+    background: #059669;
+}
+
+.orders-detail-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.orders-detail-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orders-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.orders-detail-block h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+}
+
+.orders-detail-muted {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.orders-lines-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.order-status-edit-form {
+    max-width: 320px;
+    margin-top: 16px;
+}
+
+.stock-form-static-value {
+    margin: 0;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.order-lines-list {
+    margin: 8px 0 0;
+    padding-left: 18px;
+    color: #374151;
+    font-size: 14px;
+}
+
+.order-lines-list li {
+    margin-bottom: 4px;
+}
+
+/* Order view — same sections as edit status (stock-form-*) */
+.order-view-panel {
+    width: 100%;
+}
+
+.order-view-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 24px;
+}
+
+.order-view-field-full {
+    grid-column: 1 / -1;
+}
+
+.order-view-total {
+    font-weight: 700;
+    font-size: 16px;
+    color: #059669 !important;
+}
+
+.order-view-actions {
+    margin: 0 0 16px;
+}
+
+.order-view-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none !important;
+    width: auto;
+}
+
+.order-lines-section {
+    margin-bottom: 0;
+}
+
+.order-lines-table-wrap {
+    width: 100%;
+    margin-top: 4px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.order-lines-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.order-lines-table thead th {
+    background: #f9fafb;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.order-lines-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+    font-size: 14px;
+    color: #374151;
+}
+
+.order-lines-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.order-lines-table__product {
+    width: 55%;
+}
+
+.order-lines-table__qty {
+    width: 12%;
+    text-align: center;
+}
+
+.order-lines-table__price,
+.order-lines-table__subtotal {
+    width: 16%;
+    white-space: nowrap;
+}
+
+.order-lines-table__subtotal {
+    font-weight: 700;
+    color: #059669;
+}
+
+.order-line-product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.order-line-product__thumb {
+    flex: 0 0 56px;
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fdf2f8;
+    border: 1px solid #fce7f3;
+}
+
+.order-line-product__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.order-line-product__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 1.5rem;
+}
+
+.order-line-product__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.order-line-product__name {
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.order-line-product__desc {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.35;
+}
+
+.admin-modal__body .order-view-panel {
+    width: 100%;
+    max-width: 100%;
+}
+
+.admin-modal__body .order-flowers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.order-view-modal-actions {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+@media (max-width: 640px) {
+    .order-view-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .order-lines-table__product {
+        width: auto;
+    }
+}
+
+/* Legacy flower cards (unused after table layout) */
+.order-flowers-section {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.order-flowers-section .product-detail-label {
+    display: block;
+    margin-bottom: 12px;
+}
+
+.order-flowers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+
+.order-flower-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.order-flower-card__image img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+}
+
+.order-flower-card__placeholder {
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fdf2f8;
+    font-size: 2.5rem;
+}
+
+.order-flower-card__body {
+    padding: 12px 14px;
+}
+
+.order-flower-card__name {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.order-flower-card__desc {
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.order-flower-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0 0 6px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.order-flower-card__subtotal {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #059669;
+}
+
+.order-detail-modal .product-detail-info h2 {
+    margin-bottom: 16px;
+}
+
 /* Empty State - Match Product Table */
 .card .table-responsive .table tbody td[colspan="5"] {
     text-align: center !important;
@@ -372,31 +800,7 @@
         table-layout: fixed !important;
     }
     
-    /* Adjust column widths for mobile */
-    .card .table-responsive .table th:nth-child(1),
-    .card .table-responsive .table td:nth-child(1) {
-        width: 12% !important;
-    }
-    
-    .card .table-responsive .table th:nth-child(2),
-    .card .table-responsive .table td:nth-child(2) {
-        width: 22% !important;
-    }
-    
-    .card .table-responsive .table th:nth-child(3),
-    .card .table-responsive .table td:nth-child(3) {
-        width: 18% !important;
-    }
-    
-    .card .table-responsive .table th:nth-child(4),
-    .card .table-responsive .table td:nth-child(4) {
-        width: 15% !important;
-    }
-    
-    .card .table-responsive .table th:nth-child(5),
-    .card .table-responsive .table td:nth-child(5) {
-        width: 33% !important;
-    }
+    .orders-table-checkbox-col { width: 40px !important; min-width: 40px !important; }
     
     .card .table-responsive .table th {
         font-size: 11px !important;

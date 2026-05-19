@@ -36,7 +36,7 @@
                     <i class="fa fa-box menu-item-icon"></i>
                     Product
                 </a>
-                <a class="menu-item {% if app.request.attributes.get('_route') == 'app_orders' %}menu-item-active{% endif %}" href="{{ path('app_orders') }}">
+                <a class="menu-item {% if 'app_orders' in app.request.attributes.get('_route') %}menu-item-active{% endif %}" href="{{ path('app_orders') }}">
                     <i class="fa fa-receipt menu-item-icon"></i>
                     Orders
                 </a>

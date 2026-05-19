@@ -19,12 +19,13 @@ security:
             pattern: ^/api
             stateless: true
             provider: app_user_provider
+            user_checker: App\Security\ApiUserChecker
             json_login:
                 check_path: /api/login
                 username_path: email
                 password_path: password
                 success_handler: App\Security\JWTAuthenticationSuccessHandler
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+                failure_handler: App\Security\ApiAuthenticationFailureHandler
             jwt: ~  
 
         main:
@@ -59,6 +60,7 @@ security:
         - { path: ^/admin/users, roles: ROLE_ADMIN }
         - { path: ^/admin/profile, allow_if: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')" }
         - { path: ^/admin, allow_if: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')" }
+        - { path: ^/orders, allow_if: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')" }
         - { path: ^/connect, roles: PUBLIC_ACCESS }
         - { path: ^/verify-email, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }

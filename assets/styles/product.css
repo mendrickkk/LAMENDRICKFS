@@ -2227,3 +2227,35 @@ input[type="checkbox"]:checked {
 .card .stock-table .product-action-btn i {
     font-size: 11px !important;
 }
+
+/* Stock view modal */
+.stock-form-static-value {
+    margin: 0;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.stock-view-panel {
+    width: 100%;
+}
+
+.stock-view-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 24px;
+}
+
+.stock-view-field-full {
+    grid-column: 1 / -1;
+}
+
+.stock-view-modal-actions {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.admin-modal__body .stock-view-panel .stock-form-section {
+    margin-bottom: 0;
+}

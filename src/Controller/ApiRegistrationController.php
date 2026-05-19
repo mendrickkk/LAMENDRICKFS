@@ -31,6 +31,9 @@ final class ApiRegistrationController extends AbstractController
         $email = $data['email'] ?? null;
         $plainPassword = $data['password'] ?? null;
 
+        // API registration is customer-only; ignore any role sent by the client.
+        unset($data['role'], $data['roles']);
+
         if (!is_string($username) || $username === '' || !is_string($email) || $email === '' || !is_string($plainPassword) || $plainPassword === '') {
             return $this->json([
                 'success' => false,

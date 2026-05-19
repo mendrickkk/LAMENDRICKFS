@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Serializer;
 
 use App\Entity\Product;
+use App\Service\StockService;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
@@ -24,6 +25,7 @@ final class ProductNormalizer implements NormalizerInterface, NormalizerAwareInt
 
     public function __construct(
         private readonly UrlHelper $urlHelper,
+        private readonly StockService $stockService,
     ) {
     }
 
@@ -55,6 +57,9 @@ final class ProductNormalizer implements NormalizerInterface, NormalizerAwareInt
         } else {
             $data['imageUrl'] = null;
         }
+
+        // Same source as admin Stock Management (SUM of stock.quantity per product)
+        $data['availableQuantity'] = $this->stockService->getAvailableQuantity($object);
 
         return $data;
     }
