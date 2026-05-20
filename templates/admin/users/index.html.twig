@@ -137,15 +137,19 @@
                                     <td>{{ user.createdBy ? user.createdBy.username : '-' }}</td>
                                     <td>
                                         <div class="product-actions-cell">
-                                            <a href="{{ path('app_user_show', {'id': user.id}) }}" 
+                                            <a href="{{ path('app_user_show', {'id': user.id}) }}"
                                                class="card-action-btn product-action-btn"
                                                data-view-user-modal="true"
+                                               data-user-id="{{ user.id }}"
+                                               data-user-name="{{ user.username }}"
                                                title="View">
                                                 <i class="fa fa-eye"></i>
                                             </a>
-                                            <a href="{{ path('app_user_edit', {'id': user.id}) }}" 
+                                            <a href="{{ path('app_user_edit', {'id': user.id}) }}"
                                                class="card-action-btn product-action-btn product-action-btn-edit"
                                                data-edit-user-modal="true"
+                                               data-user-id="{{ user.id }}"
+                                               data-user-name="{{ user.username }}"
                                                title="Edit">
                                                 <i class="fa fa-pencil"></i>
                                             </a>
@@ -453,7 +457,7 @@
             const modal = document.getElementById('newUserModal');
             const modalBody = document.getElementById('newUserModalBody');
 
-            function openModal() {
+            function openNewUserModal() {
                 if (!modal) return;
                 modal.classList.add('is-open');
                 modal.setAttribute('aria-hidden', 'false');
@@ -462,21 +466,18 @@
                 if (firstInput) firstInput.focus();
             }
 
-            function closeModal() {
+            function closeNewUserModal() {
                 if (!modal) return;
                 modal.classList.remove('is-open');
                 modal.setAttribute('aria-hidden', 'true');
                 document.body.classList.remove('modal-open');
             }
 
-            if (openBtn) openBtn.addEventListener('click', openModal);
+            if (openBtn) openBtn.addEventListener('click', openNewUserModal);
 
             if (modal) {
                 modal.addEventListener('click', function(e) {
-                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeModal();
-                });
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeNewUserModal();
                 });
             }
 
@@ -508,94 +509,151 @@
 
             const editModal = document.getElementById('editUserModal');
             const editModalBody = document.getElementById('editUserModalBody');
+            const editModalTitle = document.getElementById('editUserModalTitle');
             const editLinks = document.querySelectorAll('a[data-edit-user-modal="true"]');
             const viewModal = document.getElementById('viewUserModal');
             const viewModalBody = document.getElementById('viewUserModalBody');
+            const viewModalTitle = document.getElementById('viewUserModalTitle');
             const viewLinks = document.querySelectorAll('a[data-view-user-modal="true"]');
 
-            function openEditModal() {
-                if (!editModal) return;
-                editModal.classList.add('is-open');
-                editModal.setAttribute('aria-hidden', 'false');
+            function openUserModal(el) {
+                if (!el) return;
+                el.classList.add('is-open');
+                el.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('modal-open');
             }
 
-            function closeEditModal() {
-                if (!editModal) return;
-                editModal.classList.remove('is-open');
-                editModal.setAttribute('aria-hidden', 'true');
+            function closeUserModal(el, body) {
+                if (!el) return;
+                el.classList.remove('is-open');
+                el.setAttribute('aria-hidden', 'true');
                 document.body.classList.remove('modal-open');
-                if (editModalBody) editModalBody.innerHTML = '';
+                if (body) body.innerHTML = '';
             }
 
-            function openViewModal() {
-                if (!viewModal) return;
-                viewModal.classList.add('is-open');
-                viewModal.setAttribute('aria-hidden', 'false');
-                document.body.classList.add('modal-open');
+            async function loadUserView(url, userName) {
+                if (!url || !viewModalBody) return;
+                if (viewModalTitle && userName) {
+                    viewModalTitle.textContent = 'View · ' + userName;
+                }
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) throw new Error('Could not load user');
+                viewModalBody.innerHTML = await res.text();
+                openUserModal(viewModal);
             }
 
-            function closeViewModal() {
-                if (!viewModal) return;
-                viewModal.classList.remove('is-open');
-                viewModal.setAttribute('aria-hidden', 'true');
-                document.body.classList.remove('modal-open');
-                if (viewModalBody) viewModalBody.innerHTML = '';
+            async function loadUserEdit(url, userName) {
+                if (!url || !editModalBody) return;
+                if (editModalTitle && userName) {
+                    editModalTitle.textContent = 'Edit · ' + userName;
+                }
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) throw new Error('Could not load form');
+                editModalBody.innerHTML = await res.text();
+                openUserModal(editModal);
+            }
+
+            function findUserLink(kind, userId) {
+                const selector = kind === 'view'
+                    ? 'a[data-view-user-modal="true"][data-user-id="' + userId + '"]'
+                    : 'a[data-edit-user-modal="true"][data-user-id="' + userId + '"]';
+                return document.querySelector(selector);
+            }
+
+            async function openUserViewById(userId) {
+                const link = findUserLink('view', userId);
+                if (!link) return;
+                await loadUserView(link.getAttribute('href'), link.getAttribute('data-user-name'));
+            }
+
+            async function openUserEditById(userId) {
+                const link = findUserLink('edit', userId);
+                if (!link) return;
+                await loadUserEdit(link.getAttribute('href'), link.getAttribute('data-user-name'));
             }
 
             viewLinks.forEach(link => {
                 link.addEventListener('click', async function(ev) {
                     ev.preventDefault();
-                    const url = this.getAttribute('href');
-                    if (!url) return;
-
                     try {
-                        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                        const html = await res.text();
-                        if (viewModalBody) viewModalBody.innerHTML = html;
-                        openViewModal();
+                        await loadUserView(this.getAttribute('href'), this.getAttribute('data-user-name'));
                     } catch (err) {
-                        window.location.href = url;
+                        console.error(err);
                     }
                 });
-            });
-
-            if (viewModal) {
-                viewModal.addEventListener('click', function(e) {
-                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeViewModal();
-                });
-            }
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && viewModal && viewModal.classList.contains('is-open')) {
-                    closeViewModal();
-                }
             });
 
             editLinks.forEach(link => {
                 link.addEventListener('click', async function(ev) {
                     ev.preventDefault();
-                    const url = this.getAttribute('href');
-                    if (!url) return;
-
                     try {
-                        const res = await fetch(url, {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        });
-                        const html = await res.text();
-                        if (editModalBody) editModalBody.innerHTML = html;
-                        openEditModal();
+                        await loadUserEdit(this.getAttribute('href'), this.getAttribute('data-user-name'));
                     } catch (err) {
-                        window.location.href = url;
+                        console.error(err);
                     }
                 });
             });
 
-            if (editModal) {
-                editModal.addEventListener('click', function(e) {
-                    if (e.target && e.target.matches('[data-modal-close="true"]')) closeEditModal();
+            document.addEventListener('click', async function(ev) {
+                const editBtn = ev.target.closest('[data-open-edit-user]');
+                if (!editBtn) return;
+                ev.preventDefault();
+                const userId = editBtn.getAttribute('data-open-edit-user');
+                const userName = editBtn.getAttribute('data-user-name');
+                closeUserModal(viewModal, viewModalBody);
+                try {
+                    const link = findUserLink('edit', userId);
+                    if (link) {
+                        await loadUserEdit(link.getAttribute('href'), userName || link.getAttribute('data-user-name'));
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+
+            const params = new URLSearchParams(window.location.search);
+            const openViewId = params.get('openView');
+            const openEditId = params.get('openEdit');
+            if (openViewId || openEditId) {
+                const cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete('openView');
+                cleanUrl.searchParams.delete('openEdit');
+                window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search);
+            }
+            if (openViewId) {
+                openUserViewById(openViewId).catch(console.error);
+            } else if (openEditId) {
+                openUserEditById(openEditId).catch(console.error);
+            }
+
+            if (viewModal) {
+                viewModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) {
+                        closeUserModal(viewModal, viewModalBody);
+                    }
                 });
             }
+
+            if (editModal) {
+                editModal.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('[data-modal-close="true"]')) {
+                        closeUserModal(editModal, editModalBody);
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key !== 'Escape') return;
+                if (modal && modal.classList.contains('is-open')) {
+                    closeNewUserModal();
+                }
+                if (viewModal && viewModal.classList.contains('is-open')) {
+                    closeUserModal(viewModal, viewModalBody);
+                }
+                if (editModal && editModal.classList.contains('is-open')) {
+                    closeUserModal(editModal, editModalBody);
+                }
+            });
 
             document.addEventListener('submit', async function(e) {
                 const formEl = e.target;

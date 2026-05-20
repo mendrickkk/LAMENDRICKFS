@@ -1,43 +1,69 @@
-<div class="card" style="margin-top: 0;">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h3 style="margin-bottom: 1.5rem; color: #111827;">Account Information</h3>
-                <div style="margin-bottom: 1rem;"><strong>ID:</strong><p style="margin-top: 0.5rem; color: #374151;">#{{ user.id }}</p></div>
-                <div style="margin-bottom: 1rem;"><strong>First Name:</strong><p style="margin-top: 0.5rem; color: #374151;">{{ user.firstName ?: '-' }}</p></div>
-                <div style="margin-bottom: 1rem;"><strong>Last Name:</strong><p style="margin-top: 0.5rem; color: #374151;">{{ user.lastName ?: '-' }}</p></div>
-                <div style="margin-bottom: 1rem;"><strong>Full Name:</strong><p style="margin-top: 0.5rem; color: #374151;">{{ user.fullName }}</p></div>
-                <div style="margin-bottom: 1rem;"><strong>Username:</strong><p style="margin-top: 0.5rem; color: #374151;">{{ user.username }}</p></div>
-                <div style="margin-bottom: 1rem;"><strong>Email:</strong><p style="margin-top: 0.5rem; color: #374151;">{{ user.email }}</p></div>
-                <div style="margin-bottom: 1rem;">
-                    <strong>Role:</strong>
-                    <p style="margin-top: 0.5rem;">
-                        {% if user.role == 'ROLE_ADMIN' %}
-                            <span class="badge" style="background: #dc2626; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Admin</span>
-                        {% elseif user.role == 'ROLE_STAFF' %}
-                            <span class="badge" style="background: #2563eb; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Staff</span>
-                        {% else %}
-                            <span class="badge" style="background: #059669; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Client</span>
-                        {% endif %}
-                    </p>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <strong>Status:</strong>
-                    <p style="margin-top: 0.5rem;">
-                        {% if user.isActive %}
-                            <span class="badge" style="background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;"><i class="fa fa-check-circle"></i> Active</span>
-                        {% else %}
-                            <span class="badge" style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;"><i class="fa fa-times-circle"></i> Inactive</span>
-                        {% endif %}
-                    </p>
-                </div>
+<div class="stock-view-panel">
+    <div class="stock-form-section">
+        <h3 class="stock-form-section-title">USER DETAILS</h3>
+        <p class="stock-form-section-description">
+            User <strong>#{{ user.id }}</strong> — {{ user.fullName }} ({{ user.username }})
+        </p>
+
+        <div class="stock-view-fields">
+            <div class="stock-form-field">
+                <label class="stock-form-label">Full name</label>
+                <p class="stock-form-static-value">{{ user.fullName }}</p>
             </div>
-            <div class="col-md-6">
-                <h3 style="margin-bottom: 1.5rem; color: #111827;">Audit Information</h3>
-                <div style="margin-bottom: 1rem;"><strong>Created At:</strong><p style="margin-top: 0.5rem; color: #374151;">{{ user.createdAt ? user.createdAt|date('Y-m-d H:i:s') : '-' }}</p></div>
-                <div style="margin-bottom: 1rem;"><strong>Updated At:</strong><p style="margin-top: 0.5rem; color: #374151;">{{ user.updatedAt ? user.updatedAt|date('Y-m-d H:i:s') : '-' }}</p></div>
-                <div style="margin-bottom: 1rem;"><strong>Created By:</strong><p style="margin-top: 0.5rem; color: #374151;">{{ user.createdBy ? user.createdBy.username : 'Self-registered' }}</p></div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Username</label>
+                <p class="stock-form-static-value">{{ user.username }}</p>
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Email</label>
+                <p class="stock-form-static-value">{{ user.email }}</p>
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Role</label>
+                <p class="stock-form-static-value">
+                    {% if user.role == 'ROLE_ADMIN' %}
+                        <span class="badge" style="background: #dc2626; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px;">Admin</span>
+                    {% elseif user.role == 'ROLE_STAFF' %}
+                        <span class="badge" style="background: #2563eb; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px;">Staff</span>
+                    {% else %}
+                        <span class="badge" style="background: #059669; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px;">Client</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Status</label>
+                <p class="stock-form-static-value">
+                    {% if user.isActive %}
+                        <span class="badge" style="background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 12px; font-size: 12px;"><i class="fa fa-check-circle"></i> Active</span>
+                    {% else %}
+                        <span class="badge" style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 12px; font-size: 12px;"><i class="fa fa-times-circle"></i> Inactive</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Created</label>
+                <p class="stock-form-static-value">{{ user.createdAt ? user.createdAt|date('M d, Y g:i A') : '—' }}</p>
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Last updated</label>
+                <p class="stock-form-static-value">{{ user.updatedAt ? user.updatedAt|date('M d, Y g:i A') : '—' }}</p>
+            </div>
+            <div class="stock-form-field">
+                <label class="stock-form-label">Created by</label>
+                <p class="stock-form-static-value">{{ user.createdBy ? user.createdBy.username : 'Self-registered' }}</p>
             </div>
         </div>
+    </div>
+
+    <div class="stock-form-actions stock-view-modal-actions">
+        <button
+            type="button"
+            class="stock-form-btn-primary"
+            data-open-edit-user="{{ user.id }}"
+            data-user-name="{{ user.username }}"
+        >
+            Edit user
+        </button>
+        <button type="button" class="stock-form-btn-cancel" data-modal-close="true">Close</button>
     </div>
 </div>

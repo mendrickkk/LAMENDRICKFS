@@ -152,16 +152,13 @@ final class UserController extends AbstractController
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
     public function show(Request $request, Users $user): Response
     {
-        if ($request->isXmlHttpRequest()) {
-            $html = $this->renderView('admin/users/_show_content.html.twig', [
-                'user' => $user,
-            ]);
-            return new Response($html);
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirectToRoute('app_user_index', ['openView' => $user->getId()], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('admin/users/show.html.twig', [
+        return new Response($this->renderView('admin/users/_show_content.html.twig', [
             'user' => $user,
-        ]);
+        ]));
     }
 
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
@@ -282,10 +279,7 @@ final class UserController extends AbstractController
             return new Response($html, 422);
         }
 
-        return $this->render('admin/users/edit.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
+        return $this->redirectToRoute('app_user_index', ['openEdit' => $user->getId()], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
