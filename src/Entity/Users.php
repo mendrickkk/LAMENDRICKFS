@@ -251,7 +251,15 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     // --- Security interface methods ---
     public function getRoles(): array
     {
-        return [$this->role ?? 'ROLE_CLIENT'];
+        $role = $this->role ?? 'ROLE_CLIENT';
+        if (str_starts_with($role, '[')) {
+            $decoded = json_decode($role, true);
+            if (is_array($decoded) && isset($decoded[0]) && is_string($decoded[0])) {
+                return [$decoded[0]];
+            }
+        }
+
+        return [$role];
     }
 
     public function eraseCredentials(): void

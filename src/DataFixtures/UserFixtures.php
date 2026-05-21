@@ -63,8 +63,9 @@ class UserFixtures extends Fixture
         $admin->setEmail($adminEmail);
         $admin->setRole('ROLE_ADMIN');
         $admin->setIsActive(true);
-        
-        // Hash password
+        $admin->setIsVerified(true);
+
+        // Hash password (Symfony never accepts plain text in the database)
         $hashedPassword = $this->passwordHasher->hashPassword($admin, $adminPassword);
         $admin->setPassword($hashedPassword);
 
