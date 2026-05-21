@@ -58,12 +58,8 @@ php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migratio
 echo "[release] Repairing plain-text passwords (hash + verify)..."
 php bin/console app:user:repair-login --all-plain --verify --no-interaction
 
-if [ -n "${ADMIN_BOOTSTRAP_EMAIL:-}" ] && [ -n "${ADMIN_BOOTSTRAP_PASSWORD:-}" ]; then
-    echo "[release] Bootstrapping admin ${ADMIN_BOOTSTRAP_EMAIL}..."
-    php bin/console app:user:bootstrap-admin --no-interaction
-else
-    echo "[release] Skip admin bootstrap (set ADMIN_BOOTSTRAP_EMAIL + ADMIN_BOOTSTRAP_PASSWORD on Railway to auto-reset admin login)."
-fi
+echo "[release] Ensuring default admin placeholder (only kurttruk1234@gmail.com / adminkurt)..."
+php bin/console app:seed-default-admin --no-interaction
 
 if [ -f .env ]; then
     rm -f .env
