@@ -31,9 +31,10 @@ class RepairUserLoginCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('email', InputArgument::REQUIRED, 'User email address')
-            ->addOption('password', 'p', InputOption::VALUE_REQUIRED, 'Plain password to hash (required if DB password is not already hashed)')
+            ->addArgument('email', InputArgument::OPTIONAL, 'User email (optional when using --all-plain)')
+            ->addOption('password', 'p', InputOption::VALUE_REQUIRED, 'Override plain password to hash (default: use value already stored in DB)')
             ->addOption('verify', null, InputOption::VALUE_NONE, 'Mark the account as email-verified')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Re-hash password even if already hashed (requires --password)')
             ->addOption('all-plain', null, InputOption::VALUE_NONE, 'Repair every user whose password is not hashed');
     }
 
@@ -46,7 +47,7 @@ class RepairUserLoginCommand extends Command
             $users = $this->usersRepository->findAll();
             $repaired = 0;
             foreach ($users as $user) {
-                if ($this->repairUser($user, null, $markVerified, $io)) {
+                if ($this->repairUser($user, null, $markVerified, $io, false)) {
                     ++$repaired;
                 }
             }
@@ -57,6 +58,12 @@ class RepairUserLoginCommand extends Command
         }
 
         $email = $input->getArgument('email');
+        if ($email === null || $email === '') {
+            $io->error('Email is required unless you use --all-plain.');
+
+            return Command::FAILURE;
+        }
+
         $user = $this->usersRepository->findOneBy(['email' => $email]);
         if (!$user instanceof Users) {
             $io->error(sprintf('No user found for email "%s".', $email));
@@ -65,7 +72,13 @@ class RepairUserLoginCommand extends Command
         }
 
         $plainPassword = $input->getOption('password');
-        if (!$this->repairUser($user, $plainPassword, true, $io)) {
+        $force = (bool) $input->getOption('force');
+        if ($force && ($plainPassword === null || $plainPassword === '')) {
+            $io->error('--force requires --password.');
+
+            return Command::FAILURE;
+        }
+        if (!$this->repairUser($user, $plainPassword, true, $io, $force)) {
             $io->warning('Nothing to change for this user.');
 
             return Command::SUCCESS;
@@ -77,7 +90,7 @@ class RepairUserLoginCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function repairUser(Users $user, ?string $plainPassword, bool $markVerified, SymfonyStyle $io): bool
+    private function repairUser(Users $user, ?string $plainPassword, bool $markVerified, SymfonyStyle $io, bool $force): bool
     {
         $changed = false;
 
@@ -92,17 +105,25 @@ class RepairUserLoginCommand extends Command
         }
 
         $stored = (string) $user->getPassword();
-        if (!$this->isHashedPassword($stored)) {
-            if ($plainPassword === null || $plainPassword === '') {
-                $io->warning(sprintf(
-                    '  Skipping %s: password is plain text; re-run with --password=YOUR_PASSWORD',
-                    $user->getEmail()
-                ));
+        $mustHash = $force || !$this->isHashedPassword($stored);
+        if ($mustHash) {
+            if ($force && ($plainPassword === null || $plainPassword === '')) {
+                $io->warning(sprintf('  Skipping %s: --force needs --password', $user->getEmail()));
 
                 return $changed;
             }
-            $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
-            $io->writeln(sprintf('  Hashed password for %s', $user->getEmail()));
+            $plain = ($plainPassword !== null && $plainPassword !== '') ? $plainPassword : $stored;
+            if ($plain === '') {
+                $io->warning(sprintf('  Skipping %s: empty password in database', $user->getEmail()));
+
+                return $changed;
+            }
+            $user->setPassword($this->passwordHasher->hashPassword($user, $plain));
+            $io->writeln(sprintf(
+                '  %s password for %s',
+                $force ? 'Reset' : 'Hashed',
+                $user->getEmail()
+            ));
             $changed = true;
         }
 

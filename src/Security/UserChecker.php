@@ -20,7 +20,13 @@ class UserChecker implements UserCheckerInterface
             throw new CustomUserMessageAccountStatusException('Your account has been disabled. Please contact an administrator.');
         }
 
-        if (!$user->isVerified()) {
+        // Staff and admin use form login / Google; do not block on client email verification
+        $isStaff = (bool) array_intersect(
+            ['ROLE_ADMIN', 'ROLE_STAFF'],
+            $user->getRoles()
+        );
+
+        if (!$user->isVerified() && !$isStaff) {
             throw new CustomUserMessageAccountStatusException('Please verify your email address before logging in. Check your inbox for the verification link.');
         }
     }

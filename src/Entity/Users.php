@@ -137,13 +137,30 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRole(): ?string
     {
-        return $this->role;
+        return $this->normalizeRoleValue($this->role);
     }
 
     public function setRole(string $role): static
     {
-        $this->role = $role;
+        $this->role = $this->normalizeRoleValue($role) ?? $role;
+
         return $this;
+    }
+
+    private function normalizeRoleValue(?string $role): ?string
+    {
+        if ($role === null || $role === '') {
+            return $role;
+        }
+
+        if (str_starts_with($role, '[')) {
+            $decoded = json_decode($role, true);
+            if (is_array($decoded) && isset($decoded[0]) && is_string($decoded[0])) {
+                return $decoded[0];
+            }
+        }
+
+        return $role;
     }
 
     public function isCustomer(): bool
@@ -251,15 +268,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     // --- Security interface methods ---
     public function getRoles(): array
     {
-        $role = $this->role ?? 'ROLE_CLIENT';
-        if (str_starts_with($role, '[')) {
-            $decoded = json_decode($role, true);
-            if (is_array($decoded) && isset($decoded[0]) && is_string($decoded[0])) {
-                return [$decoded[0]];
-            }
-        }
-
-        return [$role];
+        return [$this->getRole() ?? 'ROLE_CLIENT'];
     }
 
     public function eraseCredentials(): void
