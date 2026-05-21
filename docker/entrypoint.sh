@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+export SYMFONY_DEPRECATIONS_HELPER=disabled
+
 is_web_start() {
     case "$1" in
         */start-web.sh|start-web.sh) return 0 ;;
@@ -49,7 +51,22 @@ fi
 
 echo "Running database migrations..."
 if ! php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration; then
-    echo "WARNING: migrations did not complete (database may already be initialized)."
+    echo "WARNING: migrations failed — syncing Version20260323104223 if schema already exists..."
+    if php -r '
+        require "vendor/autoload.php";
+        $url = getenv("DATABASE_URL");
+        $parts = parse_url($url);
+        $dsn = sprintf("mysql:host=%s;port=%s;dbname=%s", $parts["host"], $parts["port"] ?? 3306, ltrim($parts["path"] ?? "", "/"));
+        $pdo = new PDO($dsn, $parts["user"], $parts["pass"]);
+        $exists = $pdo->query("SHOW TABLES LIKE \"activity_log\"")->fetch();
+        exit($exists ? 0 : 1);
+    ' 2>/dev/null; then
+        php bin/console doctrine:migrations:version 'DoctrineMigrations\\Version20260323104223' --add --no-interaction 2>/dev/null || true
+        php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || \
+            echo "WARNING: some migrations could not be applied; check doctrine:migrations:status"
+    else
+        echo "WARNING: migrations did not complete (database may already be initialized)."
+    fi
 fi
 
 echo "Warming up cache..."

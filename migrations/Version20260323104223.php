@@ -14,11 +14,22 @@ final class Version20260323104223 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Initial schema: activity_log, category, product, orders, users, etc.';
+    }
+
+    public function isTransactional(): bool
+    {
+        return false;
     }
 
     public function up(Schema $schema): void
     {
+        if ($schema->hasTable('activity_log')) {
+            $this->write('Schema from Version20260323104223 already exists — skipping.');
+
+            return;
+        }
+
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE activity_log (id INT AUTO_INCREMENT NOT NULL, user_relation_id INT DEFAULT NULL, user_id INT DEFAULT NULL, username VARCHAR(255) NOT NULL, role VARCHAR(50) NOT NULL, action VARCHAR(50) NOT NULL, target_entity VARCHAR(100) DEFAULT NULL, target_id INT DEFAULT NULL, target_data LONGTEXT DEFAULT NULL, created_at DATETIME NOT NULL, INDEX IDX_FD06F6479B4D58CE (user_relation_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE category (id INT AUTO_INCREMENT NOT NULL, created_by_id INT DEFAULT NULL, name VARCHAR(100) NOT NULL, description LONGTEXT DEFAULT NULL, is_active TINYINT(1) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, INDEX IDX_64C19C1B03A8386 (created_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
