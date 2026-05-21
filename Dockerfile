@@ -67,6 +67,7 @@ RUN composer dump-autoload --optimize --classmap-authoritative --no-dev \
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/start-web.sh /usr/local/bin/start-web.sh
+COPY docker/php-fpm-env.conf /usr/local/etc/php-fpm.d/zz-env.conf
 COPY docker/nginx-railway.conf.template /etc/nginx/http.d/default.conf.template
 
 RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh /usr/local/bin/start-web.sh \

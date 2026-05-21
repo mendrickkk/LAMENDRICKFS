@@ -56,7 +56,21 @@ echo "Warming up cache..."
 php bin/console cache:clear --env="${APP_ENV:-prod}" --no-warmup
 php bin/console cache:warmup --env="${APP_ENV:-prod}"
 
+# Baked .env is for Docker build only — remove so PHP-FPM uses Railway variables
+if [ -f .env ] && { [ -n "${RAILWAY_ENVIRONMENT:-}" ] || [ -n "${RAILWAY_SERVICE_NAME:-}" ]; }; then
+    echo "Removing build-time .env (using Railway environment variables)."
+    rm -f .env
+    php bin/console cache:clear --env="${APP_ENV:-prod}" --no-warmup
+    php bin/console cache:warmup --env="${APP_ENV:-prod}"
+fi
+
+if [ -z "${APP_SECRET:-}" ] || [ "${APP_SECRET}" = "change_me_to_a_long_random_string" ] || [ "${APP_SECRET}" = "build-time-secret-set-in-railway-variables" ]; then
+    echo "ERROR: Set a real APP_SECRET in Railway variables."
+    exit 1
+fi
+
 chown -R www-data:www-data var config/jwt public/uploads 2>/dev/null || true
+chmod -R ug+rwX var config/jwt public/uploads 2>/dev/null || true
 
 if [ "$1" = "php-fpm" ]; then
     exec docker-php-entrypoint php-fpm
