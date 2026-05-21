@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Stock;
 use App\Entity\Product;
+use App\Entity\Users;
 use App\Form\StockType;
 use App\Repository\StockRepository;
 use App\Service\ActivityLogService;
@@ -14,43 +15,31 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/stock')]
+#[IsGranted('ROLE_STAFF')]
 final class StockController extends AbstractController
 {
     #[Route(name: 'app_stock_index', methods: ['GET'])]
     public function index(StockRepository $stockRepository): Response
     {
-        // Check if user is admin
+        $qb = $stockRepository->createQueryBuilder('s')
+            ->leftJoin('s.product', 'p')
+            ->leftJoin('p.category', 'c')
+            ->leftJoin('s.createdBy', 'cb')
+            ->addSelect('p')
+            ->addSelect('c')
+            ->addSelect('cb')
+            ->orderBy('s.id', 'DESC');
+
         if (!$this->isGranted('ROLE_ADMIN')) {
-            // Staff: Show only own records
-            $stocks = $stockRepository->createQueryBuilder('s')
-                ->leftJoin('s.product', 'p')
-                ->leftJoin('p.category', 'c')
-                ->leftJoin('s.createdBy', 'cb')
-                ->addSelect('p')
-                ->addSelect('c')
-                ->addSelect('cb')
-                ->where('s.createdBy = :user')
-                ->setParameter('user', $this->getUser())
-                ->orderBy('s.id', 'DESC')
-                ->getQuery()
-                ->getResult();
-        } else {
-            // Admin: Show all records
-            // Load stocks with products, categories, and createdBy to ensure images are available
-            $stocks = $stockRepository->createQueryBuilder('s')
-                ->leftJoin('s.product', 'p')
-                ->leftJoin('p.category', 'c')
-                ->leftJoin('s.createdBy', 'cb')
-                ->addSelect('p')
-                ->addSelect('c')
-                ->addSelect('cb')
-                ->orderBy('s.id', 'DESC')
-                ->getQuery()
-                ->getResult();
+            $qb->andWhere('s.createdBy = :user')
+                ->setParameter('user', $this->getUser());
         }
+
+        $stocks = $qb->getQuery()->getResult();
         
         $stock = new Stock();
         $form = $this->createForm(StockType::class, $stock, ['is_edit' => false]);
@@ -341,12 +330,7 @@ final class StockController extends AbstractController
     #[Route('/{id}', name: 'app_stock_show', methods: ['GET'])]
     public function show(Request $request, Stock $stock): Response
     {
-        // Check ownership for staff
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            if ($stock->getCreatedBy() !== $this->getUser()) {
-                throw $this->createAccessDeniedException('You can only view your own records.');
-            }
-        }
+        $this->assertStaffCanAccessStock($stock);
 
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('app_stock_index', ['openView' => $stock->getId()], Response::HTTP_SEE_OTHER);
@@ -360,12 +344,7 @@ final class StockController extends AbstractController
     #[Route('/{id}/edit', name: 'app_stock_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Stock $stock, EntityManagerInterface $entityManager, SluggerInterface $slugger, ActivityLogService $activityLogService): Response
     {
-        // Check ownership for staff
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            if ($stock->getCreatedBy() !== $this->getUser()) {
-                throw $this->createAccessDeniedException('You can only edit your own records.');
-            }
-        }
+        $this->assertStaffCanAccessStock($stock);
 
         $form = $this->createForm(StockType::class, $stock, ['is_edit' => true]);
         $form->handleRequest($request);
@@ -515,6 +494,10 @@ final class StockController extends AbstractController
         $productsToDelete = [];
 
         foreach ($stocks as $stock) {
+            if (!$this->isGranted('ROLE_ADMIN') && !$this->staffOwnsStock($stock)) {
+                continue;
+            }
+
             $product = $stock->getProduct();
             
             // Remove stock
@@ -558,12 +541,7 @@ final class StockController extends AbstractController
     public function delete(Request $request, Stock $stock, EntityManagerInterface $entityManager, StockRepository $stockRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$stock->getId(), $request->getPayload()->getString('_token'))) {
-            // Check ownership for staff
-            if (!$this->isGranted('ROLE_ADMIN')) {
-                if ($stock->getCreatedBy() !== $this->getUser()) {
-                    throw $this->createAccessDeniedException('You can only delete your own records.');
-                }
-            }
+            $this->assertStaffCanAccessStock($stock);
 
             $product = $stock->getProduct();
             
@@ -592,6 +570,24 @@ final class StockController extends AbstractController
         }
 
         return $this->redirectToRoute('app_stock_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function assertStaffCanAccessStock(Stock $stock): void
+    {
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
+        if (!$this->staffOwnsStock($stock)) {
+            throw $this->createAccessDeniedException('You can only access stock entries you created.');
+        }
+    }
+
+    private function staffOwnsStock(Stock $stock): bool
+    {
+        $user = $this->getUser();
+
+        return $user instanceof Users && $stock->getCreatedBy() === $user;
     }
 }
 
