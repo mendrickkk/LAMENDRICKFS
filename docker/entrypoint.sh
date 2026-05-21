@@ -10,15 +10,30 @@ is_web_start() {
     return 1
 }
 
+is_placeholder_jwt() {
+    case "$1" in
+        ''|build_jwt_passphrase|change_me_jwt_passphrase|REPLACE_WITH_JWT_PASSPHRASE) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 if [ -z "${APP_SECRET:-}" ] || [ "${APP_SECRET}" = "change_me_to_a_long_random_string" ] || [ "${APP_SECRET}" = "build-time-secret-set-in-railway-variables" ]; then
     echo "ERROR: Set a real APP_SECRET in Railway variables."
     exit 1
 fi
 
-# Railway: migrations/cache run in release.sh — start HTTP after JWT keys (required for /api/login)
+# Resolve JWT_PASSPHRASE HERE (parent shell) so PHP-FPM workers inherit the correct value.
+# This must happen before any sub-shell or exec call.
+if is_placeholder_jwt "${JWT_PASSPHRASE:-}"; then
+    export JWT_PASSPHRASE="$APP_SECRET"
+    echo "[jwt] JWT_PASSPHRASE not set — using APP_SECRET."
+fi
+
+# Railway: migrations/cache ran in release.sh — start HTTP after JWT keys
 if is_web_start "$1" && { [ -n "${RAILWAY_ENVIRONMENT:-}" ] || [ -n "${RAILWAY_SERVICE_NAME:-}" ]; }; then
-    if ! sh /usr/local/bin/ensure-jwt-keys.sh; then
-        echo "ERROR: JWT keys could not be prepared. Set APP_SECRET in Railway (JWT_PASSPHRASE optional)."
+    echo "[jwt] Ensuring JWT keys..."
+    if ! php bin/console app:jwt:ensure-keys --no-interaction; then
+        echo "ERROR: JWT keys could not be prepared."
         exit 1
     fi
     chown -R www-data:www-data var config/jwt public/uploads 2>/dev/null || true
@@ -58,7 +73,8 @@ until php -r '
     sleep 2
 done
 
-sh /usr/local/bin/ensure-jwt-keys.sh
+echo "[jwt] Ensuring JWT keys..."
+php bin/console app:jwt:ensure-keys --no-interaction
 
 if php -r '
     $url = getenv("DATABASE_URL");

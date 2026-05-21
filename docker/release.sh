@@ -6,10 +6,16 @@ export SYMFONY_DEPRECATIONS_HELPER=disabled
 
 cd /var/www/html
 
-# JWT keys are created in the web container entrypoint (release FS does not persist to the app).
-# Non-fatal here so a missing JWT_PASSPHRASE never blocks migrations or deploy health.
-if ! sh /usr/local/bin/ensure-jwt-keys.sh; then
-    echo "[release] WARNING: JWT keys will be created when the web container starts."
+is_placeholder_jwt() {
+    case "$1" in
+        ''|build_jwt_passphrase|change_me_jwt_passphrase|REPLACE_WITH_JWT_PASSPHRASE) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# Resolve JWT_PASSPHRASE so Symfony commands (cache warmup etc.) use the correct value.
+if is_placeholder_jwt "${JWT_PASSPHRASE:-}"; then
+    export JWT_PASSPHRASE="$APP_SECRET"
 fi
 
 if [ -z "${DATABASE_URL:-}" ]; then
