@@ -6,8 +6,11 @@ export SYMFONY_DEPRECATIONS_HELPER=disabled
 
 cd /var/www/html
 
-# JWT only — does not touch MySQL data
-sh /usr/local/bin/ensure-jwt-keys.sh
+# JWT keys are created in the web container entrypoint (release FS does not persist to the app).
+# Non-fatal here so a missing JWT_PASSPHRASE never blocks migrations or deploy health.
+if ! sh /usr/local/bin/ensure-jwt-keys.sh; then
+    echo "[release] WARNING: JWT keys will be created when the web container starts."
+fi
 
 if [ -z "${DATABASE_URL:-}" ]; then
     echo "ERROR: DATABASE_URL is not set."

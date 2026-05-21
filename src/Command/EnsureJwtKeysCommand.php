@@ -11,7 +11,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Aligns config/jwt/*.pem with JWT_PASSPHRASE. Does not read or write the database.
+ * Aligns config/jwt/*.pem with the active passphrase. Does not read or write the database.
  */
 #[AsCommand(
     name: 'app:jwt:ensure-keys',
@@ -19,10 +19,15 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 )]
 final class EnsureJwtKeysCommand extends Command
 {
-    private const PLACEHOLDER_PASSPHRASES = [
+    private const PLACEHOLDER_JWT_PASSPHRASES = [
         'build_jwt_passphrase',
         'change_me_jwt_passphrase',
         'REPLACE_WITH_JWT_PASSPHRASE',
+    ];
+
+    private const PLACEHOLDER_APP_SECRETS = [
+        'build-time-secret-set-in-railway-variables',
+        'change_me_to_a_long_random_string',
     ];
 
     public function __construct(
@@ -35,13 +40,15 @@ final class EnsureJwtKeysCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $passphrase = (string) ($_ENV['JWT_PASSPHRASE'] ?? $_SERVER['JWT_PASSPHRASE'] ?? getenv('JWT_PASSPHRASE') ?: '');
+        $passphrase = $this->resolvePassphrase();
 
-        if ($passphrase === '' || in_array($passphrase, self::PLACEHOLDER_PASSPHRASES, true)) {
-            $io->error('Set JWT_PASSPHRASE in Railway variables (same value as your local .env).');
+        if ($passphrase === null) {
+            $io->error('Set APP_SECRET (and optionally JWT_PASSPHRASE) in Railway variables.');
 
             return Command::FAILURE;
         }
+
+        $this->syncPassphraseEnv($passphrase);
 
         $privatePath = $this->projectDir.'/config/jwt/private.pem';
         $publicPath = $this->projectDir.'/config/jwt/public.pem';
@@ -51,13 +58,13 @@ final class EnsureJwtKeysCommand extends Command
         }
 
         if ($this->keysMatchPassphrase($privatePath, $passphrase)) {
-            $io->writeln('JWT keys OK (match JWT_PASSPHRASE).');
+            $io->writeln('JWT keys OK.');
 
             return Command::SUCCESS;
         }
 
         if (is_file($privatePath)) {
-            $io->warning('JWT keys do not match JWT_PASSPHRASE — regenerating (existing API tokens will stop working until users log in again).');
+            $io->warning('JWT keys do not match passphrase — regenerating (users must log in again).');
             @unlink($privatePath);
             @unlink($publicPath);
         } else {
@@ -73,7 +80,7 @@ final class EnsureJwtKeysCommand extends Command
 
         $exitCode = $generate->run(new ArrayInput([]), $output);
         if ($exitCode !== Command::SUCCESS || !$this->keysMatchPassphrase($privatePath, $passphrase)) {
-            $io->error('Could not create JWT keys that match JWT_PASSPHRASE.');
+            $io->error('Could not create JWT keys.');
 
             return Command::FAILURE;
         }
@@ -81,6 +88,28 @@ final class EnsureJwtKeysCommand extends Command
         $io->success('JWT keypair ready.');
 
         return Command::SUCCESS;
+    }
+
+    private function resolvePassphrase(): ?string
+    {
+        $jwt = trim((string) ($_ENV['JWT_PASSPHRASE'] ?? $_SERVER['JWT_PASSPHRASE'] ?? getenv('JWT_PASSPHRASE') ?: ''));
+        if ($jwt !== '' && !in_array($jwt, self::PLACEHOLDER_JWT_PASSPHRASES, true)) {
+            return $jwt;
+        }
+
+        $appSecret = trim((string) ($_ENV['APP_SECRET'] ?? $_SERVER['APP_SECRET'] ?? getenv('APP_SECRET') ?: ''));
+        if ($appSecret !== '' && !in_array($appSecret, self::PLACEHOLDER_APP_SECRETS, true)) {
+            return $appSecret;
+        }
+
+        return null;
+    }
+
+    private function syncPassphraseEnv(string $passphrase): void
+    {
+        putenv('JWT_PASSPHRASE='.$passphrase);
+        $_ENV['JWT_PASSPHRASE'] = $passphrase;
+        $_SERVER['JWT_PASSPHRASE'] = $passphrase;
     }
 
     private function keysMatchPassphrase(string $privatePath, string $passphrase): bool

@@ -41,22 +41,16 @@ COPY --from=vendor /app/vendor ./vendor
 # Symfony bootstraps via .env; Railway/CI have no local .env (gitignored)
 COPY .env.docker.example .env
 
-# Override with production build defaults (runtime uses Railway variables)
+# Build-time defaults only (real secrets come from Railway at runtime via .env + injected env)
 ENV APP_ENV=prod \
     APP_DEBUG=0 \
-    APP_SECRET=build-time-secret-set-in-railway-variables \
     DATABASE_URL="mysql://build:build@127.0.0.1:3306/build?serverVersion=8.0&charset=utf8mb4" \
     DEFAULT_URI=http://localhost/ \
     MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0 \
     MAILER_DSN=null://null \
     MAILER_FROM_ADDRESS=noreply@example.com \
     MAILER_FROM_NAME="Flower Shop" \
-    CORS_ALLOW_ORIGIN='^https?://.*$' \
-    GOOGLE_CLIENT_ID=build \
-    GOOGLE_CLIENT_SECRET=build \
-    JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem \
-    JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem \
-    JWT_PASSPHRASE=build_jwt_passphrase
+    CORS_ALLOW_ORIGIN='^https?://.*$'
 
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev \
     && mkdir -p var/cache var/log public/uploads/products config/jwt \

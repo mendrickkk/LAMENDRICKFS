@@ -15,9 +15,12 @@ if [ -z "${APP_SECRET:-}" ] || [ "${APP_SECRET}" = "change_me_to_a_long_random_s
     exit 1
 fi
 
-# Railway: migrations/cache run in release.sh — start HTTP immediately for healthcheck
+# Railway: migrations/cache run in release.sh — start HTTP after JWT keys (required for /api/login)
 if is_web_start "$1" && { [ -n "${RAILWAY_ENVIRONMENT:-}" ] || [ -n "${RAILWAY_SERVICE_NAME:-}" ]; }; then
-    sh /usr/local/bin/ensure-jwt-keys.sh
+    if ! sh /usr/local/bin/ensure-jwt-keys.sh; then
+        echo "ERROR: JWT keys could not be prepared. Set APP_SECRET in Railway (JWT_PASSPHRASE optional)."
+        exit 1
+    fi
     chown -R www-data:www-data var config/jwt public/uploads 2>/dev/null || true
     chmod -R ug+rwX var config/jwt public/uploads 2>/dev/null || true
     echo "Railway PORT=${PORT:-not set} — starting web server."
