@@ -73,5 +73,6 @@ RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh /usr/local/bin/start-web.sh \
     && chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/start-web.sh
 
 # Railway: HTTP on $PORT via start-web.sh | Docker Compose: override with command: php-fpm
+EXPOSE 8080
 ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]
 CMD ["/usr/local/bin/start-web.sh"]

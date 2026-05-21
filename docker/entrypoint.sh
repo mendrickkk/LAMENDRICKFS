@@ -1,20 +1,30 @@
 #!/bin/sh
 set -e
 
+is_web_start() {
+    case "$1" in
+        */start-web.sh|start-web.sh) return 0 ;;
+    esac
+    return 1
+}
+
 if [ -z "${DATABASE_URL:-}" ]; then
-    echo "DATABASE_URL is not set. Check your .env file or compose environment."
+    echo "ERROR: DATABASE_URL is not set. Link MySQL to this service in Railway."
     exit 1
 fi
 
-echo "Waiting for database..."
+echo "Waiting for database (max 90s)..."
+attempt=0
+max_attempts=45
 until php -r '
     $url = getenv("DATABASE_URL");
     if (!$url) { exit(1); }
     $parts = parse_url($url);
-    $host = $parts["host"] ?? "mysql";
+    $host = $parts["host"] ?? "";
     $port = $parts["port"] ?? 3306;
     $user = $parts["user"] ?? "";
     $pass = $parts["pass"] ?? "";
+    if ($host === "") { exit(1); }
     try {
         new PDO("mysql:host={$host};port={$port}", $user, $pass, [PDO::ATTR_TIMEOUT => 3]);
         exit(0);
@@ -22,6 +32,12 @@ until php -r '
         exit(1);
     }
 ' 2>/dev/null; do
+    attempt=$((attempt + 1))
+    if [ "$attempt" -ge "$max_attempts" ]; then
+        echo "ERROR: Database not reachable. Check DATABASE_URL and MySQL service link."
+        echo "DATABASE_URL host: $(php -r 'echo parse_url(getenv("DATABASE_URL"), PHP_URL_HOST) ?: "unknown";')"
+        exit 1
+    fi
     sleep 2
 done
 echo "Database is ready."
@@ -34,7 +50,6 @@ fi
 echo "Running database migrations..."
 if ! php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration; then
     echo "WARNING: migrations did not complete (database may already be initialized)."
-    echo "If the app fails to load data, run: docker compose exec app php bin/console doctrine:migrations:status"
 fi
 
 echo "Warming up cache..."
@@ -45,6 +60,11 @@ chown -R www-data:www-data var config/jwt public/uploads 2>/dev/null || true
 
 if [ "$1" = "php-fpm" ]; then
     exec docker-php-entrypoint php-fpm
+fi
+
+if is_web_start "$1"; then
+    echo "Railway PORT=${PORT:-not set}"
+    exec "$1"
 fi
 
 exec "$@"
