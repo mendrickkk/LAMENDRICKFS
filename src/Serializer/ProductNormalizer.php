@@ -61,6 +61,16 @@ final class ProductNormalizer implements NormalizerInterface, NormalizerAwareInt
         // Same source as admin Stock Management (SUM of stock.quantity per product)
         $data['availableQuantity'] = $this->stockService->getAvailableQuantity($object);
 
+        $category = $object->getCategory();
+        if ($category !== null) {
+            $categoryId = $category->getId();
+            $data['category'] = [
+                '@id' => '/api/categories/' . $categoryId,
+                'id' => $categoryId,
+                'name' => $category->getName(),
+            ];
+        }
+
         return $data;
     }
 

@@ -15,14 +15,15 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Put(),
-        new Delete()
+        new Get(normalizationContext: ['groups' => ['product:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['product:read']]),
+        new Post(security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')"),
+        new Put(security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')"),
+        new Delete(security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')"),
     ]
 )]
 
@@ -32,22 +33,23 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'name', length: 255)]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?string $Name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['product:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?float $price = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?string $image = null;
 
     #[ORM\ManyToMany(targetEntity: Orders::class, mappedBy: 'products')]
@@ -58,6 +60,8 @@ class Product
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['product:read'])]
+    #[MaxDepth(1)]
     private ?Category $category = null;
 
     #[ORM\ManyToOne(targetEntity: Users::class)]

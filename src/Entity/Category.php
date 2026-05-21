@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -17,11 +18,11 @@ use ApiPlatform\Metadata\Delete;
 
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Put(),
-        new Delete()
+        new Get(normalizationContext: ['groups' => ['category:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['category:read']]),
+        new Post(security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')"),
+        new Put(security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')"),
+        new Delete(security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')"),
     ]
 )]
 
@@ -32,9 +33,11 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['category:read', 'product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['category:read', 'product:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
