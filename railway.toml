@@ -8,7 +8,8 @@ dockerfilePath = "Dockerfile"
 [deploy]
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
-healthcheckPath = "/"
-healthcheckTimeout = 300
-# Use Dockerfile ENTRYPOINT + CMD (entrypoint must run before start-web.sh)
-# Do not override startCommand — it skips DB setup and breaks PORT startup
+# Migrations + cache run here (before the app container must pass healthcheck)
+releaseCommand = "sh /usr/local/bin/release.sh"
+healthcheckPath = "/health.html"
+healthcheckTimeout = 120
+# Use Dockerfile ENTRYPOINT + CMD — do not set a custom startCommand in the dashboard

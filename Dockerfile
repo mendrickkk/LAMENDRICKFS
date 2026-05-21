@@ -66,12 +66,13 @@ RUN composer dump-autoload --optimize --classmap-authoritative --no-dev \
     && chown -R www-data:www-data var public/uploads config/jwt
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/release.sh /usr/local/bin/release.sh
 COPY docker/start-web.sh /usr/local/bin/start-web.sh
 COPY docker/php-fpm-env.conf /usr/local/etc/php-fpm.d/zz-env.conf
 COPY docker/nginx-railway.conf.template /etc/nginx/http.d/default.conf.template
 
-RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh /usr/local/bin/start-web.sh \
-    && chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/start-web.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh /usr/local/bin/release.sh /usr/local/bin/start-web.sh \
+    && chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/release.sh /usr/local/bin/start-web.sh
 
 # Railway: HTTP on $PORT via start-web.sh | Docker Compose: override with command: php-fpm
 EXPOSE 8080
