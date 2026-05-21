@@ -6,6 +6,9 @@ export SYMFONY_DEPRECATIONS_HELPER=disabled
 
 cd /var/www/html
 
+# JWT only — does not touch MySQL data
+sh /usr/local/bin/ensure-jwt-keys.sh
+
 if [ -z "${DATABASE_URL:-}" ]; then
     echo "ERROR: DATABASE_URL is not set."
     exit 1
@@ -35,10 +38,6 @@ until php -r '
     fi
     sleep 2
 done
-
-if [ ! -f config/jwt/private.pem ]; then
-    php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
-fi
 
 # Mark bulk schema migration when tables already exist (avoids "table already exists")
 if php -r '

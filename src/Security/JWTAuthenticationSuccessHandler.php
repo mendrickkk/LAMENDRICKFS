@@ -29,6 +29,7 @@ final class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHand
 
         if (!$user->isCustomer()) {
             return new JsonResponse([
+                'success' => false,
                 'message' => CustomerApiAccess::NON_CUSTOMER_MESSAGE,
             ], 403);
         }
@@ -41,7 +42,14 @@ final class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHand
             ], 403);
         }
 
-        $jwt = $this->jwtManager->create($user);
+        try {
+            $jwt = $this->jwtManager->create($user);
+        } catch (\Throwable) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Unable to issue login token. Server JWT configuration is invalid.',
+            ], 503);
+        }
 
         return new JsonResponse([
             'success' => true,

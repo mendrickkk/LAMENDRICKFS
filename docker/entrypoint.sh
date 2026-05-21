@@ -17,9 +17,7 @@ fi
 
 # Railway: migrations/cache run in release.sh — start HTTP immediately for healthcheck
 if is_web_start "$1" && { [ -n "${RAILWAY_ENVIRONMENT:-}" ] || [ -n "${RAILWAY_SERVICE_NAME:-}" ]; }; then
-    if [ ! -f config/jwt/private.pem ]; then
-        php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
-    fi
+    sh /usr/local/bin/ensure-jwt-keys.sh
     chown -R www-data:www-data var config/jwt public/uploads 2>/dev/null || true
     chmod -R ug+rwX var config/jwt public/uploads 2>/dev/null || true
     echo "Railway PORT=${PORT:-not set} — starting web server."
@@ -57,9 +55,7 @@ until php -r '
     sleep 2
 done
 
-if [ ! -f config/jwt/private.pem ]; then
-    php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
-fi
+sh /usr/local/bin/ensure-jwt-keys.sh
 
 if php -r '
     $url = getenv("DATABASE_URL");
