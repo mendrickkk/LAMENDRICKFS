@@ -43,4 +43,8 @@ php bin/console cache:warmup --env="${APP_ENV:-prod}"
 
 chown -R www-data:www-data var config/jwt public/uploads 2>/dev/null || true
 
-exec docker-php-entrypoint "$@"
+if [ "$1" = "php-fpm" ]; then
+    exec docker-php-entrypoint php-fpm
+fi
+
+exec "$@"
