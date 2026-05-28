@@ -53,10 +53,11 @@ final class OrdersController extends AbstractController
             @ob_flush();
             flush();
 
-            $maxRuntimeSeconds = 25;
-            $sleepMicroseconds = 1_000_000;
+            $maxRuntimeSeconds = 10;
+            $sleepMicroseconds = 500_000;
             $cursor = $lastEventId;
             $startedAt = time();
+            $lastHeartbeatAt = time();
 
             while ((time() - $startedAt) < $maxRuntimeSeconds) {
                 $events = $publisher->readEventsAfter($cursor);
@@ -67,6 +68,11 @@ final class OrdersController extends AbstractController
                     echo 'id: ' . $event['eventId'] . "\n";
                     echo "event: new-order\n";
                     echo 'data: ' . json_encode($event, JSON_UNESCAPED_SLASHES) . "\n\n";
+                }
+
+                if ((time() - $lastHeartbeatAt) >= 5) {
+                    echo ": heartbeat\n\n";
+                    $lastHeartbeatAt = time();
                 }
 
                 @ob_flush();

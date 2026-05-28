@@ -172,6 +172,8 @@
 
             let realtimeConnected = false;
             let fallbackPollTimer = null;
+            let orderEventSource = null;
+            let realtimeReconnectTimer = null;
 
             function getOrderCheckboxes() {
                 return Array.from(document.querySelectorAll('.order-checkbox'));
@@ -326,6 +328,22 @@
                 fallbackPollTimer = null;
             }
 
+            function pauseRealtimeStream() {
+                if (orderEventSource) {
+                    try { orderEventSource.close(); } catch (e) {}
+                    orderEventSource = null;
+                }
+                realtimeConnected = false;
+            }
+
+            function scheduleRealtimeReconnect() {
+                if (realtimeReconnectTimer !== null) return;
+                realtimeReconnectTimer = window.setTimeout(function() {
+                    realtimeReconnectTimer = null;
+                    connectRealtimeStream();
+                }, 400);
+            }
+
             function connectRealtimeStream() {
                 if (!ordersTable || typeof window.EventSource !== 'function') {
                     startFallbackPolling();
@@ -338,7 +356,9 @@
                     return;
                 }
 
+                pauseRealtimeStream();
                 const source = new EventSource(streamUrl, { withCredentials: true });
+                orderEventSource = source;
 
                 source.addEventListener('open', function() {
                     realtimeConnected = true;
@@ -359,6 +379,7 @@
                         realtimeConnected = false;
                     }
                     startFallbackPolling();
+                    scheduleRealtimeReconnect();
                 };
             }
 
@@ -391,6 +412,7 @@
 
             function openModal(modal) {
                 if (!modal) return;
+                pauseRealtimeStream();
                 modal.classList.add('is-open');
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('modal-open');
@@ -402,6 +424,11 @@
                 modal.setAttribute('aria-hidden', 'true');
                 document.body.classList.remove('modal-open');
                 if (body) body.innerHTML = '';
+                // Reconnect only if no modal is open.
+                const anyOpen = document.querySelector('.admin-modal.is-open');
+                if (!anyOpen) {
+                    scheduleRealtimeReconnect();
+                }
             }
 
             const viewModalTitle = document.getElementById('viewOrderModalTitle');
