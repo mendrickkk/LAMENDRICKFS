@@ -8,13 +8,15 @@
 
 {% block admin_content %}
     <!-- Stats -->
-    <div class="stats-grid">
+    <div class="stats-grid"
+         data-admin-metrics-stream-url="{{ path('app_admin_stream_metrics') }}"
+         data-admin-metrics-url="{{ path('app_admin_realtime_metrics') }}">
         <a href="{{ path('app_orders') }}" class="stat-card-link">
             <div class="stat-card stat-card-pink">
                 <div class="stat-card-header">
                     <div class="stat-card-info">
                         <div class="stat-card-label">Total Orders</div>
-                        <div class="stat-card-value">{{ totalOrders|number_format(0, '.', ',') }}</div>
+                        <div class="stat-card-value" id="metricTotalOrders">{{ totalOrders|number_format(0, '.', ',') }}</div>
                     </div>
                     <div class="stat-card-icon stat-card-icon-pink">
                         <i class="fa fa-receipt"></i>
@@ -32,7 +34,7 @@
                 <div class="stat-card-header">
                     <div class="stat-card-info">
                         <div class="stat-card-label">Revenue</div>
-                        <div class="stat-card-value">₱ {{ totalRevenue|number_format(2, '.', ',') }}</div>
+                        <div class="stat-card-value" id="metricRevenue">₱ {{ totalRevenue|number_format(2, '.', ',') }}</div>
                     </div>
                     <div class="stat-card-icon stat-card-icon-green">
                         <i class="fa fa-peso-sign"></i>
@@ -65,7 +67,7 @@
                 <div class="stat-card-header">
                     <div class="stat-card-info">
                         <div class="stat-card-label">Total Users</div>
-                        <div class="stat-card-value">{{ totalUsers|number_format(0, '.', ',') }}</div>
+                        <div class="stat-card-value" id="metricTotalUsers">{{ totalUsers|number_format(0, '.', ',') }}</div>
                     </div>
                     <div class="stat-card-icon stat-card-icon-blue">
                         <i class="fa fa-users"></i>
@@ -82,7 +84,7 @@
                 <div class="stat-card-header">
                     <div class="stat-card-info">
                         <div class="stat-card-label">Total Staff</div>
-                        <div class="stat-card-value">{{ totalStaff|number_format(0, '.', ',') }}</div>
+                        <div class="stat-card-value" id="metricTotalStaff">{{ totalStaff|number_format(0, '.', ',') }}</div>
                     </div>
                     <div class="stat-card-icon stat-card-icon-orange">
                         <i class="fa fa-user-tie"></i>
@@ -100,7 +102,7 @@
                 <div class="stat-card-header">
                     <div class="stat-card-info">
                         <div class="stat-card-label">Low Stock</div>
-                        <div class="stat-card-value">{{ lowStockCount|number_format(0, '.', ',') }}</div>
+                        <div class="stat-card-value" id="metricLowStock">{{ lowStockCount|number_format(0, '.', ',') }}</div>
                     </div>
                     <div class="stat-card-icon stat-card-icon-purple">
                         <i class="fa fa-box"></i>
@@ -117,7 +119,7 @@
                 <div class="stat-card-header">
                     <div class="stat-card-info">
                         <div class="stat-card-label">Categories</div>
-                        <div class="stat-card-value">{{ totalCategories|number_format(0, '.', ',') }}</div>
+                        <div class="stat-card-value" id="metricCategories">{{ totalCategories|number_format(0, '.', ',') }}</div>
                     </div>
                     <div class="stat-card-icon stat-card-icon-blue">
                         <i class="fa fa-tags"></i>
@@ -134,7 +136,7 @@
                 <div class="stat-card-header">
                     <div class="stat-card-info">
                         <div class="stat-card-label">Products</div>
-                        <div class="stat-card-value">{{ totalProducts|number_format(0, '.', ',') }}</div>
+                        <div class="stat-card-value" id="metricProducts">{{ totalProducts|number_format(0, '.', ',') }}</div>
                     </div>
                     <div class="stat-card-icon stat-card-icon-green">
                         <i class="fa fa-box-open"></i>
@@ -151,7 +153,7 @@
                 <div class="stat-card-header">
                     <div class="stat-card-info">
                         <div class="stat-card-label">Stocks</div>
-                        <div class="stat-card-value">{{ totalStocks|number_format(0, '.', ',') }}</div>
+                        <div class="stat-card-value" id="metricStocks">{{ totalStocks|number_format(0, '.', ',') }}</div>
                     </div>
                     <div class="stat-card-icon stat-card-icon-pink">
                         <i class="fa fa-warehouse"></i>
@@ -163,6 +165,129 @@
             </div>
         </a>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const grid = document.querySelector('.stats-grid');
+            if (!grid) return;
+
+            const streamUrl = grid.getAttribute('data-admin-metrics-stream-url');
+            const metricsUrl = grid.getAttribute('data-admin-metrics-url');
+
+            const els = {
+                totalOrders: document.getElementById('metricTotalOrders'),
+                revenue: document.getElementById('metricRevenue'),
+                totalUsers: document.getElementById('metricTotalUsers'),
+                totalStaff: document.getElementById('metricTotalStaff'),
+                lowStock: document.getElementById('metricLowStock'),
+                categories: document.getElementById('metricCategories'),
+                products: document.getElementById('metricProducts'),
+                stocks: document.getElementById('metricStocks'),
+            };
+
+            let source = null;
+            let pollTimer = null;
+            let reconnectTimer = null;
+            let inflight = false;
+
+            function startPollingFallback() {
+                if (pollTimer !== null) return;
+                pollTimer = window.setInterval(fetchAndApplyMetrics, 60000);
+            }
+
+            function stopPollingFallback() {
+                if (pollTimer === null) return;
+                window.clearInterval(pollTimer);
+                pollTimer = null;
+            }
+
+            function closeStream() {
+                if (!source) return;
+                try { source.close(); } catch (e) {}
+                source = null;
+            }
+
+            function scheduleReconnect() {
+                if (reconnectTimer !== null) return;
+                reconnectTimer = window.setTimeout(function () {
+                    reconnectTimer = null;
+                    connectStream();
+                }, 800);
+            }
+
+            function formatInt(value) {
+                const n = Number(value || 0);
+                return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+            }
+
+            function formatMoney(value) {
+                const n = Number(value || 0);
+                return '₱ ' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            function applyMetrics(metrics) {
+                if (!metrics || typeof metrics !== 'object') return;
+
+                if (els.totalOrders) els.totalOrders.textContent = formatInt(metrics.totalOrders);
+                if (els.lowStock) els.lowStock.textContent = formatInt(metrics.lowStockCount);
+                if (els.categories) els.categories.textContent = formatInt(metrics.totalCategories);
+                if (els.products) els.products.textContent = formatInt(metrics.totalProducts);
+                if (els.stocks) els.stocks.textContent = formatInt(metrics.totalStocks);
+
+                // Admin-only cards (may not exist in DOM for staff)
+                if (els.revenue && metrics.totalRevenue !== null && metrics.totalRevenue !== undefined) {
+                    els.revenue.textContent = formatMoney(metrics.totalRevenue);
+                }
+                if (els.totalUsers && metrics.totalUsers !== null && metrics.totalUsers !== undefined) {
+                    els.totalUsers.textContent = formatInt(metrics.totalUsers);
+                }
+                if (els.totalStaff && metrics.totalStaff !== null && metrics.totalStaff !== undefined) {
+                    els.totalStaff.textContent = formatInt(metrics.totalStaff);
+                }
+            }
+
+            async function fetchAndApplyMetrics() {
+                if (!metricsUrl || inflight) return;
+                inflight = true;
+                try {
+                    const res = await fetch(metricsUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    applyMetrics(data && data.metrics ? data.metrics : null);
+                } catch (e) {
+                    // ignore
+                } finally {
+                    inflight = false;
+                }
+            }
+
+            function connectStream() {
+                if (!streamUrl || typeof window.EventSource !== 'function') {
+                    startPollingFallback();
+                    return;
+                }
+
+                closeStream();
+                source = new EventSource(streamUrl, { withCredentials: true });
+
+                source.addEventListener('open', function () {
+                    stopPollingFallback();
+                });
+
+                source.addEventListener('metrics-changed', function () {
+                    fetchAndApplyMetrics();
+                });
+
+                source.onerror = function () {
+                    startPollingFallback();
+                    scheduleReconnect();
+                };
+            }
+
+            connectStream();
+            startPollingFallback();
+        });
+    </script>
 
     <!-- Recent Activity & Orders Row -->
     <div class="row" style="margin-top: 20px;">
