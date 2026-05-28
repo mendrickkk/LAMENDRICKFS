@@ -137,6 +137,8 @@ final class AdminController extends AbstractController
         if ($isAdmin) {
             $totalRevenue = $ordersRepository->createQueryBuilder('o')
                 ->select('SUM(o.total) as total')
+                ->where('LOWER(o.status) = :completed')
+                ->setParameter('completed', 'completed')
                 ->getQuery()
                 ->getSingleScalarResult() ?? 0;
             
@@ -145,7 +147,9 @@ final class AdminController extends AbstractController
             $revenueThisMonth = $ordersRepository->createQueryBuilder('o')
                 ->select('SUM(o.total) as total')
                 ->where('o.createdAt >= :monthStart')
+                ->andWhere('LOWER(o.status) = :completed')
                 ->setParameter('monthStart', $currentMonth)
+                ->setParameter('completed', 'completed')
                 ->getQuery()
                 ->getSingleScalarResult() ?? 0;
             
@@ -156,8 +160,10 @@ final class AdminController extends AbstractController
                 ->select('SUM(o.total) as total')
                 ->where('o.createdAt >= :monthStart')
                 ->andWhere('o.createdAt <= :monthEnd')
+                ->andWhere('LOWER(o.status) = :completed')
                 ->setParameter('monthStart', $lastMonth)
                 ->setParameter('monthEnd', $lastMonthEnd)
+                ->setParameter('completed', 'completed')
                 ->getQuery()
                 ->getSingleScalarResult() ?? 0;
             
