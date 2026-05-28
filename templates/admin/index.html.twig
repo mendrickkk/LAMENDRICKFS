@@ -277,7 +277,20 @@
             }
 
             connectStream();
+            // Always sync immediately so no manual refresh is needed.
+            fetchAndApplyMetrics();
             startPollingFallback();
+
+            // Fix "needs one refresh" when returning via Back button (bfcache) or switching tabs.
+            window.addEventListener('pageshow', function () {
+                connectStream();
+                fetchAndApplyMetrics();
+            });
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible') {
+                    fetchAndApplyMetrics();
+                }
+            });
         });
     </script>
 
