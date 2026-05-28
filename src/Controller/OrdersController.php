@@ -8,11 +8,13 @@ use App\Entity\Orders;
 use App\Enum\OrderStatus;
 use App\Form\OrderStatusType;
 use App\Repository\OrdersRepository;
+use App\Service\OrderRealtimePublisher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -23,9 +25,83 @@ final class OrdersController extends AbstractController
     #[Route(name: 'app_orders', methods: ['GET'])]
     public function index(OrdersRepository $ordersRepository): Response
     {
+        $recentOrders = $ordersRepository->findRecentForAdmin(50);
+        $pendingCount = 0;
+        foreach ($recentOrders as $order) {
+            if (strtolower((string) $order->getStatus()) === 'pending') {
+                ++$pendingCount;
+            }
+        }
+
         return $this->render('orders/index.html.twig', [
-            'recentOrders' => $ordersRepository->findRecentForAdmin(50),
+            'recentOrders' => $recentOrders,
+            'pendingCount' => $pendingCount,
         ]);
+    }
+
+    #[Route('/stream/new', name: 'app_orders_stream_new', methods: ['GET'])]
+    public function streamNewOrders(Request $request, OrderRealtimePublisher $publisher): StreamedResponse
+    {
+        $lastEventId = (int) $request->headers->get('Last-Event-ID', '0');
+
+        $response = new StreamedResponse(function () use ($publisher, $lastEventId): void {
+            @ini_set('output_buffering', 'off');
+            @ini_set('zlib.output_compression', '0');
+            @set_time_limit(0);
+
+            echo ": connected\n\n";
+            @ob_flush();
+            flush();
+
+            $maxRuntimeSeconds = 25;
+            $sleepMicroseconds = 1_000_000;
+            $cursor = $lastEventId;
+            $startedAt = time();
+
+            while ((time() - $startedAt) < $maxRuntimeSeconds) {
+                $events = $publisher->readEventsAfter($cursor);
+
+                foreach ($events as $event) {
+                    $cursor = max($cursor, (int) $event['eventId']);
+
+                    echo 'id: ' . $event['eventId'] . "\n";
+                    echo "event: new-order\n";
+                    echo 'data: ' . json_encode($event, JSON_UNESCAPED_SLASHES) . "\n\n";
+                }
+
+                @ob_flush();
+                flush();
+
+                usleep($sleepMicroseconds);
+            }
+        });
+
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache, no-transform');
+        $response->headers->set('Connection', 'keep-alive');
+        $response->headers->set('X-Accel-Buffering', 'no');
+
+        return $response;
+    }
+
+    #[Route('/realtime/recent', name: 'app_orders_realtime_recent', methods: ['GET'])]
+    public function realtimeRecent(OrdersRepository $ordersRepository): JsonResponse
+    {
+        $orders = $ordersRepository->findRecentForAdmin(20);
+
+        $payload = array_map(
+            static fn (Orders $order): array => [
+                'orderId' => $order->getId(),
+                'orderNumber' => $order->getOrderNumber(),
+                'status' => $order->getStatus(),
+                'total' => (float) $order->getTotal(),
+                'createdAt' => $order->getCreatedAt()?->format(\DateTimeInterface::ATOM),
+                'customerName' => $order->getCustomerName(),
+            ],
+            $orders
+        );
+
+        return new JsonResponse(['orders' => $payload]);
     }
 
     #[Route('/bulk-delete', name: 'app_orders_bulk_delete', methods: ['POST'])]

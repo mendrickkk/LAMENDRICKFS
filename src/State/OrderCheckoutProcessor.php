@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\OrderLine;
 use App\Entity\Orders;
+use App\Service\OrderRealtimePublisher;
 use App\Service\StockService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -22,6 +23,7 @@ final class OrderCheckoutProcessor implements ProcessorInterface
         private readonly EntityManagerInterface $em,
         private readonly Security $security,
         private readonly StockService $stockService,
+        private readonly OrderRealtimePublisher $orderRealtimePublisher,
     ) {
     }
 
@@ -29,7 +31,7 @@ final class OrderCheckoutProcessor implements ProcessorInterface
     {
         assert($data instanceof Orders);
 
-        return $this->em->wrapInTransaction(function () use ($data): Orders {
+        $order = $this->em->wrapInTransaction(function () use ($data): Orders {
             $user = $this->security->getUser();
 
             if (empty(trim((string) $data->getDeliveryAddress()))) {
@@ -74,6 +76,11 @@ final class OrderCheckoutProcessor implements ProcessorInterface
 
             return $data;
         });
+
+        // Publish only after successful transaction/flush.
+        $this->orderRealtimePublisher->publishNewOrder($order);
+
+        return $order;
     }
 
     private function generateOrderNumber(): string

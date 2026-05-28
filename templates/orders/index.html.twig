@@ -29,6 +29,10 @@
             <div class="card-title">
                 <i class="fa fa-receipt"></i>
                 Recent Orders
+                <span id="pendingOrdersBadge" class="status-badge status-pending" style="margin-left: 12px;">
+                    <span class="status-badge-dot"></span>
+                    Pending: <strong id="pendingOrdersCount">{{ pendingCount|default(0) }}</strong>
+                </span>
             </div>
         </div>
         <div class="card-body card-body-no-padding">
@@ -44,7 +48,11 @@
                 </form>
             </div>
             <div class="table-responsive orders-table-wrap">
-                <table class="table orders-table">
+                <table class="table orders-table"
+                       data-orders-stream-url="{{ path('app_orders_stream_new') }}"
+                       data-orders-poll-url="{{ path('app_orders_realtime_recent') }}"
+                       data-order-view-url-template="{{ path('app_orders_show', { id: 999999999 })|replace({'999999999': '__ID__'}) }}"
+                       data-order-edit-url-template="{{ path('app_orders_edit', { id: 999999999 })|replace({'999999999': '__ID__'}) }}">
                     <thead>
                         <tr>
                             <th class="orders-table-checkbox-col">
@@ -58,7 +66,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="ordersTableBody">
                         {% if recentOrders is not empty %}
                             {% for order in recentOrders %}
                                 <tr class="order-row" data-id="{{ order.id }}">
@@ -153,6 +161,17 @@
             const bulkActionsBar = document.getElementById('ordersBulkActions');
             const selectedCountEl = document.getElementById('ordersSelectedCount');
             const bulkDeleteIdsInput = document.getElementById('ordersBulkDeleteIds');
+            const ordersTable = document.querySelector('.orders-table');
+            const ordersTableBody = document.getElementById('ordersTableBody');
+            const pendingOrdersCountEl = document.getElementById('pendingOrdersCount');
+            const seenOrderIds = new Set(
+                Array.from(document.querySelectorAll('.order-row[data-id]'))
+                    .map(function(row) { return Number(row.getAttribute('data-id')); })
+                    .filter(function(id) { return Number.isFinite(id); })
+            );
+
+            let realtimeConnected = false;
+            let fallbackPollTimer = null;
 
             function getOrderCheckboxes() {
                 return Array.from(document.querySelectorAll('.order-checkbox'));
@@ -184,6 +203,165 @@
                 }
             }
 
+            function escapeHtml(value) {
+                return String(value ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function formatAmount(total) {
+                const numeric = Number(total || 0);
+                return '₱' + numeric.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            function formatDate(createdAt) {
+                const date = createdAt ? new Date(createdAt) : new Date();
+                return date.toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' });
+            }
+
+            function normalizeStatus(status) {
+                const safe = String(status || 'pending').trim();
+                return safe === '' ? 'pending' : safe;
+            }
+
+            function toStatusClass(status) {
+                return normalizeStatus(status).toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+            }
+
+            function updatePendingCountUi() {
+                if (!pendingOrdersCountEl) return;
+                const pendingRows = document.querySelectorAll('.order-row .status-badge.status-pending').length;
+                pendingOrdersCountEl.textContent = String(pendingRows);
+            }
+
+            function showNewOrderToast(orderNumber) {
+                const toast = document.createElement('div');
+                toast.className = 'flash-messages';
+                toast.innerHTML = '<div class="flash-message flash-success">New order received: #' + escapeHtml(orderNumber) + '</div>';
+                document.body.appendChild(toast);
+                setTimeout(function() {
+                    toast.remove();
+                }, 3500);
+            }
+
+            function createOrderRowHtml(order) {
+                const orderId = Number(order.orderId);
+                const orderNumber = escapeHtml(order.orderNumber || '');
+                const customerName = escapeHtml(order.customerName || 'Unknown customer');
+                const status = normalizeStatus(order.status);
+                const statusClass = toStatusClass(status);
+                const viewUrlTemplate = ordersTable ? (ordersTable.getAttribute('data-order-view-url-template') || '/orders/__ID__') : '/orders/__ID__';
+                const editUrlTemplate = ordersTable ? (ordersTable.getAttribute('data-order-edit-url-template') || '/orders/__ID__/edit') : '/orders/__ID__/edit';
+                const viewUrl = viewUrlTemplate.replace('__ID__', String(orderId));
+                const editUrl = editUrlTemplate.replace('__ID__', String(orderId));
+
+                return '' +
+                    '<tr class="order-row" data-id="' + orderId + '">' +
+                        '<td class="orders-table-checkbox-col">' +
+                            '<input type="checkbox" class="order-checkbox" value="' + orderId + '" aria-label="Select order ' + orderNumber + '">' +
+                        '</td>' +
+                        '<td style="font-weight: 600; color: #ec4899; font-family: \'Courier New\', monospace;">#' + orderNumber + '</td>' +
+                        '<td style="font-weight: 500; color: #111827;">' + customerName + '</td>' +
+                        '<td><span class="status-badge status-' + statusClass + '"><span class="status-badge-dot"></span>' + escapeHtml(status) + '</span></td>' +
+                        '<td style="font-weight: 600; color: #059669; font-family: \'Courier New\', monospace;">' + formatAmount(order.total) + '</td>' +
+                        '<td style="color: #6b7280; font-size: 13px;">' + escapeHtml(formatDate(order.createdAt)) + '</td>' +
+                        '<td>' +
+                            '<div class="product-actions-cell">' +
+                                '<a href="' + escapeHtml(viewUrl) + '" class="card-action-btn product-action-btn" data-view-order-modal="true" data-order-id="' + orderId + '" data-order-number="' + orderNumber + '" title="View order"><i class="fa fa-eye"></i></a>' +
+                                '<a href="' + escapeHtml(editUrl) + '" class="card-action-btn product-action-btn product-action-btn-edit" data-edit-order-modal="true" data-order-id="' + orderId + '" data-order-number="' + orderNumber + '" title="Update status"><i class="fa fa-pencil"></i></a>' +
+                            '</div>' +
+                        '</td>' +
+                    '</tr>';
+            }
+
+            function prependOrderRow(order, showToast) {
+                if (!ordersTableBody) return;
+                const orderId = Number(order.orderId);
+                if (!Number.isFinite(orderId) || seenOrderIds.has(orderId)) {
+                    return;
+                }
+
+                const emptyRow = ordersTableBody.querySelector('tr td[colspan="7"]');
+                if (emptyRow) {
+                    emptyRow.parentElement.remove();
+                }
+
+                ordersTableBody.insertAdjacentHTML('afterbegin', createOrderRowHtml(order));
+                seenOrderIds.add(orderId);
+                updateBulkActionsBar();
+                updatePendingCountUi();
+                if (showToast) {
+                    showNewOrderToast(order.orderNumber);
+                }
+            }
+
+            async function pollRecentOrders() {
+                if (!ordersTable) return;
+                const pollUrl = ordersTable.getAttribute('data-orders-poll-url');
+                if (!pollUrl) return;
+                try {
+                    const res = await fetch(pollUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    const orders = Array.isArray(data.orders) ? data.orders : [];
+                    orders
+                        .sort(function(a, b) { return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); })
+                        .forEach(function(order) { prependOrderRow(order, false); });
+                } catch (err) {
+                    console.warn('orders poll failed', err);
+                }
+            }
+
+            function startFallbackPolling() {
+                if (fallbackPollTimer !== null) return;
+                fallbackPollTimer = window.setInterval(pollRecentOrders, 45000);
+            }
+
+            function stopFallbackPolling() {
+                if (fallbackPollTimer === null) return;
+                window.clearInterval(fallbackPollTimer);
+                fallbackPollTimer = null;
+            }
+
+            function connectRealtimeStream() {
+                if (!ordersTable || typeof window.EventSource !== 'function') {
+                    startFallbackPolling();
+                    return;
+                }
+
+                const streamUrl = ordersTable.getAttribute('data-orders-stream-url');
+                if (!streamUrl) {
+                    startFallbackPolling();
+                    return;
+                }
+
+                const source = new EventSource(streamUrl, { withCredentials: true });
+
+                source.addEventListener('open', function() {
+                    realtimeConnected = true;
+                    stopFallbackPolling();
+                });
+
+                source.addEventListener('new-order', function(event) {
+                    try {
+                        const payload = JSON.parse(event.data);
+                        prependOrderRow(payload, true);
+                    } catch (err) {
+                        console.error('Invalid realtime order payload', err);
+                    }
+                });
+
+                source.onerror = function() {
+                    if (realtimeConnected) {
+                        realtimeConnected = false;
+                    }
+                    startFallbackPolling();
+                };
+            }
+
             if (selectAllOrders) {
                 selectAllOrders.addEventListener('change', function() {
                     const checked = selectAllOrders.checked;
@@ -198,14 +376,18 @@
                 cb.addEventListener('change', updateBulkActionsBar);
             });
 
+            document.addEventListener('change', function(ev) {
+                if (ev.target && ev.target.matches('.order-checkbox')) {
+                    updateBulkActionsBar();
+                }
+            });
+
             const viewModal = document.getElementById('viewOrderModal');
             const viewModalBody = document.getElementById('viewOrderModalBody');
-            const viewLinks = document.querySelectorAll('a[data-view-order-modal="true"]');
 
             const editModal = document.getElementById('editOrderModal');
             const editModalBody = document.getElementById('editOrderModalBody');
             const editModalTitle = document.getElementById('editOrderModalTitle');
-            const editLinks = document.querySelectorAll('a[data-edit-order-modal="true"]');
 
             function openModal(modal) {
                 if (!modal) return;
@@ -265,26 +447,27 @@
                 await loadOrderEdit(link.getAttribute('href'), link.getAttribute('data-order-number'));
             }
 
-            viewLinks.forEach(link => {
-                link.addEventListener('click', async function(ev) {
+            document.addEventListener('click', async function(ev) {
+                const viewLink = ev.target.closest('a[data-view-order-modal="true"]');
+                if (viewLink) {
                     ev.preventDefault();
                     try {
-                        await loadOrderView(this.getAttribute('href'), this.getAttribute('data-order-number'));
+                        await loadOrderView(viewLink.getAttribute('href'), viewLink.getAttribute('data-order-number'));
                     } catch (err) {
                         console.error(err);
                     }
-                });
-            });
+                    return;
+                }
 
-            editLinks.forEach(link => {
-                link.addEventListener('click', async function(ev) {
+                const editLink = ev.target.closest('a[data-edit-order-modal="true"]');
+                if (editLink) {
                     ev.preventDefault();
                     try {
-                        await loadOrderEdit(this.getAttribute('href'), this.getAttribute('data-order-number'));
+                        await loadOrderEdit(editLink.getAttribute('href'), editLink.getAttribute('data-order-number'));
                     } catch (err) {
                         console.error(err);
                     }
-                });
+                }
             });
 
             document.addEventListener('click', async function(ev) {
@@ -366,6 +549,9 @@
                     formEl.submit();
                 }
             });
+
+            connectRealtimeStream();
+            updatePendingCountUi();
         });
     </script>
 {% endblock %}
