@@ -56,8 +56,8 @@ final class AdminController extends AbstractController
             @ob_flush();
             flush();
 
-            $maxRuntimeSeconds = 10;
-            $sleepMicroseconds = 500_000;
+            $maxRuntimeSeconds = 60;
+            $sleepMicroseconds = 1_000_000;
             $cursor = $lastEventId;
             $startedAt = time();
             $lastHeartbeatAt = time();

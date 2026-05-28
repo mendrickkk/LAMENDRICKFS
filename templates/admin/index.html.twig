@@ -187,7 +187,6 @@
 
             let source = null;
             let pollTimer = null;
-            let reconnectTimer = null;
             let inflight = false;
 
             function startPollingFallback() {
@@ -205,14 +204,6 @@
                 if (!source) return;
                 try { source.close(); } catch (e) {}
                 source = null;
-            }
-
-            function scheduleReconnect() {
-                if (reconnectTimer !== null) return;
-                reconnectTimer = window.setTimeout(function () {
-                    reconnectTimer = null;
-                    connectStream();
-                }, 800);
             }
 
             function formatInt(value) {
@@ -267,6 +258,7 @@
                     return;
                 }
 
+                // Keep a single long-lived connection; EventSource will auto-reconnect if it drops.
                 closeStream();
                 source = new EventSource(streamUrl, { withCredentials: true });
 
@@ -280,7 +272,7 @@
 
                 source.onerror = function () {
                     startPollingFallback();
-                    scheduleReconnect();
+                    // No manual reconnect loop here — EventSource handles it.
                 };
             }
 
